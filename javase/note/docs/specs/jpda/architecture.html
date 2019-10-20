@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Structure Overview</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Structure Overview</h1>
+</header>
+<br />
+<div class="centered">
+<h1 id="structure-overview">Structure Overview</h1>
+</div>
+<p>The Java Platform Debugger Architecture is structured as follows:</p>
+<pre class="codeblock">
+           Components                          Debugger Interfaces
+
+                /    |--------------|
+               /     |     <a href="#vm">VM</a>       |
+ <a href=
+"#debuggee">debuggee</a> ----(      |--------------|  &lt;------- <a href="#jvmti">JVM TI</a> - Java VM Tool Interface
+               \     |   <a href="#back-end">back-end</a>   |
+                \    |--------------|
+                /           |
+ <a href=
+"#channel">comm channel</a> -(            |  &lt;--------------- <a href="#jdwp">JDWP</a> - Java Debug Wire Protocol
+                \           |
+                     |--------------|
+                     | <a href="#front-end">front-end</a>    |
+                     |--------------|  &lt;------- <a href=
+"#jdi">JDI</a> - Java Debug Interface
+                     |      <a href="#ui">UI</a>      |
+                     |--------------|
+
+</pre>
+<h2 id="what-is-the-java-platform-debugger-architecture-jpda">What is the Java Platform Debugger Architecture (JPDA)?</h2>
+<p>JPDA is a multi-tiered debugging architecture that allows tools developers to easily create debugger applications which run portably across platforms, <a href="#vm">virtual machine (VM)</a> implementations and JDK versions.</p>
+<p>JPDA consists of three layers:</p>
+<dl>
+<dt>
+<a href="#jvmti">JVM TI</a> - Java VM Tool Interface
+</dt>
+<dd>
+Defines the debugging services a VM provides.
+</dd>
+<dt>
+<a href="#jdwp">JDWP</a> - Java Debug Wire Protocol
+</dt>
+<dd>
+Defines the communication between <a href="#debuggee">debuggee</a> and debugger processes.
+</dd>
+<dt>
+<a href="#jdi">JDI</a> - Java Debug Interface
+</dt>
+<dd>
+Defines a high-level Java language interface which tool developers can easily use to write remote debugger applications.
+</dd>
+</dl>
+<h2 id="reference-implementation">Reference implementation</h2>
+<p>In addition to the specification of these interfaces, Oracle also provides a reference implementation, which consists of:</p>
+<ul>
+<li>JVM TI implementations on multiple VMs (see <a href="https://docs.oracle.com/javase/specs/">VM documentation</a>).</li>
+<li>A <a href="#back-end">back-end</a> which uses JVM TI to implement the debuggee side of JDWP.</li>
+<li>A <a href="#front-end">front-end</a> which uses the debugger side of JDWP to implement JDI.</li>
+<li>Two simple example debugger applications which are built on JDI.</li>
+</ul>
+<p>This provides a layered implementation in which any layer may be substituted.</p>
+<h2 id="using-jpda">Using JPDA</h2>
+<p>A debugger developer may hook into JPDA at any layer. Since the JDI is the highest level and easiest to use we encourage developers to use this interface. Suppose a company develops a debugger using JDI. They can use it with the reference implementation and it will automatically work with the VMs and platforms that Oracle supports. It can also work, for example, with the reference implementation front-end and a debuggee running another company's VM that implements JDWP (which might use or by-pass JVM TI).</p>
+<p>Some debuggers are built on top of lower layers, JDWP (for example if the front-end is not written in the Java language) or JVM TI (for specialized debuggers which need low-level functionality).</p>
+<hr />
+<div class="centered">
+<h2 id="components">Components</h2>
+</div>
+<h2 id="debuggee">debuggee</h2>
+<p>The debuggee is the process being debugged, it consists of the application being debugged (not shown), the <a href="#vm">VM</a> running the application and the <a href="#back-end">back-end</a> of the debugger.</p>
+<h2 id="java-virtual-machine-vm"><a id="vm"/>Java Virtual Machine (VM)</h2>
+<p>This refers to the VM running the application being debugged.</p>
+<p>The debugger architecture is being designed for use in wide spectrum of VM implementations.</p>
+<p>The VM implements the Java Virtual Machine Tool Interface (<a href="#jvmti">JVM TI</a>).</p>
+<h2 id="back-end">back-end</h2>
+<p>The back-end of the debugger is responsible for communicating requests from the debugger <a href="#front-end">front-end</a> to the debuggee <a href="#vm">VM</a> and for communicating the response to these requests (including desired events) to the front-end. The back-end communicates with the front-end over a <a href="#channel">communications channel</a> using the Java Debug Wire Protocol (<a href="#jdwp">JDWP</a>). The back-end communicates with the debuggee VM using the Java Virtual Machine Tool Interface (<a href="#jvmti">JVM TI</a>).</p>
+<p>It is clear from experience that debugger support code, running on the debuggee and written in Java, contends with the debuggee in ways that cause hangs and other undesired behavior. Thus, the back-end is native code. This, in turn, implies that the <a href="#jvmti">JVM TI</a> be a pure native interface.</p>
+<h2 id="communications-channel"><a id="channel"/>communications channel</h2>
+<p>The communications channel is the link between the <a href="#front-end">front</a> and <a href="#back-end">back</a> ends of the debugger. It can be thought of as consisting of two mechanisms:</p>
+<ol type="1">
+<li><p>A connector. A connector is a JDI object that is the means by which a connection is established between the front and back-ends.</p>
+<p>JPDA defines three types of connectors:</p>
+<ul>
+<li>listening connectors: The front-end listens for an incoming connection from the back-end</li>
+<li>attaching connectors: The front-end attaches to an already running back-end.</li>
+<li>launching connectors: The front-end actually launches the java process that will run the debuggee code and the back-end.</li>
+</ul></li>
+<li><p>A transport. A transport is the underlying mechanism used to move bits between the front-end and the back-end.<br />
+<br />
+The transport mechanism used is unspecified; possible mechanisms include: sockets, serial lines, and shared memory. However, the format and semantics of the serialized bit-stream flowing over the channel is specified by the Java Debug Wire Protocol (JDWP).</p></li>
+</ol>
+<p>JPDA includes service provider interfaces to allow the development and deployment of connector and transport implementations. These service provider interfaces allow debugger and other tool vendors to develop new connector implementations and provide addition transport mechanisms over and beyond the socket and shared memory transport provided by Oracle. The service provider interfaces in JDI are specified in the <a href="../../api/jdk.jdi/com/sun/jdi/connect/spi/package-summary.html">com.sun.jdi.connect.spi</a> package.</p>
+<p>In addition to the service provider interfaces in JDI, JPDA also defines a transport library interface called the <a href="../jdwp/jdwp-transport.html">Java Debug Wire Protocol Transport Interface</a>. A transport library is loaded by the JDWP agent in the target VM and is used to establish a connection to the debugger and to transport JDWP packets between the debugger and the VM.</p>
+<p>See <a href="jpda_spis.html">Java Platform Debugger Architecture - Service Provider Interfaces</a> for more information on using these SPIs.</p>
+<h2 id="front-end">front-end</h2>
+<p>The debugger front-end implements the high-level Java Debug Interface (<a href="#jdi">JDI</a>). The front-end uses the information from the low-level Java Debug Wire Protocol (<a href="#jdwp">JDWP</a>).</p>
+<h2 id="user-interface-ui"><a id="ui"/>User Interface (UI)</h2>
+<p>The user interface to the debugger is not specified; the intent is that tool vendors will provide value added implementations. We provide an example simple graphical user interface (GUI) which serves as test harness and as a starting point for the development of more complex GUIs. A version of JDB is also available as an example.</p>
+<p>The example UIs are clients of the Java Debug Interface (<a href="#jdi">JDI</a>).</p>
+<br />
+<div class="centered">
+<hr />
+<h2 id="debugger-interfaces"><a id="interfaces"/>Debugger Interfaces</h2>
+</div>
+<h2 id="java-virtual-machine-tool-interface-jvm-ti"><a id="jvmti"/>Java Virtual Machine Tool Interface (JVM TI)</h2>
+<p>A native interface implemented by the <a href="#vm">VM</a>.</p>
+<p>Defines the services a VM must provide for debugging. Includes requests for information (for example, current stack frame), actions (for example, set a breakpoint), and notification (for example, when a breakpoint has been hit). A debugger may make use of VM information other than this (for example, Java Native Interface (JNI)), but this is the source of all debugger specific information.</p>
+<p>Specifying the VM Interface allows any VM implementor to plug easily into the debugging architecture. It also allows alternate communication channel implementations. VM implementations which do not adhere to this interface can still provide access via the Java Debug Wire Protocol (<a href="#jdwp">JDWP</a>).</p>
+<p>See also:</p>
+<p><a href="../jvmti.html">JVM TI Specification</a></p>
+<p><br /></p>
+<h2 id="java-debug-wire-protocol-jdwp"><a id="jdwp"/>Java Debug Wire Protocol (JDWP)</h2>
+<p>Defines the format of information and requests transferred between the <a href="#debuggee">debuggee</a> process and the debugger <a href="#front-end">front-end</a>. It does not define the transport mechanism (socket, serial line, shared memory, ...).</p>
+<p>The specification of the protocol allows the debuggee and debugger front-end to run under separate VM implementations and/or on separate platforms. It also allows the front-end to be written in a language other than Java, or the debuggee to be non-native (e.g. Java).</p>
+<p>Information and requests are roughly at the level of the Java Virtual Machine Debug Interface (<a href="#jvmti">JVM TI</a>), but will include additional information and requests necessitated by bandwidth issues, examples include information filtering and batching.</p>
+<p>See also:</p>
+<p><a href="../jdwp/jdwp-spec.html">JDWP Specification</a></p>
+<p><a href="../jdwp/jdwp-transport.html">JDWP Transport Specification</a></p>
+<p><br /></p>
+<h2 id="java-debug-interface-jdi"><a id="jdi"/>Java Debug Interface (JDI)</h2>
+<p>A 100% Java interface implemented by the <a href="#front-end">front-end</a>.</p>
+<p>Defines information and requests at a user code level.</p>
+<p>While debugger implementors could  directly use the Java Debug Wire Protocol (<a href="#jdwp">JDWP</a>) or Java Virtual Machine Tool Interface (<a href="#jvmti">JVM TI</a>), this interface greatly facilitates the integration of debugging capabilities into development environments. We recommend the JDI layer for all debugger development.</p>
+<p>See also:</p>
+<p><a href="../../api/jdk.jdi-summary.html">JDI Specification</a></p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2018, Oracle and/or its affiliates. All rights reserved.</em></p>
+</body>
+</html>

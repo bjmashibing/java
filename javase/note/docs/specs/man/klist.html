@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The klist Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The klist Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>klist - display the entries in the local credentials cache and key table</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>klist</code> [<code>-c</code> [<code>-f</code>] [<code>-e</code>] [<code>-a</code> [<code>-n</code>]]] [<code>-k</code> [<code>-t</code>] [<code>-K</code>]] [<em>name</em>] [<code>-help</code>]</p>
+<h2 id="description">Description</h2>
+<p>The <code>klist</code> tool displays the entries in the local credentials cache and key table. After you modify the credentials cache with the <code>kinit</code> tool or modify the keytab with the <code>ktab</code> tool, the only way to verify the changes is to view the contents of the credentials cache or keytab using the <code>klist</code> tool. The <code>klist</code> tool doesn't change the Kerberos database.</p>
+<h2 id="commands">Commands</h2>
+<dl>
+<dt><code>-c</code></dt>
+<dd><p>Specifies that the credential cache is to be listed.</p>
+<p>The following are the options for credential cache entries:</p>
+<dl>
+<dt><code>-f</code></dt>
+<dd>Show credential flags.
+</dd>
+<dt><code>-e</code></dt>
+<dd>Show the encryption type.
+</dd>
+<dt><code>-a</code></dt>
+<dd>Show addresses.
+</dd>
+<dt><code>-n</code></dt>
+<dd>If the <code>-a</code> option is specified, don't reverse resolve addresses.
+</dd>
+</dl>
+</dd>
+<dt><code>-k</code></dt>
+<dd><p>Specifies that key tab is to be listed.</p>
+<p>List the keytab entries. The following are the options for keytab entries:</p>
+<dl>
+<dt><code>-t</code></dt>
+<dd>Show keytab entry timestamps.
+</dd>
+<dt><code>-K</code></dt>
+<dd>Show keytab entry DES keys.
+</dd>
+<dt><code>-e</code></dt>
+<dd>Shows keytab entry key type.
+</dd>
+</dl>
+</dd>
+<dt><em>name</em></dt>
+<dd>Specifies the credential cache name or the keytab name. File-based cache or keytab's prefix is <code>FILE:</code>. If the name isn't specified, the <code>klist</code> tool uses default values for the cache name and keytab. The <code>kinit</code> documentation lists these default values.
+</dd>
+<dt><code>-help</code></dt>
+<dd>Displays instructions.
+</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>List entries in the keytable specified including keytab entry timestamps and DES keys:</p>
+<blockquote>
+<p><code>klist -k -t -K FILE:\temp\mykrb5cc</code></p>
+</blockquote>
+<p>List entries in the credentials cache specified including credentials flag and address list:</p>
+<blockquote>
+<p><code>klist -c -f FILE:\temp\mykrb5cc</code></p>
+</blockquote>
+</body>
+</html>

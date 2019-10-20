@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: A - Exceptions In RMI</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="protocol.html">PREV</a> | <a href="properties.html">NEXT</a>
+<h1 id="a-exceptions-in-rmi">A Exceptions In RMI</h1>
+<ul>
+<li><a href="#a.1-exceptions-during-remote-object-export">Exceptions During Remote Object Export</a></li>
+<li><a href="#a.2-exceptions-during-rmi-call">Exceptions During RMI Call</a></li>
+<li><a href="#a.3-exceptions-or-errors-during-return">Exceptions or Errors During Return</a></li>
+<li><a href="#a.4-naming-exceptions">Naming Exceptions</a></li>
+<li><a href="#a.5-activation-exceptions">Activation Exceptions</a></li>
+<li><a href="#a.6-other-exceptions">Other Exceptions</a></li>
+</ul>
+<hr />
+<h2 id="a.1-exceptions-during-remote-object-export">A.1 Exceptions During Remote Object Export</h2>
+<p>When a remote object class is created that extends <code>UnicastRemoteObject</code>, the object is exported, meaning it can receive calls from external Java virtual machines and can be passed in an RMI call as either a parameter or return value. An object can either be exported on an anonymous port or on a specified port. For objects not extended from <code>UnicastRemoteObject</code>, the <code>java.rmi.server.UnicastRemoteObject.exportObject</code> method is used to explicitly export the object.</p>
+<h3 id="java.rmi.stubnotfoundexception"><code>java.rmi.StubNotFoundException</code></h3>
+<p>Class of stub not found.</p>
+<p>Name collision with class of same name as stub causes one of these errors:</p>
+<ul>
+<li>Stub can't be instantiated</li>
+<li>Stub not of correct class</li>
+</ul>
+<p>Bad URL due to wrong codebase.</p>
+<p>Stub not of correct class.</p>
+<h3 id="java.rmi.server.skeletonnotfoundexception"><code>java.rmi.server.SkeletonNotFoundException</code></h3>
+<p><em>Note: this exception is deprecated as of Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>Class of skeleton not found.</p>
+<p>Name collision with class of same name as skeleton causes one of these errors:</p>
+<ul>
+<li>Skeleton can't be instantiated</li>
+<li>Skeleton not of correct class</li>
+</ul>
+<p>Bad URL due to wrong codebase.</p>
+<p>Skeleton not of correct class.</p>
+<h3 id="java.rmi.server.exportexception"><code>java.rmi.server.ExportException</code></h3>
+<p>The port is in use by another VM.</p>
+<h2 id="a.2-exceptions-during-rmi-call">A.2 Exceptions During RMI Call</h2>
+<h3 id="java.rmi.unknownhostexception"><code>java.rmi.UnknownHostException</code></h3>
+<p>Unknown host.</p>
+<h3 id="java.rmi.connectexception"><code>java.rmi.ConnectException</code></h3>
+<p>Connection refused to host.</p>
+<h3 id="java.rmi.connectioexception"><code>java.rmi.ConnectIOException</code></h3>
+<p>I/O error creating connection.</p>
+<h3 id="java.rmi.marshalexception"><code>java.rmi.MarshalException</code></h3>
+<p>I/O error marshaling transport header, marshaling call header, or marshaling arguments.</p>
+<h3 id="java.rmi.nosuchobjectexception"><code>java.rmi.NoSuchObjectException</code></h3>
+<p>Attempt to invoke a method on an object that is no longer available.</p>
+<h3 id="java.rmi.stubnotfoundexception-1"><code>java.rmi.StubNotFoundException</code></h3>
+<p>Remote object not exported.</p>
+<h3 id="java.rmi.activation.activatefailedexception"><code>java.rmi.activation.ActivateFailedException</code></h3>
+<p>Thrown by RMI runtime when activation fails during a remote call to an activatable object</p>
+<h2 id="a.3-exceptions-or-errors-during-return">A.3 Exceptions or Errors During Return</h2>
+<h3 id="java.rmi.unmarshalexception"><code>java.rmi.UnmarshalException</code></h3>
+<p>Corrupted stream leads to either an I/O or protocol error when:</p>
+<ul>
+<li>Marshaling return header</li>
+<li>Checking return type</li>
+<li>Checking return code</li>
+<li>Unmarshaling return</li>
+</ul>
+<p>Return value class not found.</p>
+<h3 id="java.rmi.unexpectedexception"><code>java.rmi.UnexpectedException</code></h3>
+<p>An exception not mentioned in the method signature occurred (excluding runtime exceptions). The <code>UnexpectedException</code> exception object contains the underlying exception that was thrown by the server.</p>
+<h3 id="java.rmi.servererror"><code>java.rmi.ServerError</code></h3>
+<p>Any error that occurs while the server is executing a remote method. The <code>ServerError</code> exception object contains the underlying error that was thrown by the server.</p>
+<h3 id="java.rmi.serverexception"><code>java.rmi.ServerException</code></h3>
+<p>This exception is thrown as a result of a remote method invocation when a <code>RemoteException</code> is thrown while processing the invocation on the server, either while unmarshalling the arguments or executing the remote method itself. For examples, see <a href="#a.3.1-possible-causes-of-java.rmi.serverexception">Section A.3.1, &quot;Possible Causes of java.rmi.ServerException&quot;</a>.</p>
+<h3 id="java.rmi.serverruntimeexception"><code>java.rmi.ServerRuntimeException</code></h3>
+<p><em>Note: this exception is deprecated as of Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>This exception is not thrown by servers running Java 2 SDK, Standard Edition, v1.2-compatible versions. A <code>RuntimeException</code> is propagated to clients intact.</p>
+<h3 id="a.3.1-possible-causes-of-java.rmi.serverexception">A.3.1 Possible Causes of <code>java.rmi.ServerException</code></h3>
+<p>These are some of the underlying exceptions which can occur on the server when the server is itself executing a remote method invocation. These exceptions are wrapped in a <code>java.rmi.ServerException</code>; that is the <code>java.rmi.ServerException</code> contains the original exception for the client to extract. These exceptions are wrapped by <code>ServerException</code> so that the client will know that its own remote method invocation on the server did not fail, but that a secondary remote method invocation made by the server failed.</p>
+<h4 id="java.rmi.server.skeletonmismatchexception"><code>java.rmi.server.SkeletonMismatchException</code></h4>
+<p><em>Note: this exception is deprecated as of the Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>Hash mismatch of stub and skeleton.</p>
+<h4 id="java.rmi.unmarshalexception-1"><code>java.rmi.UnmarshalException</code></h4>
+<ul>
+<li>I/O error unmarshaling call header.</li>
+<li>I/O error unmarshaling arguments.</li>
+<li>Invalid method number or method hash.</li>
+</ul>
+<h4 id="java.rmi.marshalexception-1"><code>java.rmi.MarshalException</code></h4>
+<p>Protocol error marshaling return.</p>
+<h4 id="java.rmi.remoteexception"><code>java.rmi.RemoteException</code></h4>
+<p>A <code>RemoteException</code> occurring as a result of a remote invocation by the server.</p>
+<h2 id="a.4-naming-exceptions">A.4 Naming Exceptions</h2>
+<p>The following table lists the exceptions specified in methods of the <code>java.rmi.Naming</code> class and the <code>java.rmi.registry.Registry</code> interface.</p>
+<h3 id="java.rmi.accessexception"><code>java.rmi.AccessException</code></h3>
+<p>Operation disallowed. The registry restricts bind, rebind, and unbind to the same host. The lookup operation can originate from any host.</p>
+<h3 id="java.rmi.alreadyboundexception"><code>java.rmi.AlreadyBoundException</code></h3>
+<p>Attempt to bind a name that is already bound.</p>
+<h3 id="java.rmi.notboundexception"><code>java.rmi.NotBoundException</code></h3>
+<p>Attempt to look up a name that is not bound.</p>
+<h3 id="java.rmi.unknownhostexception-1"><code>java.rmi.UnknownHostException</code></h3>
+<p>Attempt to contact a registry on an unknown host.</p>
+<h2 id="a.5-activation-exceptions">A.5 Activation Exceptions</h2>
+<p>The following table lists the exceptions that can be thrown in activities involving activatable objects. The activation API is in the package java.rmi.activation.</p>
+<h3 id="java.rmi.activation.activatefailedexception-1"><code>java.rmi.activation.ActivateFailedException</code></h3>
+<p>Thrown by RMI runtime when activation fails during a remote call to an activatable object.</p>
+<h3 id="java.rmi.activation.activationexception"><code>java.rmi.activation.ActivationException</code></h3>
+<p>General exception class used by the activation interfaces and classes.</p>
+<h3 id="java.rmi.activation.unknowngroupexception"><code>java.rmi.activation.UnknownGroupException</code></h3>
+<p>Thrown by methods of the activation classes and interfaces when the <code>ActivationGroupID</code> parameter or <code>ActivationGroupID</code> in an <code>ActivationGroupDesc</code> parameter is invalid.</p>
+<h3 id="java.rmi.activation.unknownobjectexception"><code>java.rmi.activation.UnknownObjectException</code></h3>
+<p>Thrown by methods of the activation classes and interfaces when the <code>ActivationID</code> parameter is invalid.</p>
+<h2 id="a.6-other-exceptions">A.6 Other Exceptions</h2>
+<h3 id="java.rmi.rmisecurityexception"><code>java.rmi.RMISecurityException</code></h3>
+<p><em>Note: this exception is deprecated as of the Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>A security exception that is thrown by the <code>RMISecurityManager</code>.</p>
+<h3 id="java.rmi.server.servercloneexception"><code>java.rmi.server.ServerCloneException</code></h3>
+<p>Clone failed.</p>
+<h3 id="java.rmi.server.servernotactiveexception"><code>java.rmi.server.ServerNotActiveException</code></h3>
+<p>Attempt to get the client host via the <code>RemoteServer.getClientHost</code> method when the remote server is not executing in a remote method.</p>
+<h3 id="java.rmi.server.socketsecurityexception"><code>java.rmi.server.SocketSecurityException</code></h3>
+<p>Attempt to export object on an illegal port.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="protocol.html">PREV</a> | <a href="properties.html">NEXT</a>
+</body>
+</html>

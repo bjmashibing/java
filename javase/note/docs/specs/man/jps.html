@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jps Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jps Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jps - list the instrumented JVMs on the target system</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> This command is experimental??and unsupported.</p>
+<p><code>jps</code> [<code>-q</code>] [<code>-mlvV</code>] [<em>hostid</em>]</p>
+<p><code>jps</code> [<code>-help</code>]</p>
+<h2 id="options">Options</h2>
+<dl>
+<dt><code>-q</code></dt>
+<dd>Suppresses the output of the class name, JAR file name, and arguments passed to the <code>main</code> method, producing a list of only local JVM identifiers.
+</dd>
+<dt><code>-mlvV</code></dt>
+<dd><p>You can specify any combination of these options.</p>
+<ul>
+<li><p><code>-m</code> displays the arguments passed to the <code>main</code> method. The output may be <code>null</code> for embedded JVMs.</p></li>
+<li><p><code>-l</code> displays the full package name for the application's <code>main</code> class or the full path name to the application's JAR file.</p></li>
+<li><p><code>-v</code> displays the arguments passed to the JVM.</p></li>
+<li><p><code>-V</code> suppresses the output of the class name, JAR file name, and arguments passed to the <code>main</code> method, producing a list of only local JVM identifiers.</p></li>
+</ul>
+</dd>
+<dt><em>hostid</em></dt>
+<dd>The identifier of the host for which the process report should be generated. The <code>hostid</code> can include optional components that indicate the communications protocol, port number, and other implementation specific data. See <a href="#host-identifier">Host Identifier</a>.
+</dd>
+<dt><code>-help</code></dt>
+<dd>Displays the help message for the <code>jps</code> command.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jps</code> command lists the instrumented Java HotSpot VMs on the target system. The command is limited to reporting information on JVMs for which it has the access permissions.</p>
+<p><strong>Note:</strong></p>
+<p>JDK 10 added support for using the Attach API when attaching to Java processes running in a separate docker process. However, the <code>jps</code> tool cannot see JVM processes running in a separate docker instance. If you are trying to connect a Linux host with a Virtual Machine within a docker container, you must use tools such as <code>ps</code> to look up the PID of the JVM and then specify the PID on the command line of the tools that accept the PID.</p>
+<p>If the <code>jps</code> command is run without specifying a <code>hostid</code>, then it searches for instrumented JVMs on the local host. If started with a <code>hostid</code>, then it searches for JVMs on the indicated host, using the specified protocol and port. A <code>jstatd</code> process is assumed to be running on the target host.</p>
+<p>The <code>jps</code> command reports the local JVM identifier, or <code>lvmid</code>, for each instrumented JVM found on the target system. The <code>lvmid</code> is typically, but not necessarily, the operating system's process identifier for the JVM process. With no options, the <code>jps</code> command lists each Java application's <code>lvmid</code> followed by the short form of the application's class name or jar file name. The short form of the class name or JAR file name omits the class's package information or the JAR files path information.</p>
+<p>The <code>jps</code> command uses the Java launcher to find the class name and arguments passed to the main method. If the target JVM is started with a custom launcher, then the class or JAR file name, and the arguments to the <code>main</code> method aren't available. In this case, the <code>jps</code> command outputs the string <code>Unknown</code> for the class name, or JAR file name, and for the arguments to the <code>main</code> method.</p>
+<p>The list of JVMs produced by the <code>jps</code> command can be limited by the permissions granted to the principal running the command. The command lists only the JVMs for which the principal has access rights as determined by operating system-specific access control mechanisms.</p>
+<h2 id="host-identifier">Host Identifier</h2>
+<p>The host identifier, or <code>hostid</code>, is a string that indicates the target system. The syntax of the <code>hostid</code> string corresponds to the syntax of a URI:</p>
+<blockquote>
+<p>[<em>protocol</em><code>:</code>][[<code>//</code>]<em>hostname</em>][<code>:</code><em>port</em>][<code>/</code><em>servername</em>]</p>
+</blockquote>
+<dl>
+<dt><em>protocol</em></dt>
+<dd>The communications protocol. If the <em>protocol</em> is omitted and a <em>hostname</em> isn't specified, then the default protocol is a platform-specific, optimized, local protocol. If the protocol is omitted and a host name is specified, then the default protocol is <code>rmi</code>.
+</dd>
+<dt><em>hostname</em></dt>
+<dd>A host name or IP address that indicates the target host. If you omit the <em>hostname</em> parameter, then the target host is the local host.
+</dd>
+<dt><em>port</em></dt>
+<dd>The default port for communicating with the remote server. If the <em>hostname</em> parameter is omitted or the <em>protocol</em> parameter specifies an optimized, local protocol, then the <em>port</em> parameter is ignored. Otherwise, treatment of the <em>port</em> parameter is implementation-specific. For the default <code>rmi</code> protocol, the <em>port</em> parameter indicates the port number for the <code>rmiregistry</code> on the remote host. If the <em>port</em> parameter is omitted, and the <em>protocol</em> parameter indicates <code>rmi</code>, then the default <code>rmiregistry</code> port (<code>1099</code>) is used.
+</dd>
+<dt><em>servername</em></dt>
+<dd>The treatment of this parameter depends on the implementation. For the optimized, local protocol, this field is ignored. For the <code>rmi</code> protocol, this parameter is a string that represents the name of the RMI remote object on the remote host. See the <a href="jstatd.html">jstatd</a> command <code>-n</code> option.
+</dd>
+</dl>
+<h2 id="output-format-of-the-jps-command">Output Format of the jps Command</h2>
+<p>The output of the <code>jps</code> command has the following pattern:</p>
+<blockquote>
+<p><em>lvmid</em> [ [ <em>classname</em> | <em>JARfilename</em> | <code>&quot;Unknown&quot;</code>] [ <em>arg</em>* ] [ <em>jvmarg</em>* ] ]</p>
+</blockquote>
+<p>All output tokens are separated by white space. An <code>arg</code> value that includes embedded white space introduces ambiguity when attempting to map arguments to their actual positional parameters.</p>
+<p><strong>Note:</strong></p>
+<p>It's recommended that you don't write scripts to parse <code>jps</code> output because the format might change in future releases. If you write scripts that parse <code>jps</code> output, then expect to modify them for future releases of this tool.</p>
+<h2 id="examples">Examples</h2>
+<p>This section provides examples of the <code>jps</code> command.</p>
+<p>List the instrumented JVMs on the local host:</p>
+<pre><code>jps
+18027 Java2Demo.JAR
+18032 jps
+18005 jstat</code></pre>
+<p>The following example lists the instrumented JVMs on a remote host. This example assumes that the <code>jstat</code> server and either the its internal RMI registry or a separate external <code>rmiregistry</code> process are running on the remote host on the default port (port <code>1099</code>). It also assumes that the local host has appropriate permissions to access the remote host. This example includes the <code>-l</code> option to output the long form of the class names or JAR file names.</p>
+<pre><code>jps -l remote.domain
+3002 /opt/jdk1.7.0/demo/jfc/Java2D/Java2Demo.JAR
+2857 sun.tools.jstatd.jstatd</code></pre>
+<p>The following example lists the instrumented JVMs on a remote host with a nondefault port for the RMI registry. This example assumes that the <code>jstatd</code> server, with an internal RMI registry bound to port <code>2002</code>, is running on the remote host. This example also uses the <code>-m</code> option to include the arguments passed to the <code>main</code> method of each of the listed Java applications.</p>
+<pre><code>jps -m remote.domain:2002
+3002 /opt/jdk1.7.0/demo/jfc/Java2D/Java2Demo.JAR
+3102 sun.tools.jstatd.jstatd -p 2002</code></pre>
+</body>
+</html>

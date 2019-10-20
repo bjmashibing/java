@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jinfo Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jinfo Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jinfo - generate Java configuration information for a specified Java process</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> This command is experimental??and unsupported.</p>
+<p><code>jinfo</code> [<em>option</em>] <em>pid</em></p>
+<dl>
+<dt><em>option</em></dt>
+<dd>This represents the <code>jinfo</code> command-line options. See <a href="#options-for-the-jinfo-command">Options for the jinfo Command</a>.
+</dd>
+<dt><em>pid</em></dt>
+<dd><p>The process ID for which the configuration information is to be printed. The process must be a Java process. To get a list of Java processes running on a machine, use either the <code>ps</code> command or, if the JVM processes are not running in a separate docker instance, the <a href="jps.html">jps</a> command.</p>
+<p><strong>Note:</strong> JDK 10 has added support for using the Attach API when attaching to Java processes running in a separate docker process. However, the <code>jps</code> command will not list the JVM processes that are running in a separate docker instance. If you are trying to connect a Linux host with a Virtual Machine that is in a docker container, you must use tools such as <code>ps</code> to look up the PID of the JVM.</p>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jinfo</code> command prints Java configuration information for a specified Java process. The configuration information includes Java system properties and JVM command-line flags. If the specified process is running on a 64-bit JVM, then you might need to specify the <code>-J-d64</code> option, for example:</p>
+<blockquote>
+<p><code>jinfo -J-d64 -sysprops</code> <em>pid</em></p>
+</blockquote>
+<p>This command is unsupported and might not be available in future releases of the JDK. In Windows Systems where <code>dbgeng.dll</code> is not present, the Debugging Tools for Windows must be installed to have these tools work. The <code>PATH</code> environment variable should contain the location of the <code>jvm.dll</code> that's used by the target process or the location from which the core dump file was produced.</p>
+<h2 id="options-for-the-jinfo-command">Options for the jinfo Command</h2>
+<p><strong>Note:</strong></p>
+<p>If none of the following options are used, both the command-line flags and the system property name-value pairs are printed.</p>
+<dl>
+<dt><code>-flag</code> <em>name</em></dt>
+<dd>Prints the name and value of the specified command-line flag.
+</dd>
+<dt><code>-flag</code> [<code>+</code>|<code>-</code>]<em>name</em></dt>
+<dd>Enables or disables the specified Boolean command-line flag.
+</dd>
+<dt><code>-flag</code> <em>name</em><code>=</code><em>value</em></dt>
+<dd>Sets the specified command-line flag to the specified value.
+</dd>
+<dt><code>-flags</code></dt>
+<dd>Prints command-line flags passed to the JVM.
+</dd>
+<dt><code>-sysprops</code></dt>
+<dd>Prints Java system properties as name-value pairs.
+</dd>
+<dt><code>-h</code> or <code>-help</code></dt>
+<dd>Prints a help message.
+</dd>
+</dl>
+</body>
+</html>

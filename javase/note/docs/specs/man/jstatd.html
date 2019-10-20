@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jstatd Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jstatd Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jstatd - monitor the creation and termination of instrumented Java HotSpot VMs</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> This command is experimental??and unsupported.</p>
+<p><code>jstatd</code> [<em>options</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents the <code>jstatd</code> command-line options. See <a href="#options-for-the-jstatd-command">Options for the jstatd Command</a>.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jstatd</code> command is an RMI server application that monitors for the creation and termination of instrumented Java HotSpot VMs and provides an interface to enable remote monitoring tools, <code>jstat</code> and <code>jps</code>, to attach to JVMs that are running on the local host and collect information about the JVM process.</p>
+<p>The <code>jstatd</code> server requires an RMI registry on the local host. The <code>jstatd</code> server attempts to attach to the RMI registry on the default port, or on the port you specify with the <code>-p</code> <code>port</code> option. If an RMI registry is not found, then one is created within the <code>jstatd</code> application that's bound to the port that's indicated by the <code>-p</code> <code>port</code> option or to the default RMI registry port when the <code>-p</code> <code>port</code> option is omitted. You can stop the creation of an internal RMI registry by specifying the <code>-nr</code> option.</p>
+<h2 id="options-for-the-jstatd-command">Options for the jstatd Command</h2>
+<dl>
+<dt><code>-nr</code></dt>
+<dd>This option does not attempt to create an internal RMI registry within the <code>jstatd</code> process when an existing RMI registry isn't found.
+</dd>
+<dt><code>-p</code> <em>port</em></dt>
+<dd>This option sets the port number where the RMI registry is expected to be found, or when not found, created if the <code>-nr</code> option isn't specified.
+</dd>
+<dt><code>-n</code> <em>rminame</em></dt>
+<dd>This option sets the name to which the remote RMI object is bound in the RMI registry. The default name is <code>JStatRemoteHost</code>. If multiple <code>jstatd</code> servers are started on the same host, then the name of the exported RMI object for each server can be made unique by specifying this option. However, doing so requires that the unique server name be included in the monitoring client's <code>hostid</code> and <code>vmid</code> strings.
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd>This option passes a Java <code>option</code> to the JVM, where the option is one of those described on the reference page for the Java application launcher. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB. See <a href="java.html">java</a>.
+</dd>
+</dl>
+<h2 id="security">Security</h2>
+<p>The <code>jstatd</code> server can monitor only JVMs for which it has the appropriate native access permissions. Therefore, the <code>jstatd</code> process must be running with the same user credentials as the target JVMs. Some user credentials, such as the root user in Oracle Solaris, Linux, and OS X operating systems, have permission to access the instrumentation exported by any JVM on the system. A <code>jstatd</code> process running with such credentials can monitor any JVM on the system, but introduces additional security concerns.</p>
+<p>The <code>jstatd</code> server doesn't provide any authentication of remote clients. Therefore, running a <code>jstatd</code> server process exposes the instrumentation export by all JVMs for which the <code>jstatd</code> process has access permissions to any user on the network. This exposure might be undesirable in your environment, and therefore, local security policies should be considered before you start the <code>jstatd</code> process, particularly in production environments or on networks that aren't secure.</p>
+<p>The <code>jstatd</code> server installs an instance of <code>RMISecurityPolicy</code> when no other security manager is installed, and therefore, requires a security policy file to be specified. The policy file must conform to Default Policy Implementation and Policy File Syntax.</p>
+<p>If your security concerns can't be addressed with a customized policy file, then the safest action is to not run the <code>jstatd</code> server and use the <code>jstat</code> and <code>jps</code> tools locally. However, when using <code>jps</code> to get a list of instrumented JVMs, the list will not include any JVMs running in docker containers.</p>
+<h2 id="remote-interface">Remote Interface</h2>
+<p>The interface exported by the <code>jstatd</code> process is proprietary and guaranteed to change. Users and developers are discouraged from writing to this interface.</p>
+<h2 id="examples">Examples</h2>
+<p>The following are examples of the <code>jstatd</code> command. The <code>jstatd</code> scripts automatically start the server in the background.</p>
+<h2 id="internal-rmi-registry">Internal RMI Registry</h2>
+<p>This example shows how to start a <code>jstatd</code> session with an internal RMI registry. This example assumes that no other server is bound to the default RMI registry port (port <code>1099</code>).</p>
+<blockquote>
+<p><code>jstatd -J-Djava.security.policy=all.policy</code></p>
+</blockquote>
+<h2 id="external-rmi-registry">External RMI Registry</h2>
+<p>This example starts a <code>jstatd</code> session with an external RMI registry.</p>
+<pre><code>rmiregistry&amp;
+jstatd -J-Djava.security.policy=all.policy</code></pre>
+<p>This example starts a <code>jstatd</code> session with an external RMI registry server on port <code>2020</code>.</p>
+<pre><code>jrmiregistry 2020&amp;
+jstatd -J-Djava.security.policy=all.policy -p 2020</code></pre>
+<p>This example starts a <code>jstatd</code> session with an external RMI registry on port 2020 that's bound to <code>AlternateJstatdServerName</code>.</p>
+<pre><code>rmiregistry 2020&amp;
+jstatd -J-Djava.security.policy=all.policy -p 2020 -n AlternateJstatdServerName</code></pre>
+<h2 id="stop-the-creation-of-an-in-process-rmi-registry">Stop the Creation of an In-Process RMI Registry</h2>
+<p>This example starts a <code>jstatd</code> session that doesn't create an RMI registry when one isn't found. This example assumes an RMI registry is already running. If an RMI registry isn't running, then an error message is displayed.</p>
+<blockquote>
+<p><code>jstatd -J-Djava.security.policy=all.policy -nr</code></p>
+</blockquote>
+<h2 id="enable-rmi-logging">Enable RMI Logging</h2>
+<p>This example starts a <code>jstatd</code> session with RMI logging capabilities enabled. This technique is useful as a troubleshooting aid or for monitoring server activities.</p>
+<blockquote>
+<p><code>jstatd -J-Djava.security.policy=all.policy -J-Djava.rmi.server.logCalls=true</code></p>
+</blockquote>
+</body>
+</html>

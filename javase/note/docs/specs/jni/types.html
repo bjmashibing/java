@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Native Interface Specification: 3 - JNI Types and Data Structures</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="design.html">PREV</a> | <a href="functions.html">NEXT</a>
+<h1 id="chapter-3-jni-types-and-data-structures">Chapter 3: JNI Types and Data Structures</h1>
+<p>This chapter discusses how the JNI maps Java types to native C types.</p>
+<p>This chapter covers the following topics:</p>
+<ul>
+<li><a href="#primitive-types">Primitive Types</a></li>
+<li><a href="#reference-types">Reference Types</a></li>
+<li><a href="#field-and-method-ids">Field and Method IDs</a></li>
+<li><a href="#the-value-type">The Value Type</a></li>
+<li><a href="#type-signatures">Type Signatures</a></li>
+<li><a href="#modified-utf-8-strings">Modified UTF-8 Strings</a></li>
+</ul>
+<h2 id="primitive-types">Primitive Types</h2>
+<p>The following table describes Java primitive types and their machine-dependent native equivalents.</p>
+<table>
+<caption>Primitive Types and Native Equivalents</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Java Type</th>
+<th style="text-align: left;">Native Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">jboolean</td>
+<td style="text-align: left;">unsigned 8 bits</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">byte</td>
+<td style="text-align: left;">jbyte</td>
+<td style="text-align: left;">signed 8 bits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">char</td>
+<td style="text-align: left;">jchar</td>
+<td style="text-align: left;">unsigned 16 bits</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">short</td>
+<td style="text-align: left;">jshort</td>
+<td style="text-align: left;">signed 16 bits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">int</td>
+<td style="text-align: left;">jint</td>
+<td style="text-align: left;">signed 32 bits</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">long</td>
+<td style="text-align: left;">jlong</td>
+<td style="text-align: left;">signed 64 bits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">float</td>
+<td style="text-align: left;">jfloat</td>
+<td style="text-align: left;">32 bits</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">double</td>
+<td style="text-align: left;">jdouble</td>
+<td style="text-align: left;">64 bits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">void</td>
+<td style="text-align: left;">void</td>
+<td style="text-align: left;">not applicable</td>
+</tr>
+</tbody>
+</table>
+<p>The following definition is provided for convenience.</p>
+<pre><code>#define JNI_FALSE  0
+#define JNI_TRUE   1</code></pre>
+<p>The <code>jsize</code> integer type is used to describe cardinal indices and sizes:</p>
+<pre><code>typedef jint jsize;</code></pre>
+<h2 id="reference-types">Reference Types</h2>
+<p>The JNI includes a number of reference types that correspond to different kinds of Java objects. JNI reference types are organized in the following hierarchy:</p>
+<ul>
+<li><code>jobject</code>
+<ul>
+<li><code>jclass</code> (<code>java.lang.Class</code> objects)</li>
+<li><code>jstring</code> (<code>java.lang.String</code> objects)</li>
+<li><code>jarray</code> (arrays)
+<ul>
+<li><code>jobjectArray</code> (object arrays)</li>
+<li><code>jbooleanArray</code> (<code>boolean</code> arrays)</li>
+<li><code>jbyteArray</code> (<code>byte</code> arrays)</li>
+<li><code>jcharArray</code> (<code>char</code> arrays)</li>
+<li><code>jshortArray</code> (<code>short</code> arrays)</li>
+<li><code>jintArray</code> (<code>int</code> arrays)</li>
+<li><code>jlongArray</code> (<code>long</code> arrays)</li>
+<li><code>jfloatArray</code> (<code>float</code> arrays)</li>
+<li><code>jdoubleArray</code> (<code>double</code> arrays)</li>
+</ul></li>
+<li><code>jthrowable</code> (<code>java.lang.Throwable</code> objects)</li>
+</ul></li>
+</ul>
+<p>In C, all other JNI reference types are defined to be the same as jobject. For example:</p>
+<pre><code>typedef jobject jclass;</code></pre>
+<p>In C++, JNI introduces a set of dummy classes to enforce the subtyping relationship. For example:</p>
+<pre><code>class _jobject {};
+class _jclass : public _jobject {};
+// ...
+typedef _jobject *jobject;
+typedef _jclass *jclass;</code></pre>
+<h2 id="field-and-method-ids">Field and Method IDs</h2>
+<p>Method and field IDs are regular C pointer types:</p>
+<pre><code>struct _jfieldID;              /* opaque structure */
+typedef struct _jfieldID *jfieldID;   /* field IDs */
+
+struct _jmethodID;              /* opaque structure */
+typedef struct _jmethodID *jmethodID; /* method IDs */</code></pre>
+<h2 id="the-value-type">The Value Type</h2>
+<p>The <code>jvalue</code> union type is used as the element type in argument arrays. It is declared as follows:</p>
+<pre><code>typedef union jvalue {
+    jboolean z;
+    jbyte    b;
+    jchar    c;
+    jshort   s;
+    jint     i;
+    jlong    j;
+    jfloat   f;
+    jdouble  d;
+    jobject  l;
+} jvalue;</code></pre>
+<h2 id="type-signatures">Type Signatures</h2>
+<p>The JNI uses the Java VM’s representation of type signatures. The following table shows these type signatures.</p>
+<table>
+<caption>Java VM Type Signatures</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Type Signature</th>
+<th style="text-align: left;">Java Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>Z</code></td>
+<td style="text-align: left;">boolean</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>B</code></td>
+<td style="text-align: left;">byte</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>C</code></td>
+<td style="text-align: left;">char</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>S</code></td>
+<td style="text-align: left;">short</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>I</code></td>
+<td style="text-align: left;">int</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>J</code></td>
+<td style="text-align: left;">long</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>F</code></td>
+<td style="text-align: left;">float</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>D</code></td>
+<td style="text-align: left;">double</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>L</code> fully-qualified-class <code>;</code></td>
+<td style="text-align: left;">fully-qualified-class</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>[</code> type</td>
+<td style="text-align: left;">type[]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>(</code> arg-types <code>)</code> ret-type</td>
+<td style="text-align: left;">method type</td>
+</tr>
+</tbody>
+</table>
+<p>For example, the Java method:</p>
+<pre><code>long f (int n, String s, int[] arr);</code></pre>
+<p>has the following type signature:</p>
+<pre><code>(ILjava/lang/String;[I)J</code></pre>
+<h2 id="modified-utf-8-strings">Modified UTF-8 Strings</h2>
+<p>The JNI uses modified UTF-8 strings to represent various string types. Modified UTF-8 strings are the same as those used by the Java VM. Modified UTF-8 strings are encoded so that character sequences that contain only non-null ASCII characters can be represented using only one byte per character, but all Unicode characters can be represented.</p>
+<p>All characters in the range \u0001 to \u007F are represented by a single byte, as follows:</p>
+<ul>
+<li><code>0xxxxxxx</code></li>
+</ul>
+<p>The seven bits of data in the byte give the value of the character represented.</p>
+<p>The null character (<code>'\u0000'</code>) and characters in the range <code>'\u0080'</code> to <code>'\u07FF'</code> are represented by a pair of bytes x and y:</p>
+<ul>
+<li>x: <code>110xxxxx</code></li>
+<li>y: <code>10yyyyyy</code></li>
+</ul>
+<p>The bytes represent the character with the value ((x &amp; <code>0x1f</code>) &lt;&lt; <code>6</code>) + (y &amp; <code>0x3f</code>).</p>
+<p>Characters in the range <code>'\u0800'</code> to <code>'\uFFFF'</code> are represented by 3 bytes x, y, and z:</p>
+<ul>
+<li>x: <code>1110xxxx</code></li>
+<li>y: <code>10yyyyyy</code></li>
+<li>z: <code>10zzzzzz</code></li>
+</ul>
+<p>The character with the value ((x &amp; <code>0xf</code>) &lt;&lt; <code>12</code>) + ((y &amp; <code>0x3f</code>) &lt;&lt; <code>6</code>) + (z &amp; <code>0x3f</code>) is represented by the bytes.</p>
+<p>Characters with code points above U+FFFF (so-called <em>supplementary characters</em>) are represented by separately encoding the two surrogate code units of their UTF-16 representation. Each of the surrogate code units is represented by three bytes. This means, supplementary characters are represented by six bytes, <em>u</em>, <em>v</em>, <em>w</em>, <em>x</em>, <em>y</em>, and <em>z</em>:</p>
+<ul>
+<li>u: <code>11101101</code></li>
+<li>v: <code>1010vvvv</code></li>
+<li>w: <code>10wwwwww</code></li>
+<li>x: <code>11101101</code></li>
+<li>y: <code>1011yyyy</code></li>
+<li>z: <code>10zzzzzz</code></li>
+</ul>
+<p>The character with the value 0x10000+((v&amp;0x0f)&lt;&lt;16)+((w&amp;0x3f)&lt;&lt;10)+(y&amp;0x0f)&lt;&lt;6)+(z&amp;0x3f) is represented by the six bytes.</p>
+<p>The bytes of multibyte characters are stored in the <code>class</code> file in big-endian (high byte first) order.</p>
+<p>There are two differences between this format and the standard UTF-8 format. First, the null character <code>(char)0</code> is encoded using the two-byte format rather than the one-byte format. This means that modified UTF-8 strings never have embedded nulls. Second, only the one-byte, two-byte, and three-byte formats of standard UTF-8 are used. The Java VM does not recognize the four-byte format of standard UTF-8; it uses its own two-times-three-byte format instead.</p>
+<p>For more information regarding the standard UTF-8 format, see section <em>3.9 Unicode Encoding Forms</em> of <em>The Unicode Standard, Version 4.0</em>.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="design.html">PREV</a> | <a href="functions.html">NEXT</a>
+</body>
+</html>

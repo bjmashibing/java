@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jhsdb Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jhsdb Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jhsdb - attach to a Java process or launch a postmortem debugger to analyze the content of a core dump from a crashed Java Virtual Machine (JVM)</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jhsdb</code> <code>clhsdb</code> [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>]</p>
+<p><code>jhsdb</code> <code>debugd</code> [<em>options</em>] (<em>pid</em> | <em>executable</em> <em>coredump</em>) [<em>server-id</em>]</p>
+<p><code>jhsdb</code> <code>hsdb</code> [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>]</p>
+<p><code>jhsdb</code> <code>jstack</code> [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>] [<em>options</em>]</p>
+<p><code>jhsdb</code> <code>jmap</code> [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>] [<em>options</em>]</p>
+<p><code>jhsdb</code> <code>jinfo</code> [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>] [<em>options</em>]</p>
+<p><code>jhsdb</code> <code>jsnap</code> [<em>options</em>] [<code>--pid</code> <em>pid</em> | <code>--exe</code> <em>executable</em> <code>--core</code> <em>coredump</em>]</p>
+<dl>
+<dt><em>pid</em></dt>
+<dd><p>The process ID to which the <code>jhsdb</code> tool should attach. The process must be a Java process. To get a list of Java processes running on a machine, use the <code>ps</code> command or, if the JVM processes are not running in a separate docker instance, the <a href="jps.html">jps</a> command.</p>
+<p><strong>Note:</strong> JDK 10 has added support for using the Attach API when attaching to Java processes running in a separate docker process. However, the <code>jps</code> command will not list the JVM processes that are running in a separate docker instance. If you are trying to connect a Linux host with a Virtual Machine that is in a docker container, you must use tools such as <code>ps</code> to look up the PID of the JVM.</p>
+</dd>
+<dt><em>server-id</em></dt>
+<dd>An optional unique ID to use when multiple debug servers are running on the same remote host.
+</dd>
+<dt><em>executable</em></dt>
+<dd>The Java executable file from which the core dump was produced.
+</dd>
+<dt><em>coredump</em></dt>
+<dd>The core file to which the <code>jhsdb</code> tool should attach.
+</dd>
+<dt><em>options</em></dt>
+<dd>The command-line options for a <code>jhsdb</code> mode. See <a href="#common-options-for-jhsdb-modes">Common Options for jhsdb Modes</a>, <a href="#options-for-the-debugd-mode">Options for the debugd Mode</a>, <a href="#options-for-the-jinfo-mode">Options for the jinfo Mode</a>, <a href="#options-for-the-jmap-mode">Options for the jmap Mode</a>, <a href="#options-for-the-jmap-mode">Options for the jmap Mode</a>, <a href="#options-for-the-jstack-mode">Options for the jstack Mode</a>, and <a href="#options-for-the-jsnap-mode">Options for the jsnap Mode</a>.
+</dd>
+</dl>
+<p><strong>Note:</strong></p>
+<p>Either the <em>pid</em> or the pair of <em>executable</em> and <em>core</em> files must be provided.</p>
+<h2 id="description">Description</h2>
+<p>You can use the <code>jhsdb</code> tool to attach to a Java process or to launch a postmortem debugger to analyze the content of a core-dump from a crashed Java Virtual Machine (JVM). This command is experimental and unsupported.</p>
+<p><strong>Note:</strong></p>
+<p>Attaching the <code>jhsdb</code> tool to a live process will cause the process to hang and the process will probably crash when the debugger detaches.</p>
+<p>The <code>jhsdb</code> tool can be launched in any one of the following modes:</p>
+<dl>
+<dt><code>jhsdb clhsdb</code></dt>
+<dd>Starts the interactive command-line debugger.
+</dd>
+<dt><code>jhsdb debugd</code></dt>
+<dd>Starts the remote debug server.
+</dd>
+<dt><code>jhsdb hsdb</code></dt>
+<dd>Starts the interactive GUI debugger.
+</dd>
+<dt><code>jhsdb jstack</code></dt>
+<dd>Prints stack and locks information.
+</dd>
+<dt><code>jhsdb jmap</code></dt>
+<dd>Prints heap information.
+</dd>
+<dt><code>jhsdb jinfo</code></dt>
+<dd>Prints basic JVM information.
+</dd>
+<dt><code>jhsdb jsnap</code></dt>
+<dd>Prints performance counter information.
+</dd>
+</dl>
+<h2 id="common-options-for-jhsdb-modes">Common Options for jhsdb Modes</h2>
+<p>In addition to any required <code>jstack</code>, <code>jmap</code>, <code>jinfo</code> or <code>jsnap</code> mode specific options, the <code>pid</code>, <code>exe</code>, or <code>core</code> options must be provided for all modes. The following options are available for all modes.</p>
+<dl>
+<dt><code>--pid</code></dt>
+<dd>The process ID of the hanging process.
+</dd>
+<dt><code>--exe</code></dt>
+<dd>The executable file name.
+</dd>
+<dt><code>--core</code></dt>
+<dd>The core dump file name.
+</dd>
+<dt><code>--help</code></dt>
+<dd>Displays the options available for the command.
+</dd>
+</dl>
+<h2 id="options-for-the-debugd-mode">Options for the debugd Mode</h2>
+<dl>
+<dt><em>server-id</em></dt>
+<dd>An optional unique ID for this debug server. This is required if multiple debug servers are run on the same machine.
+</dd>
+</dl>
+<h2 id="options-for-the-jinfo-mode">Options for the jinfo Mode</h2>
+<p>Without specified options, the <code>jhsdb jinfo</code> prints both flags and properties.</p>
+<dl>
+<dt><code>--flags</code></dt>
+<dd>Prints the VM flags.
+</dd>
+<dt><code>--sysprops</code></dt>
+<dd>Prints the Java system properties.
+</dd>
+<dt>no option</dt>
+<dd>Prints the VM flags and the Java system properties.
+</dd>
+</dl>
+<h2 id="options-for-the-jmap-mode">Options for the jmap Mode</h2>
+<p>In addition to the following mode specific options, the <code>pid</code>, <code>exe</code>, or <code>core</code> options described in <a href="#common-options-for-jhsdb-modes">Common Options for jhsdb Modes</a> must be provided.</p>
+<dl>
+<dt>no option</dt>
+<dd>Prints the same information as Solaris <code>pmap</code>.
+</dd>
+<dt><code>--heap</code></dt>
+<dd>Prints the <code>java</code> heap summary.
+</dd>
+<dt><code>--binaryheap</code></dt>
+<dd>Dumps the <code>java</code> heap in <code>hprof</code> binary format.
+</dd>
+<dt><code>--dumpfile</code></dt>
+<dd>Prints the name of the dumpfile.
+</dd>
+<dt><code>--histo</code></dt>
+<dd>Prints the histogram of <code>java</code> object heap.
+</dd>
+<dt><code>--clstats</code></dt>
+<dd>Prints the class loader statistics.
+</dd>
+<dt><code>--finalizerinfo</code></dt>
+<dd>Prints the information on objects awaiting finalization.
+</dd>
+</dl>
+<h2 id="options-for-the-jstack-mode">Options for the jstack Mode</h2>
+<p>In addition to the following mode specific options, the <code>pid</code>, <code>exe</code>, or <code>core</code> options described in <a href="#common-options-for-jhsdb-modes">Common Options for jhsdb Modes</a> must be provided.</p>
+<dl>
+<dt><code>--locks</code></dt>
+<dd>Prints the <code>java.util.concurrent</code> locks information.
+</dd>
+<dt><code>--mixed</code></dt>
+<dd>Attempts to print both <code>java</code> and native frames if the platform allows it.
+</dd>
+</dl>
+<h2 id="options-for-the-jsnap-mode">Options for the jsnap Mode</h2>
+<p>In addition to the following mode specific option, the <code>pid</code>, <code>exe</code>, or <code>core</code> options described in <a href="#common-options-for-jhsdb-modes">Common Options for jhsdb Modes</a> must be provided.</p>
+<dl>
+<dt><code>--all</code></dt>
+<dd>Prints all performance counters.
+</dd>
+</dl>
+</body>
+</html>

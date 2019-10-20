@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jlink Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jlink Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jlink - assemble and optimize a set of modules and their dependencies into a custom runtime image</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jlink</code> [<em>options</em>] <code>--module-path</code> <em>modulepath</em> <code>--add-modules</code> <em>module</em> [, <em>module</em>...]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>Command-line options separated by spaces. See <a href="#jlink-options">jlink Options</a>.
+</dd>
+<dt><em>modulepath</em></dt>
+<dd>The path where the <code>jlink</code> tool discovers observable modules. These modules can be modular JAR files, JMOD files, or exploded modules.
+</dd>
+<dt><em>module</em></dt>
+<dd>The names of the modules to add to the runtime image. The <code>jlink</code> tool adds these modules and their transitive dependencies.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jlink</code> tool links a set of modules, along with their transitive dependences, to create a custom runtime image.</p>
+<p><strong>Note:</strong></p>
+<p>Developers are responsible for updating their custom runtime images.</p>
+<h2 id="jlink-options">jlink Options</h2>
+<dl>
+<dt><code>--add-modules</code> <em>mod</em> [<code>,</code> <em>mod</em>...]</dt>
+<dd>Adds the named modules, <em>mod</em>, to the default set of root modules. The default set of root modules is empty.
+</dd>
+<dt><code>--bind-services</code></dt>
+<dd>Link service provider modules and their dependencies.
+</dd>
+<dt><code>-c ={0|1|2}</code> or <code>--compress={0|1|2}</code></dt>
+<dd><p>Enable compression of resources:</p>
+<ul>
+<li><code>0</code>: No compression</li>
+<li><code>1</code>: Constant string sharing</li>
+<li><code>2</code>: ZIP</li>
+</ul>
+</dd>
+<dt><code>--disable-plugin</code> <em>pluginname</em></dt>
+<dd>Disables the specified plug-in. See <a href="#jlink-plug-ins">jlink Plug-ins</a> for the list of supported plug-ins.
+</dd>
+<dt><code>--endian</code> {<code>little</code>|<code>big</code>}</dt>
+<dd>Specifies the byte order of the generated image. The default value is the format of your system's architecture.
+</dd>
+<dt><code>-h</code> or <code>--help</code></dt>
+<dd>Prints the help message.
+</dd>
+<dt><code>--ignore-signing-information</code></dt>
+<dd>Suppresses a fatal error when signed modular JARs are linked in the runtime image. The signature-related files of the signed modular JARs aren't copied to the runtime image.
+</dd>
+<dt><code>--launcher</code> <em>command</em><code>=</code><em>module</em> or <code>--launcher</code> <em>command</em><code>=</code><em>module</em><code>/</code><em>main</em></dt>
+<dd>Specifies the launcher command name for the module or the command name for the module and main class (the module and the main class names are separated by a slash (<code>/</code>)).
+</dd>
+<dt><code>--limit-modules</code> <em>mod</em> [<code>,</code> <em>mod</em>...]</dt>
+<dd>Limits the universe of observable modules to those in the transitive closure of the named modules, <code>mod</code>, plus the main module, if any, plus any further modules specified in the <code>--add-modules</code> option.
+</dd>
+<dt><code>--list-plugins</code></dt>
+<dd>Lists available plug-ins, which you can access through command-line options; see <a href="#jlink-plug-ins">jlink Plug-ins</a>.
+</dd>
+<dt><code>-p</code> or <code>--module-path</code> <em>modulepath</em></dt>
+<dd><p>Specifies the module path.</p>
+<p>If this option is not specified, then the default module path is <code>$JAVA_HOME/jmods</code>. This directory contains the <code>java.base</code> module and the other standard and JDK modules. If this option is specified but the <code>java.base</code> module cannot be resolved from it, then the <code>jlink</code> command appends <code>$JAVA_HOME/jmods</code> to the module path.</p>
+</dd>
+<dt><code>--no-header-files</code></dt>
+<dd>Excludes header files.
+</dd>
+<dt><code>--no-man-pages</code></dt>
+<dd>Excludes man pages.
+</dd>
+<dt><code>--output</code> <em>path</em></dt>
+<dd>Specifies the location of the generated runtime image.
+</dd>
+<dt><code>--save-opts</code> <em>filename</em></dt>
+<dd>Saves <code>jlink</code> options in the specified file.
+</dd>
+<dt><code>--suggest-providers</code> [<em>name</em><code>,</code> ...]</dt>
+<dd>Suggest providers that implement the given service types from the module path.
+</dd>
+<dt><code>--version</code></dt>
+<dd>Prints version information.
+</dd>
+<dt><code>@</code><em>filename</em></dt>
+<dd><p>Reads options from the specified file.</p>
+<p>An options file is a text file that contains the options and values that you would typically enter in a command prompt. Options may appear on one line or on several lines. You may not specify environment variables for path names. You may comment out lines by prefixing a hash symbol (<code>#</code>) to the beginning of the line.</p>
+<p>The following is an example of an options file for the <code>jlink</code> command:</p>
+<pre><code>#Wed Dec 07 00:40:19 EST 2016
+--module-path mlib
+--add-modules com.greetings
+--output greetingsapp</code></pre>
+</dd>
+</dl>
+<h2 id="jlink-plug-ins">jlink Plug-ins</h2>
+<p><strong>Note:</strong></p>
+<p>Plug-ins not listed in this section aren't supported and are subject to change.</p>
+<p>For plug-in options that require a <em>pattern-list</em>, the value is a comma-separated list of elements, with each element using one the following forms:</p>
+<ul>
+<li><em>glob-pattern</em></li>
+<li><code>glob:</code><em>glob-pattern</em></li>
+<li><code>regex:</code><em>regex-pattern</em></li>
+<li><code>@</code><em>filename</em>
+<ul>
+<li><em>filename</em> is the name of a file that contains patterns to be used, one pattern per line.</li>
+</ul></li>
+</ul>
+<p>For a complete list of all available plug-ins, run the command <code>jlink --list-plugins</code>.</p>
+<h3 id="plugin-compress">Plugin <code>compress</code></h3>
+<dl>
+<dt>Options</dt>
+<dd><code>--compress=</code>{<code>0</code>|<code>1</code>|<code>2</code>}[<code>:filter=</code><em>pattern-list</em>]
+</dd>
+<dt>Description</dt>
+<dd><p>Compresses all resources in the output image.</p>
+<ul>
+<li>Level 0: No compression</li>
+<li>Level 1: Constant string sharing</li>
+<li>Level 2: ZIP</li>
+</ul>
+<p>An optional <em>pattern-list</em> filter can be specified to list the pattern of files to include.</p>
+</dd>
+</dl>
+<h3 id="plugin-include-locales">Plugin <code>include-locales</code></h3>
+<dl>
+<dt>Options</dt>
+<dd><code>--include-locales=</code><em>langtag</em>[<code>,</code><em>langtag</em>]*
+</dd>
+<dt>Description</dt>
+<dd><p>Includes the list of locales where <em>langtag</em> is a BCP 47 language tag. This option supports locale matching as defined in RFC 4647. Ensure that you add the module jdk.localedata when using this option.</p>
+<p>Example:</p>
+<blockquote>
+<p><code>--add-modules jdk.localedata --include-locales=en,ja,*-IN</code></p>
+</blockquote>
+</dd>
+</dl>
+<h3 id="plugin-order-resources">Plugin <code>order-resources</code></h3>
+<dl>
+<dt>Options</dt>
+<dd><code>--order-resources=</code><em>pattern-list</em>
+</dd>
+<dt>Description</dt>
+<dd><p>Orders the specified paths in priority order. If <code>@</code><em>filename</em> is specified, then each line in <em>pattern-list</em> must be an exact match for the paths to be ordered.</p>
+<p>Example:</p>
+<blockquote>
+<p><code>--order-resources=/module-info.class,@classlist,/java.base/java/lang/</code></p>
+</blockquote>
+</dd>
+</dl>
+<h3 id="plugin-strip-debug">Plugin <code>strip-debug</code></h3>
+<dl>
+<dt>Options</dt>
+<dd><code>--strip-debug</code>
+</dd>
+<dt>Description</dt>
+<dd>Strips debug information from the output image.
+</dd>
+</dl>
+<h2 id="jlink-examples">jlink Examples</h2>
+<p>The following command creates a runtime image in the directory <code>greetingsapp</code>. This command links the module <code>com.greetings</code>, whose module definition is contained in the directory <code>mlib</code>.</p>
+<pre><code>jlink --module-path mlib --add-modules com.greetings --output greetingsapp</code></pre>
+<p>The following command lists the modules in the runtime image <code>greetingsapp</code>:</p>
+<pre><code>greetingsapp/bin/java --list-modules
+com.greetings
+java.base@11
+java.logging@11
+org.astro@1.0</code></pre>
+<p>The following command creates a runtime image in the directory compressedrt that's stripped of debug symbols, uses compression to reduce space, and includes French language locale information:</p>
+<pre><code>jlink --add-modules jdk.localedata --strip-debug --compress=2 --include-locales=fr --output compressedrt</code></pre>
+<p>The following example compares the size of the runtime image <code>compressedrt</code> with <code>fr_rt</code>, which isn't stripped of debug symbols and doesn't use compression:</p>
+<pre><code>jlink --add-modules jdk.localedata --include-locales=fr --output fr_rt
+
+du -sh ./compressedrt ./fr_rt
+23M     ./compressedrt
+36M     ./fr_rt</code></pre>
+<p>The following example lists the providers that implement <code>java.security.Provider</code>:</p>
+<pre><code>jlink --suggest-providers java.security.Provider
+
+Suggested providers:
+  java.naming provides java.security.Provider used by java.base
+  java.security.jgss provides java.security.Provider used by java.base
+  java.security.sasl provides java.security.Provider used by java.base
+  java.smartcardio provides java.security.Provider used by java.base
+  java.xml.crypto provides java.security.Provider used by java.base
+  jdk.crypto.cryptoki provides java.security.Provider used by java.base
+  jdk.crypto.ec provides java.security.Provider used by java.base
+  jdk.crypto.mscapi provides java.security.Provider used by java.base
+  jdk.security.jgss provides java.security.Provider used by java.base</code></pre>
+<p>The following example creates a custom runtime image named <code>mybuild</code> that includes only <code>java.naming</code> and <code>jdk.crypto.cryptoki</code> and their dependencies but no other providers. Note that these dependencies must exist in the module path:</p>
+<pre><code>jlink --add-modules java.naming,jdk.crypto.cryptoki --output mybuild</code></pre>
+<p>The following command is similar to the one that creates a runtime image named <code>greetingsapp</code>, except that it will link the modules resolved from root modules with service binding; see the <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/module/Configuration.html#resolveAndBind-java.lang.module.ModuleFinder-java.util.List-java.lang.module.ModuleFinder-java.util.Collection-"><code>Configuration.resolveAndBind</code></a> method.</p>
+<pre><code>jlink --module-path mlib --add-modules com.greetings --output greetingsapp --bind-services</code></pre>
+<p>The following command lists the modules in the runtime image greetingsapp created by this command:</p>
+<pre><code>greetingsapp/bin/java --list-modules
+com.greetings
+java.base@11
+java.compiler@11
+java.datatransfer@11
+java.desktop@11
+java.logging@11
+java.management@11
+java.management.rmi@11
+java.naming@11
+java.prefs@11
+java.rmi@11
+java.security.jgss@11
+java.security.sasl@11
+java.smartcardio@11
+java.xml@11
+java.xml.crypto@11
+jdk.accessibility@11
+jdk.charsets@11
+jdk.compiler@11
+jdk.crypto.cryptoki@11
+jdk.crypto.ec@11
+jdk.crypto.mscapi@11
+jdk.internal.opt@11
+jdk.jartool@11
+jdk.javadoc@11
+jdk.jdeps@11
+jdk.jfr@11
+jdk.jlink@11
+jdk.localedata@11
+jdk.management@11
+jdk.management.jfr@11
+jdk.naming.dns@11
+jdk.naming.rmi@11
+jdk.security.auth@11
+jdk.security.jgss@11
+jdk.zipfs@11
+org.astro@1.0</code></pre>
+</body>
+</html>

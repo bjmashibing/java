@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The javap Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The javap Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>javap - disassemble one or more class files</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>javap</code> [<em>options</em>] <em>classes</em>...</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>Specifies the command-line options. See <a href="#options-for-javap">Options for javap</a>.
+</dd>
+<dt><em>classes</em></dt>
+<dd><p>Specifies one or more classes separated by spaces to be processed for annotations. You can specify a class that can be found in the class path by its file name, URL, or by its fully qualified class name.</p>
+<p>Examples:</p>
+<blockquote>
+<p><code>path/to/MyClass.class</code></p>
+</blockquote>
+<blockquote>
+<p><code>jar:file:///path/to/MyJar.jar!/mypkg/MyClass.class</code></p>
+</blockquote>
+<blockquote>
+<p><code>java.lang.Object</code></p>
+</blockquote>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>javap</code> command disassembles one or more class files. The output depends on the options used. When no options are used, the <code>javap</code> command prints the protected and public fields, and methods of the classes passed to it.</p>
+<p>The <code>javap</code> command isn't multirelease JAR aware. Using the class path form of the command results in viewing the base entry in all JAR files, multirelease or not. Using the URL form, you can use the URL form of an argument to specify a specific version of a class to be disassembled.</p>
+<p>The <code>javap</code> command prints its output to <code>stdout</code>.</p>
+<p><strong>Note:</strong></p>
+<p>In tools that support <code>--</code> style options, the GNU-style options can use the equal sign (<code>=</code>) instead of a white space to separate the name of an option from its value.</p>
+<h2 id="options-for-javap">Options for javap</h2>
+<dl>
+<dt><code>-help</code>, <code>--help</code> , or <code>-?</code></dt>
+<dd>Prints a help message for the <code>javap</code> command.
+</dd>
+<dt><code>-version</code></dt>
+<dd>Prints release information.
+</dd>
+<dt><code>-verbose</code> or <code>-v</code></dt>
+<dd>Prints additional information about the selected class.
+</dd>
+<dt><code>-l</code></dt>
+<dd>Prints line and local variable tables.
+</dd>
+<dt><code>-public</code></dt>
+<dd>Shows only public classes and members.
+</dd>
+<dt><code>-protected</code></dt>
+<dd>Shows only protected and public classes and members.
+</dd>
+<dt><code>-package</code></dt>
+<dd>Shows package/protected/public classes and members (default).
+</dd>
+<dt><code>-private</code> or <code>-p</code></dt>
+<dd>Shows all classes and members.
+</dd>
+<dt><code>-c</code></dt>
+<dd>Prints disassembled code, for example, the instructions that comprise the Java bytecodes, for each of the methods in the class.
+</dd>
+<dt><code>-s</code></dt>
+<dd>Prints internal type signatures.
+</dd>
+<dt><code>-sysinfo</code></dt>
+<dd>Shows system information (path, size, date, MD5 hash) of the class being processed.
+</dd>
+<dt><code>-constants</code></dt>
+<dd>Shows <code>static final</code> constants.
+</dd>
+<dt><code>--module</code> <em>module</em> or <code>-m</code> <em>module</em></dt>
+<dd>Specifies the module containing classes to be disassembled.
+</dd>
+<dt><code>--module-path</code> <em>path</em></dt>
+<dd>Specifies where to find application modules.
+</dd>
+<dt><code>--system</code> <em>jdk</em></dt>
+<dd>Specifies where to find system modules.
+</dd>
+<dt><code>--class-path</code> <em>path</em>, <code>-classpath</code> <em>path</em>, or <code>-cp</code> <em>path</em></dt>
+<dd>Specifies the path that the <code>javap</code> command uses to find user class files. It overrides the default or the <code>CLASSPATH</code> environment variable when it's set.
+</dd>
+<dt><code>-bootclasspath</code> <em>path</em></dt>
+<dd>Overrides the location of bootstrap class files.
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd><p>Passes the specified option to the JVM. For example:</p>
+<pre><code>javap -J-version
+
+javap -J-Djava.security.manager -J-Djava.security.policy=MyPolicy MyClassName</code></pre>
+<p>See <em>Overview of Java Options</em> in <a href="java.html">java</a>.</p>
+</dd>
+</dl>
+<h2 id="javap-example">javap Example</h2>
+<p>Compile the following <code>HelloWorldFrame</code> class:</p>
+<pre><code>import java.awt.Graphics;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class HelloWorldFrame extends JFrame {
+
+   String message = &quot;Hello World!&quot;;
+
+   public HelloWorldFrame(){
+        setContentPane(new JPanel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.drawString(message, 15, 30);
+            }
+        });
+        setSize(100, 100);
+    }
+    public static void main(String[] args) {
+        HelloWorldFrame frame = new HelloWorldFrame();
+        frame.setVisible(true);
+
+    }
+
+}</code></pre>
+<p>The output from the <code>javap HelloWorldFrame.class</code> command yields the following:</p>
+<pre><code>Compiled from &quot;HelloWorldFrame.java&quot;
+public class HelloWorldFrame extends javax.swing.JFrame {
+  java.lang.String message;
+  public HelloWorldFrame();
+  public static void main(java.lang.String[]);
+}</code></pre>
+<p>The output from the <code>javap -c HelloWorldFrame.class</code> command yields the following:</p>
+<pre><code>Compiled from &quot;HelloWorldFrame.java&quot;
+public class HelloWorldFrame extends javax.swing.JFrame {
+  java.lang.String message;
+
+  public HelloWorldFrame();
+    Code:
+       0: aload_0
+       1: invokespecial #1        // Method javax/swing/JFrame.&quot;&lt;init&gt;&quot;:()V
+       4: aload_0
+       5: ldc           #2        // String Hello World!
+       7: putfield      #3        // Field message:Ljava/lang/String;
+      10: aload_0
+      11: new           #4        // class HelloWorldFrame$1
+      14: dup
+      15: aload_0
+      16: invokespecial #5        // Method HelloWorldFrame$1.&quot;&lt;init&gt;&quot;:(LHelloWorldFrame;)V
+      19: invokevirtual #6        // Method setContentPane:(Ljava/awt/Container;)V
+      22: aload_0
+      23: bipush        100
+      25: bipush        100
+      27: invokevirtual #7        // Method setSize:(II)V
+      30: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: new           #8        // class HelloWorldFrame
+       3: dup
+       4: invokespecial #9        // Method &quot;&lt;init&gt;&quot;:()V
+       7: astore_1
+       8: aload_1
+       9: iconst_1
+      10: invokevirtual #10       // Method setVisible:(Z)V
+      13: return
+}</code></pre>
+</body>
+</html>

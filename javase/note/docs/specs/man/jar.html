@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jar Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jar Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jar - create an archive for classes and resources, and manipulate or restore individual classes or resources from an archive</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jar</code> [<em>OPTION</em> ...] [ [<code>--release</code> <em>VERSION</em>] [<code>-C</code> <em>dir</em>] <em>files</em>] ...</p>
+<h2 id="description">Description</h2>
+<p>The <code>jar</code> command is a general-purpose archiving and compression tool, based on the ZIP and ZLIB compression formats. Initially, the <code>jar</code> command was designed to package Java applets (not supported since JDK 11) or applications; however, beginning with JDK 9, users can use the <code>jar</code> command to create modular JARs. For transportation and deployment, it's usually more convenient to package modules as modular JARs.</p>
+<p>The syntax for the <code>jar</code> command resembles the syntax for the <code>tar</code> command. It has several main operation modes, defined by one of the mandatory operation arguments. Other arguments are either options that modify the behavior of the operation or are required to perform the operation.</p>
+<p>When modules or the components of an application (files, images and sounds) are combined into a single archive, they can be downloaded by a Java agent (such as a browser) in a single HTTP transaction, rather than requiring a new connection for each piece. This dramatically improves download times. The <code>jar</code> command also compresses files, which further improves download time. The <code>jar</code> command also enables individual entries in a file to be signed so that their origin can be authenticated. A JAR file can be used as a class path entry, whether or not it's compressed.</p>
+<p>An archive becomes a modular JAR when you include a module descriptor, <code>module-info.class</code>, in the root of the given directories or in the root of the <code>.jar</code> archive. The following operations described in <a href="#operation-modifiers-valid-only-in-create-and-update-modes">Operation Modifiers Valid Only in Create and Update Modes</a> are valid only when creating or updating a modular jar or updating an existing non-modular jar:</p>
+<ul>
+<li><p><code>--module-version</code></p></li>
+<li><p><code>--hash-modules</code></p></li>
+<li><p><code>--module-path</code></p></li>
+</ul>
+<p><strong>Note:</strong></p>
+<p>All mandatory or optional arguments for long options are also mandatory or optional for any corresponding short options.</p>
+<h2 id="main-operation-modes">Main Operation Modes</h2>
+<p>When using the <code>jar</code> command, you must specify the operation for it to perform. You specify the operation mode for the <code>jar</code> command by including the appropriate operation arguments described in this section. You can mix an operation argument with other one-letter options. Generally the operation argument is the first argument specified on the command line.</p>
+<dl>
+<dt><code>-c</code> or <code>--create</code></dt>
+<dd>Creates the archive.
+</dd>
+<dt><code>-i=</code><em>FILE</em> or <code>--generate-index=</code><em>FILE</em></dt>
+<dd>Generates index information for the specified JAR file.
+</dd>
+<dt><code>-t</code> or <code>--list</code></dt>
+<dd>Lists the table of contents for the archive.
+</dd>
+<dt><code>-u</code> or <code>--update</code></dt>
+<dd>Updates an existing JAR file.
+</dd>
+<dt><code>-x</code> or <code>--extract</code></dt>
+<dd>Extracts the named (or all) files from the archive.
+</dd>
+<dt><code>-d</code> or <code>--describe-module</code></dt>
+<dd>Prints the module descriptor or automatic module name.
+</dd>
+</dl>
+<h2 id="operation-modifiers-valid-in-any-mode">Operation Modifiers Valid in Any Mode</h2>
+<p>You can use the following options to customize the actions of any operation mode included in the <code>jar</code> command.</p>
+<dl>
+<dt><code>-C</code> <em>DIR</em></dt>
+<dd><p>Changes the specified directory and includes the <em>files</em> specified at the end of the command line.</p>
+<p><code>jar</code> [<em>OPTION</em> ...] [ [<code>--release</code> <em>VERSION</em>] [<code>-C</code> <em>dir</em>] <em>files</em>]</p>
+</dd>
+<dt><code>-f=</code><em>FILE</em> or <code>--file=</code><em>FILE</em></dt>
+<dd>Specifies the archive file name.
+</dd>
+<dt><code>--release</code> <em>VERSION</em></dt>
+<dd><p>Creates a multirelease JAR file. Places all files specified after the option into a versioned directory of the JAR file named <code>META-INF/versions/</code><em>VERSION</em><code>/</code>, where <em>VERSION</em> must be must be a positive integer whose value is 9 or greater.</p>
+<p>At run time, where more than one version of a class exists in the JAR, the JDK will use the first one it finds, searching initially in the directory tree whose <em>VERSION</em> number matches the JDK's major version number. It will then look in directories with successively lower <em>VERSION</em> numbers, and finally look in the root of the JAR.</p>
+</dd>
+<dt><code>-v</code> or <code>--verbose</code></dt>
+<dd>Sends or prints verbose output to standard output.
+</dd>
+</dl>
+<h2 id="operation-modifiers-valid-only-in-create-and-update-modes">Operation Modifiers Valid Only in Create and Update Modes</h2>
+<p>You can use the following options to customize the actions of the create and the update main operation modes:</p>
+<dl>
+<dt><code>-e=</code><em>CLASSNAME</em> or <code>--main-class=</code><em>CLASSNAME</em></dt>
+<dd>Specifies the application entry point for standalone applications bundled into a modular or executable modular JAR file.
+</dd>
+<dt><code>-m=</code><em>FILE</em> or <code>--manifest=</code><em>FILE</em></dt>
+<dd>Includes the manifest information from the given manifest file.
+</dd>
+<dt><code>-M</code> or <code>--no-manifest</code></dt>
+<dd>Doesn't create a manifest file for the entries.
+</dd>
+<dt><code>--module-version=</code><em>VERSION</em></dt>
+<dd>Specifies the module version, when creating or updating a modular JAR file, or updating a non-modular JAR file.
+</dd>
+<dt><code>--hash-modules=</code><em>PATTERN</em></dt>
+<dd>Computes and records the hashes of modules matched by the given pattern and that depend upon directly or indirectly on a modular JAR file being created or a non-modular JAR file being updated.
+</dd>
+<dt><code>-p</code> or <code>--module-path</code></dt>
+<dd>Specifies the location of module dependence for generating the hash.
+</dd>
+<dt><code>@</code><em>file</em></dt>
+<dd>Reads <code>jar</code> options and file names from a text file.
+</dd>
+</dl>
+<h2 id="operation-modifiers-valid-only-in-create-update-and-generate-index-modes">Operation Modifiers Valid Only in Create, Update, and Generate-index Modes</h2>
+<p>You can use the following options to customize the actions of the create (<code>-c</code> or <code>--create</code>) the update (<code>-u</code> or <code>--update</code> ) and the generate-index (<code>-i</code> or <code>--generate-index=</code><em>FILE</em>) main operation modes:</p>
+<dl>
+<dt><code>-0</code> or <code>--no-compress</code></dt>
+<dd>Stores without using ZIP compression.
+</dd>
+</dl>
+<h2 id="other-options">Other Options</h2>
+<p>The following options are recognized by the <code>jar</code> command and not used with operation modes:</p>
+<dl>
+<dt><code>-h</code> or <code>--help</code>[<code>:compat</code>]</dt>
+<dd>Displays the command-line help for the <code>jar</code> command or optionally the compatibility help.
+</dd>
+<dt><code>--help-extra</code></dt>
+<dd>Displays help on extra options.
+</dd>
+<dt><code>--version</code></dt>
+<dd>Prints the program version.
+</dd>
+</dl>
+<h2 id="examples-of-jar-command-syntax">Examples of jar Command Syntax</h2>
+<ul>
+<li><p>Create an archive, <code>classes.jar</code>, that contains two class files, <code>Foo.class</code> and <code>Bar.class</code>.</p>
+<blockquote>
+<p><code>jar --create --file classes.jar Foo.class Bar.class</code></p>
+</blockquote></li>
+<li><p>Create an archive, <code>classes.jar</code>, by using an existing manifest, <code>mymanifest</code>, that contains all of the files in the directory <code>foo/</code>.</p>
+<blockquote>
+<p><code>jar --create --file classes.jar --manifest mymanifest -C foo/</code></p>
+</blockquote></li>
+<li><p>Create a modular JAR archive,<code>foo.jar</code>, where the module descriptor is located in <code>classes/module-info.class</code>.</p>
+<blockquote>
+<p><code>jar --create --file foo.jar --main-class com.foo.Main --module-version 1.0 -C foo/classes resources</code></p>
+</blockquote></li>
+<li><p>Update an existing non-modular JAR, <code>foo.jar</code>, to a modular JAR file.</p>
+<blockquote>
+<p><code>jar --update --file foo.jar --main-class com.foo.Main --module-version 1.0 -C foo/module-info.class</code></p>
+</blockquote></li>
+<li><p>Create a versioned or multi-release JAR, <code>foo.jar</code>, that places the files in the <code>classes</code> directory at the root of the JAR, and the files in the <code>classes-10</code> directory in the <code>META-INF/versions/10</code> directory of the JAR.</p>
+<p>In this example, the <code>classes/com/foo</code> directory contains two classes, <code>com.foo.Hello</code> (the entry point class) and <code>com.foo.NameProvider</code>, both compiled for JDK 8. The <code>classes-10/com/foo</code> directory contains a different version of the <code>com.foo.NameProvider</code> class, this one containing JDK 10 specific code and compiled for JDK 10.</p>
+<p>Given this setup, create a multirelease JAR file <code>foo.jar</code> by running the following command from the directory containing the directories <code>classes</code> and <code>classes-10</code> .</p>
+<blockquote>
+<p><code>jar --create --file foo.jar --main-class com.foo.Hello -C classes . --release 10 -C classes-10 .</code></p>
+</blockquote>
+<p>The JAR file <code>foo.jar</code> now contains:</p>
+<pre><code>% jar -tf foo.jar
+
+META-INF/
+META-INF/MANIFEST.MF
+com/
+com/foo/
+com/foo/Hello.class
+com/foo/NameProvider.class
+META-INF/versions/10/com/
+META-INF/versions/10/com/foo/
+META-INF/versions/10/com/foo/NameProvider.class</code></pre>
+<p>As well as other information, the file <code>META-INF/MANIFEST.MF</code>, will contain the following lines to indicate that this is a multirelease JAR file with an entry point of <code>com.foo.Hello</code>.</p>
+<pre><code>...
+Main-Class: com.foo.Hello
+Multi-Release: true</code></pre>
+<p>Assuming that the <code>com.foo.Hello</code> class calls a method on the <code>com.foo.NameProvider</code> class, running the program using JDK 10 will ensure that the <code>com.foo.NameProvider</code> class is the one in <code>META-INF/versions/10/com/foo/</code>. Running the program using JDK 8 will ensure that the <code>com.foo.NameProvider</code> class is the one at the root of the JAR, in <code>com/foo</code>.</p></li>
+<li><p>Create an archive, <code>my.jar</code>, by reading options and lists of class files from the file <code>classes.list</code>.</p>
+<p><strong>Note:</strong></p>
+<p>To shorten or simplify the <code>jar</code> command, you can specify arguments in a separate text file and pass it to the <code>jar</code> command with the at sign (<code>@</code>) as a prefix.</p>
+<blockquote>
+<p><code>jar --create --file my.jar @classes.list</code></p>
+</blockquote></li>
+</ul>
+</body>
+</html>

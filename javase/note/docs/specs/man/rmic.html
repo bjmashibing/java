@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The rmic Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The rmic Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>rmic - generate stub and skeleton class files using the Java Remote Method Protocol (JRMP)</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>rmic</code> [<em>options</em>] <em>package-qualified-class-names</em></p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represent the command-line <code>options</code> for the<code>rmic</code> compiler. See <a href="#options-for-the-rmic-compiler">Options for the rmic Compiler</a>.
+</dd>
+<dt><em>package-qualified-class-names</em></dt>
+<dd>Class names that include their packages, for example, <code>java.awt.Color</code>.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p><strong>Deprecation Note:</strong> Support for static generation of Java Remote Method Protocol (JRMP) stubs and skeletons has been deprecated. Oracle recommends that you use dynamically generated JRMP stubs instead, eliminating the need to use this tool for JRMP-based applications.</p>
+<p>The <code>rmic</code> compiler generates stub and skeleton class files using the JRMP.</p>
+<p><strong>Note:</strong></p>
+<p>The rmic compiler has been updated to remove the <code>-idl</code> and <code>-iiop</code> options and can no longer generate IDL or IIOP stubs and tie classes.</p>
+<p>JRMP class files are generated from compiled Java programming language classes that are remote object implementation classes. A remote implementation class is a class that implements the interface <code>java.rmi.Remote</code>. The class names in the <code>rmic</code> command must be for classes that were compiled successfully with the <code>javac</code> command and must be fully package qualified. For example, running the <code>rmic</code> command on the class file name <code>HelloImpl</code> as shown here creates the <code>HelloImpl_Stub.class</code> file in the <code>hello</code> subdirectory (named for the class's package):</p>
+<blockquote>
+<p><code>rmic hello.HelloImpl</code></p>
+</blockquote>
+<p>A skeleton for a remote object is a JRMP protocol server-side entity that has a method that dispatches calls to the remote object implementation.</p>
+<p>A stub is a client-side proxy for a remote object that's responsible for communicating method invocations on remote objects to the server where the actual remote object implementation resides. A client's reference to a remote object, therefore, is actually a reference to a local stub.</p>
+<p>By default, the <code>rmic</code> command generates stub classes that use the 1.2 JRMP stub protocol version only, as though the <code>-v1.2</code> option were specified. See <a href="#options-for-the-rmic-compiler">Options for the rmic Compiler</a>.</p>
+<p>A stub implements only the remote interfaces, and not local interfaces that the remote object also implements. Because a JRMP stub implements the same set of remote interfaces as the remote object, a client can use the Java programming language built-in operators for casting and type checking.</p>
+<p><strong>Note:</strong></p>
+<p>The rmic compiler does not support reading of class files that have been compiled with the <code>--enable-preview</code> option, nor does it support generation of stub or skeleton classes that have preview features enabled.</p>
+<h2 id="options-for-the-rmic-compiler">Options for the rmic Compiler</h2>
+<dl>
+<dt><code>-bootclasspath</code> <em>path</em></dt>
+<dd>Overrides the location of bootstrap class files.
+</dd>
+<dt><code>-classpath</code> <em>path</em></dt>
+<dd><p>Specifies the path the <code>rmic</code> command uses to look up classes. This option overrides the default or the <code>CLASSPATH</code> environment variable when it is set. Directories are separated by colons or semicolons, depending on your operating system. The following is the general format for <em>path</em>:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> <code>.:</code><em>your_path</em>, for example: <code>.:/usr/local/java/classes</code></p></li>
+<li><p><strong>Windows:</strong> <code>.;</code><em>your_path</em>, for example: <code>.;/usr/local/java/classes</code></p></li>
+</ul>
+</dd>
+<dt><code>-d</code> <em>directory</em></dt>
+<dd><p>Specifies the root destination directory for the generated class hierarchy. You can use this option to specify a destination directory for the stub, skeleton, and tie files.</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> For example, the following command places the stub and skeleton classes derived from <code>MyClass</code> into the directory <code>/java/classes/exampleclass</code>:</p>
+<blockquote>
+<p><code>rmic -d /java/classes exampleclass.MyClass</code></p>
+</blockquote></li>
+<li><p><strong>Windows:</strong> For example, the following command places the stub and skeleton classes derived from <code>MyClass</code> into the directory <code>C:\java\classes\exampleclass</code>:</p>
+<blockquote>
+<p><code>rmic -d C:\java\classes exampleclass.MyClass</code></p>
+</blockquote></li>
+</ul>
+<p>If the <code>-d</code> option isn't specified, then the default behavior is as though <code>-d</code> was specified. The package hierarchy of the target class is created in the current directory, and stub/tie/skeleton files are placed within it.</p>
+</dd>
+<dt><code>-g</code></dt>
+<dd>Enables the generation of all debugging information, including local variables. By default, only line number information is generated.
+</dd>
+<dt><code>-J</code><em>argument</em></dt>
+<dd>Used with any Java command, the <code>-J</code> option passes the <em>argument</em> that follows it (no spaces between the <code>-J</code> and the argument) to the Java interpreter.
+</dd>
+<dt><code>-keep</code> or <code>-keepgenerated</code></dt>
+<dd>Retains the generated <code>.java</code> source files for the stub, skeleton, and tie classes and writes them to the same directory as the<code>.class</code> files.
+</dd>
+<dt><code>-nowarn</code></dt>
+<dd>Turns off warnings. When the <code>-nowarn</code> options is used, the compiler doesn't print warnings.
+</dd>
+<dt><code>-nowrite</code></dt>
+<dd>Doesn't write compiled classes to the file system.
+</dd>
+<dt><code>-vcompat</code> (deprecated)</dt>
+<dd><p>Generates stub and skeleton classes that are compatible with both the 1.1 and 1.2 JRMP stub protocol versions. This option was the default in releases before 5.0. The generated stub classes use the 1.1 stub protocol version when loaded in a JDK 1.1 virtual machine and use the 1.2 stub protocol version when loaded into a 1.2 (or later) virtual machine. The generated skeleton classes support both 1.1 and 1.2 stub protocol versions. The generated classes are relatively large to support both modes of operation.</p>
+<p><strong>Note:</strong></p>
+<p>This option has been deprecated. See <a href="#description">Description</a>.</p>
+</dd>
+<dt><code>-verbose</code></dt>
+<dd>Causes the compiler and linker to print messages about what classes are being compiled and what class files are being loaded.
+</dd>
+<dt><code>-v1.1</code> (deprecated)</dt>
+<dd><p>Generates stub and skeleton classes for the 1.1 JRMP stub protocol version only. The <code>-v1.1</code> option is useful only for generating stub classes that are serialization-compatible with existing, statically deployed stub classes generated by the <code>rmic</code> command from JDK 1.1 that can't be upgraded (and dynamic class loading isn't being used).</p>
+<p><strong>Note:</strong></p>
+<p>This option has been deprecated. See <a href="#description">Description</a>.</p>
+</dd>
+<dt><code>-v1.2</code> (deprecated)</dt>
+<dd><p>(Default) Generates stub classes for the 1.2 JRMP stub protocol version only. No skeleton classes are generated because skeleton classes aren't used with the 1.2 stub protocol version. The generated stub classes don't work when they're loaded into a JDK 1.1 virtual machine.</p>
+<p><strong>Note:</strong></p>
+<p>This option has been deprecated. See <a href="#description">Description</a>.</p>
+</dd>
+</dl>
+<h2 id="environment-variables">Environment Variables</h2>
+<dl>
+<dt><code>CLASSPATH</code></dt>
+<dd><p>Used to provide the system a path to user-defined classes.</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> Directories are separated by colons, for example: <code>.:/usr/local/java/classes</code>.</p></li>
+<li><p><strong>Windows:</strong> Directories are separated by colons, for example: <code>.;C:\usr\local\java\classes</code>.</p></li>
+</ul>
+</dd>
+</dl>
+</body>
+</html>

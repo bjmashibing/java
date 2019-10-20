@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The pack200 Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The pack200 Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>pack200 - transform a Java Archive (JAR) file into a compressed pack200 file with the Java gzip compressor</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>pack200</code> [<em>-opt...</em> | <em>--option=value</em>] <em>x.pack[.gz]</em> <em>JAR-file</em></p>
+<dl>
+<dt><em>-opt...</em> | <em>--option=value</em></dt>
+<dd>Options can be in any order. The last option on the command line or in a properties file supersedes all previously specified options. See <a href="#options-for-the-pack200-command">Options for the pack200 Command</a>.
+</dd>
+<dt><em>x.pack[.gz]</em></dt>
+<dd>Name of the output file.
+</dd>
+<dt><em>JAR-file</em></dt>
+<dd>Name of the input file.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>pack200</code> command is a Java application that transforms a JAR file into a compressed <code>pack200</code> file with the Java gzip compressor. This command packages a JAR file into a compressed <code>pack200</code> file for web deployment. The <code>pack200</code> files are highly compressed files that can be directly deployed to save bandwidth and reduce download time.</p>
+<p>Typical usage is shown in the following example, where <code>myarchive.pack.gz</code> is produced with the default <code>pack200</code> command settings:</p>
+<blockquote>
+<p><code>pack200 myarchive.pack.gz myarchive.jar</code></p>
+</blockquote>
+<p><strong>Note:</strong></p>
+<p>This command shouldn't be confused with <code>pack</code>. The <code>pack</code> and <code>pack200</code> commands are separate products. The Java SE API Specification provided with the JDK is the superseding authority, when there are discrepancies.</p>
+<h2 id="exit-status">Exit Status</h2>
+<p>The following exit values are returned: 0 for successful completion and a number greater than 0 when an error occurs.</p>
+<h2 id="options-for-the-pack200-command">Options for the pack200 Command</h2>
+<p>The <code>pack200</code> command has several options to fine-tune and set the compression engine. The typical usage is shown in the following example, where <code>myarchive.pack.gz</code> is produced with the default <code>pack200</code> command settings:</p>
+<blockquote>
+<p><code>pack200 myarchive.pack.gz myarchive.jar</code></p>
+</blockquote>
+<dl>
+<dt><code>-r</code> or <code>--repack</code></dt>
+<dd><p>Produces a JAR file by packing and unpacking a JAR file. The resulting file can be used as an input to the <code>jarsigner</code> tool. The following example packs and unpacks the myarchive.jar file:</p>
+<blockquote>
+<p><code>pack200 --repack myarchive-packer.jar myarchive.jar</code></p>
+</blockquote>
+<blockquote>
+<p><code>pack200 --repack myarchive.jar</code></p>
+</blockquote>
+</dd>
+<dt><code>-g</code> or<code>--no-gzip</code></dt>
+<dd><p>Produces a <code>pack200</code> file. With this option, a suitable compressor must be used, and the target system must use a corresponding decompresser.</p>
+<blockquote>
+<p><code>pack200 --no-gzip myarchive.pack myarchive.jar</code></p>
+</blockquote>
+</dd>
+<dt><code>--gzip</code></dt>
+<dd>(Default) Post-compresses the pack output with <code>gzip</code>.
+</dd>
+<dt><code>-G</code> or <code>--strip-debug</code></dt>
+<dd>Strips debugging attributes from the output. These include <code>SourceFile</code>, <code>LineNumberTable</code>, <code>LocalVariableTable</code> and <code>LocalVariableTypeTable</code>. Removing these attributes reduces the size of both downloads and installations, also reduces the usefulness of debuggers.
+</dd>
+<dt><code>--keep-file-order</code></dt>
+<dd>Preserves the order of files in the input file. This is the default behavior.
+</dd>
+<dt><code>-O</code> or<code>--no-keep-file-order</code></dt>
+<dd>Reorders and transmits all elements. The packer can also remove JAR directory names to reduce the download size. However, certain JAR file optimizations, such as indexing, might not work correctly.
+</dd>
+<dt><code>-S</code><em>N</em> or <code>--segment-limit=</code><em>N</em></dt>
+<dd><p>The value is the estimated target size <em>N</em> (in bytes) of each archive segment. If a single input file requires more than <em>N</em> bytes, then its own archive segment is provided. As a special case, a value of <code>-1</code> produces a single large segment with all input files, while a value of 0 produces one segment for each class. Larger archive segments result in less fragmentation and better compression, but processing them requires more memory.</p>
+<p>The size of each segment is estimated by counting the size of each input file to be transmitted in the segment with the size of its name and other transmitted properties.</p>
+<p>The default is <code>-1</code>, which means that the packer creates a single segment output file. In cases where extremely large output files are generated, users are strongly encouraged to use segmenting or break up the input file into smaller JAR file.</p>
+<p>A 10 MB JAR packed without this limit typically packs about 10 percent smaller, but the packer might require a larger Java heap (about 10 times the segment limit).</p>
+</dd>
+<dt><code>-E</code><em>value</em> or <code>--effort=</code><em>value</em></dt>
+<dd><p>If the value is set to a single decimal digit, then the packer uses the indicated amount of effort in compressing the archive. Level 1 might produce somewhat larger size and faster compression speed, while level 9 takes much longer, but can produce better compression. The special value 0 instructs the <code>pack200</code> command to copy through the original JAR file directly with no compression. The JSR 200 standard requires any unpacker to understand this special case as a pass-through of the entire archive.</p>
+<p>The default is 5, to invest a modest amount of time to produce reasonable compression.</p>
+</dd>
+<dt><code>-H</code><em>value</em> or <code>--deflate-hint=</code><em>value</em></dt>
+<dd><p>Overrides the default, which preserves the input information, but can cause the transmitted archive to be larger. The possible values are: <code>true</code>, <code>false</code>, or <code>keep</code>.</p>
+<p>If the <code>value</code> is <code>true</code> or false, then the <code>packer200</code> command sets the deflation hint accordingly in the output archive and doesn't transmit the individual deflation hints of archive elements.</p>
+<p>The <code>keep</code> value preserves deflation hints observed in the input JAR. This is the default.</p>
+</dd>
+<dt><code>-m</code><em>value</em> or <code>--modification-time=</code><em>value</em></dt>
+<dd><p>The possible values are <code>latest</code> and <code>keep</code>.</p>
+<p>If the value is <code>latest</code>, then the packer attempts to determine the latest modification time, among all the available entries in the original archive, or the latest modification time of all the available entries in that segment. This single value is transmitted as part of the segment and applied to all the entries in each segment. This can marginally decrease the transmitted size of the archive at the expense of setting all installed files to a single date.</p>
+<p>If the value is <code>keep</code>, then modification times observed in the input JAR are preserved. This is the default.</p>
+</dd>
+<dt><code>-P</code><em>file</em> or <code>--pass-file=</code><em>file</em></dt>
+<dd>Indicates that a file should be passed through bytewise with no compression. By repeating the option, multiple files can be specified. There is no path name transformation, except that the system file separator is replaced by the JAR file separator forward slash (/). The resulting file names must match exactly as strings with their occurrences in the JAR file. If <em>file</em> is a directory name, then all files under that directory are passed.
+</dd>
+<dt><code>-U</code><em>action</em> or <code>--unknown-attribute=</code><em>action</em></dt>
+<dd><p>Overrides the default behavior, which means that the class file that contains the unknown attribute is passed through with the specified <em>action</em>. The possible values for actions are <code>error</code>, <code>strip</code>, or <code>pass</code>.</p>
+<p>If the value is <code>error</code>, then the entire <code>pack200</code> command operation fails with a suitable explanation.</p>
+<p>If the value is <code>strip</code>, then the attribute is dropped. Removing the required Java Virtual Machine (JVM) attributes can cause class loader failures.</p>
+<p>If the value is <code>pass</code>, then the entire class is transmitted as though it is a resource.</p>
+</dd>
+<dt><code>-C</code><em>attribute-name</em><code>=</code><em>layout</em> or <code>--class-attribute=</code><em>attribute-name</em><code>=</code><em>layout</em></dt>
+<dd>(user-defined attribute) See the description for <code>-D</code><em>attribute-name</em><code>=</code><em>layout</em>.
+</dd>
+<dt><code>-F</code><em>attribute-name</em><code>=</code><em>layout</em> or <code>--field-attribute=</code><em>attribute-name</em><code>=</code><em>layout</em></dt>
+<dd>(user-defined attribute) See the description for <code>-D</code><em>attribute-name</em><code>=</code><em>layout</em>.
+</dd>
+<dt><code>-M</code><em>attribute-name</em><code>=</code><em>layout</em> or <code>--method-attribute=</code><em>attribute-name</em><code>=</code><em>layout</em></dt>
+<dd>(user-defined attribute) See the description for <code>-D</code><em>attribute-name</em><code>=</code><em>layout</em>.
+</dd>
+<dt><code>-D</code><em>attribute-name</em><code>=</code><em>layout</em> or <code>--code-attribute=</code><em>attribute-name</em><code>=</code><em>layout</em></dt>
+<dd><p>(user-defined attribute) The attribute layout can be specified for a class entity, such as <code>class-attribute</code>, <code>field-attribute</code>, <code>method-attribute</code>, and <code>code-attribute</code>. The <em>attribute-name</em> is the name of the attribute for which the layout or action is being defined. The possible values for <em>action</em> are <em>some-layout-string</em>, <code>error</code>, <code>strip</code>, <code>pass</code>.</p>
+<p><em>some-layout-string</em>: The layout language is defined in the JSR 200 specification, for example: <code>--class-attribute=SourceFile=RUH</code>.</p>
+<p>If the value is <code>error</code>, then the <code>pack200</code> operation fails with an explanation.</p>
+<p>If the value is <code>strip</code>, then the attribute is removed from the output. Removing JVM-required attributes can cause class loader failures. For example, <code>--class-attribute=CompilationID=pass</code> causes the class file that contains this attribute to be passed through without further action by the packer.</p>
+<p>If the value is <code>pass</code>, then the entire class is transmitted as though it's a resource.</p>
+</dd>
+<dt><code>-f</code><em>pack.properties</em> or <code>--config-file=</code><em>pack.properties</em></dt>
+<dd><p>Indicates a configuration file, containing Java properties to initialize the packer, can be specified on the command line.</p>
+<pre><code>pack200 -f pack.properties myarchive.pack.gz myarchive.jar
+more pack.properties
+# Generic properties for the packer.
+modification.time=latest
+deflate.hint=false
+keep.file.order=false
+# This option will cause the files bearing new attributes to
+# be reported as an error rather than passed uncompressed.
+unknown.attribute=error
+# Change the segment limit to be unlimited.
+segment.limit=-1</code></pre>
+</dd>
+<dt><code>-v</code> or <code>--verbose</code></dt>
+<dd>Outputs minimal messages. Multiple specification of this option will create more verbose messages.
+</dd>
+<dt><code>-q</code> or <code>--quiet</code></dt>
+<dd>Specifies quiet operation with no messages.
+</dd>
+<dt><code>-l</code><em>filename</em> or <code>--log-file=</code><em>filename</em></dt>
+<dd>Specifies a log file to output messages.
+</dd>
+<dt><code>-?</code>, <code>-h</code>, or<code>--help</code></dt>
+<dd>Prints help information about this command.
+</dd>
+<dt><code>-V</code> or <code>--version</code></dt>
+<dd>Prints version information about this command.
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd>Passes the specified <em>option</em> to the Java Virtual Machine. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB.
+</dd>
+</dl>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Platform Debugger Architecture</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Java Platform Debugger Architecture</h1>
+</header>
+<br />
+<div class="centered">
+<h1 id="java-platform-debugger-architecture">Java Platform Debugger Architecture</h1>
+</div>
+<div class="centered">
+<h2 id="overview">Overview</h2>
+</div>
+<p>The Java Platform Debugger Architecture (JPDA) consists of two interfaces (JVM TI and JDI), a protocol (JDWP) and two software components which tie them together (back-end and front-end). The intent of JVM TI is multi-fold:</p>
+<ul>
+<li>To provide standard interfaces (for the sake of simplicity we will refer to JDWP as an interface) which allow Java programming language debugging tools to be easily written without regard to platform specifics such hardware, operating system and virtual machine implementation.</li>
+<li>To describe a complete architecture for implementing these interfaces, including remote and cross-platform debugging.</li>
+<li>To provide a reference implementation of this architecture.</li>
+<li>To provide a highly modular architecture where the implementation and/or client of an interface can be different than the reference implementation or different from the JPDA component.</li>
+</ul>
+<h2 id="background">Background</h2>
+<p>See <a href="architecture.html">Java Platform Debugger Architecture</a>.</p>
+<h2 id="modularity">Modularity</h2>
+<p>Details of the modular structure of JPDA are discussed below. In each case the standard JPDA usage is described. The reference implementation is described and alternative implementations and clients of the interface are discussed.</p>
+<h3 id="jvm-ti-modularity">JVM TI Modularity</h3>
+<p>The Java Virtual Machine Tool Interface (JVM TI) describes the functionality provided by a virtual machine (VM) in order to allow debugging of Java programming language applications running under this VM. In JPDA, JVM TI is implemented by a VM and the client is the JPDA back-end. In the reference implementation of JPDA, JVM TI is implemented by the Java HotSpot VM and the client is the reference implementation of the back-end, supplied as a native shared library (jdwp.so, jdwp.dll, ...), which is shipped with the JDK.</p>
+<p>Many VMs other than the Java HotSpot VM implement JVM TI. The reference implementation of the back-end has been ported to other platforms. And there are JVM TI clients other than the back-end, most notably agents for applications that allow debugging of both native and Java programming language code, and thus need native level control and information. We are aware of no clean-room implementations of the back-end, although this is possible - and a lot of work.</p>
+<h3 id="jdwp-modularity">JDWP Modularity</h3>
+<p>The Java Debug Wire Protocol (JDWP) describes the format of debugging information and requests between a debuggee and a debugger. In JPDA, there is a communication channel between the front-end (in the debugger process) and the back-end (in the debuggee process) - the format of data flowing on this channel is described by JDWP. In the reference implementation of JPDA, the reference implementation of the back-end (above) provides the debuggee side of this channel, and the reference implementation of the front-end (a Java programming language component of the JDK, located in tools.jar) provides the debugger side.</p>
+<p>JVM TI is problematic to implement in some VMs. JDWP is implemented directly in such VMs. On the client side, an application written in a language other than the Java programming language may not be an optimal candidate for using JDI. Some have chosen to be clients of JDWP.</p>
+<h3 id="jdi-modularity">JDI Modularity</h3>
+<p>The Java Debug Interface (JDI) provides a pure Java programming language interface for debugging Java programming language applications. In JPDA, the JDI is a remote view in the debugger process of a virtual machine in the debuggee process. It is implemented by the front-end (above) while a debugger-like application (IDE, debugger, tracer, monitoring tool, ...) is the client.</p>
+<p>The JDI could be implemented by a system with a static view of an application. It could be implemented by a system with a mechanism utterly different than JDWP/front-end for collecting information or controlling a VM.</p>
+<h2 id="walk-through">Walk-through</h2>
+<p>The various ways that the interfaces can be used is discussed above. This section will examine how the standard full JPDA works. The examples go into detail about specific calls and codes. It is not important to understand these -- they are present only to make the examples more concrete.</p>
+<p>Across each interface there are two classes of activity: requests and events. Requests originate on the debugger side and include queries for information, setting of state changes in the remote VM/application, and setting of debugging state. Events originate on the debuggee side and denote changes of state in the remote VM/application.</p>
+<p>Let's walk through an example. A user clicks on a local variable in a stack view in an IDE, requesting its value. The IDE uses the JDI to get the value, in particular it calls the <code>getValue</code> method, for example:</p>
+<pre><code>    theStackFrame.getValue(theLocalVariable)</code></pre>
+<p>Where <code>theStackFrame</code> is a <a href="../../api/jdk.jdi/com/sun/jdi/StackFrame.html"><code>com.sun.jdi.StackFrame</code></a> and <code>theLocalVariable</code> is a <a href="../../api/jdk.jdi/com/sun/jdi/LocalVariable.html"><code>com.sun.jdi.LocalVariable</code></a>.</p>
+<p>The front-end then sends this query over a communications channel (let's say a socket) to the back-end running in the debuggee process. It sends it by formatting it into a byte stream in accordance with the JDWP. In particular, it sends a GetValues command (byte value: 1) in the StackFrame command set (byte value: 16), followed by the thread ID, frame ID, etc.</p>
+<p>The back-end deciphers the byte-stream and sends the query off to the VM through the JVM TI. In particular, let's say the requested value is an integer, the following JVM TI function call is made:</p>
+<pre><code>    error = jvmti-&gt;GetLocalInt(frame, slot, &amp;intValue);</code></pre>
+<p>The back-end sends back across the socket, a response packet, which will include the value of <code>intValue</code>, and which will be formatted according to JDWP. The front-end deciphers the response packet and returns the value as the value of the <code>getValue</code> method call. The IDE then displays the value.</p>
+<p>Requests to change debugging state are processed in a similar manner. For example, a request to set a breakpoint goes through the same steps -- although, of course, the JDI methods called, the JDWP commands sent, and the JVM TI functions called are different. Additionally, the front-end and back-end do more than shove data back and forth, they track and schedule activity and convert, filter, and cache information, so a breakpoint request will be processed quite differently than a get value query - but the communication sequence will be the same.</p>
+<p>What happens when the application being debugged finally hits this breakpoint? This is where events come into play. The virtual machine sends an event across the JVM TI interface. In particular, it calls the event handling function passing the breakpoint:</p>
+<p>The back-end has set the event handling function to be:</p>
+<pre><code>static void Breakpoint(jvmtiEnv *jvmti_env,
+                       JNIEnv* jni_env, jthread thread,
+                       jmethodID method, jlocation location)
+{ ...</code></pre>
+<p>This back-end function starts a chain of activity which filters the event to see if it is interesting, queues it, and sends it across the socket in the JDWP format defined for breakpoint events. The front-end decodes and processes the event, eventually generating a JDI event. In particular, the JDI event is exposing it as a <a href="../../api/jdk.jdi/com/sun/jdi/event/BreakpointEvent.html"><code>com.sun.tools.jdi.event.BreakpointEvent</code></a>. The IDE then gets the event by removing it from the event queue:</p>
+<pre><code>    theEventQueue.remove()</code></pre>
+<p>where <code>theEventQueue</code> is a <a href="../../api/jdk.jdi/com/sun/jdi/event/EventQueue.html"><code>com.sun.jdi.event.EventQueue</code></a>. The IDE will probably update its displays by making many query calls across the JDI.</p>
+<h2 id="porting">Porting</h2>
+<p>Each virtual machine implementation needs its own JVM TI implementation -- a JVM TI implementation must dig deeply into VM data structures and must set hooks into the VM implementation in order to get events. Adding JVMDT to a VM without JVM TI support is a significant undertaking. Depending on the complexity of the VM and the amount of optional JVM TI implemented, it might be a three to twelve month project. Porting a VM which has JVM TI support to a new platform is primarily the work of porting the non-JVM TI portions of the VM -- JVM TI adds a comparatively small amount of work.</p>
+<p>The reference implementation of the back-end can usually be moved to a new platform with little (a few lines) or no change to the source and then recompiled. To use a new VM on the same platform, the binary of the back-end should generally work -- although, it's not Java programming language code so you never know. Note that licensing issues are not covered by this document.</p>
+<p>The front-end implementation is written in the Java programming language and will run on any platform or VM. However, the connector code has functionality that may need to be extended for some systems. For example, the reference implementation of the front-end includes a launcher which assumes virtual machines are launched using Java SE conventions. A user of the JDI can configure any launcher syntax he or she wants, but generally a debugger application would prefer to leave this to the JDI implementation. If a different type of communication channel is desired (serial, for example) this too would need to be added using the <a href="conninv.html#SPI">Service Provider Interface</a> introduced in JDK 5.0.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2018, Oracle and/or its affiliates. All rights reserved.</em></p>
+</body>
+</html>

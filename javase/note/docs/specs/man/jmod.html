@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jmod Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jmod Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jmod - create JMOD files and list the content of existing JMOD files</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jmod</code> (<code>create</code>|<code>extract</code>|<code>list</code>|<code>describe</code>|<code>hash</code>) [<em>options</em>] <em>jmod-file</em></p>
+<p>Includes the following:</p>
+<p><strong>Main operation modes</strong></p>
+<dl>
+<dt><code>create</code></dt>
+<dd>Creates a new JMOD archive file.
+</dd>
+<dt><code>extract</code></dt>
+<dd>Extracts all the files from the JMOD archive file.
+</dd>
+<dt><code>list</code></dt>
+<dd>Prints the names of all the entries.
+</dd>
+<dt><code>describe</code></dt>
+<dd>Prints the module details.
+</dd>
+<dt><code>hash</code></dt>
+<dd>Determines leaf modules and records the hashes of the dependencies that directly and indirectly require them.
+</dd>
+</dl>
+<p><strong>Options</strong></p>
+<dl>
+<dt><em>options</em></dt>
+<dd>See <a href="#options-for-jmod">Options for jmod</a>.
+</dd>
+</dl>
+<p><strong>Required</strong></p>
+<dl>
+<dt><em>jmod-file</em></dt>
+<dd>Specifies the name of the JMOD file to create or from which to retrieve information.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p><strong>Note:</strong> For most development tasks, including deploying modules on the module path or publishing them to a Maven repository, continue to package modules in modular JAR files. The <code>jmod</code> tool is intended for modules that have native libraries or other configuration files or for modules that you intend to link, with the <a href="jlink.html">jlink</a> tool, to a runtime image.</p>
+<p>The JMOD file format lets you aggregate files other than <code>.class</code> files, metadata, and resources. This format is transportable but not executable, which means that you can use it during compile time or link time but not at run time.</p>
+<p>Many <code>jmod</code> options involve specifying a path whose contents are copied into the resulting JMOD files. These options copy all the contents of the specified path, including subdirectories and their contents, but exclude files whose names match the pattern specified by the <code>--exclude</code> option.</p>
+<p>With the <code>--hash-modules</code> option or the <code>jmod hash</code> command, you can, in each module's descriptor, record hashes of the content of the modules that are allowed to depend upon it, thus &quot;tying&quot; together these modules. This enables a package to be exported to one or more specifically-named modules and to no others through qualified exports. The runtime verifies if the recorded hash of a module matches the one resolved at run time; if not, the runtime returns an error.</p>
+<h2 id="options-for-jmod">Options for jmod</h2>
+<dl>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd>Specifies the location of application JAR files or a directory containing classes to copy into the resulting JMOD file.
+</dd>
+<dt><code>--cmds</code> <em>path</em></dt>
+<dd>Specifies the location of native commands to copy into the resulting JMOD file.
+</dd>
+<dt><code>--config</code> <em>path</em></dt>
+<dd>Specifies the location of user-editable configuration files to copy into the resulting JMOD file.
+</dd>
+<dt><code>--dir</code> <em>path</em></dt>
+<dd>Specifies the location where <code>jmod</code> puts extracted files from the specified JMOD archive.
+</dd>
+<dt><code>--dry-run</code></dt>
+<dd>Performs a dry run of hash mode. It identifies leaf modules and their required modules without recording any hash values.
+</dd>
+<dt><code>--exclude</code> <em>pattern-list</em></dt>
+<dd><p>Excludes files matching the supplied comma-separated pattern list, each element using one the following forms:</p>
+<ul>
+<li><p><em>glob-pattern</em></p></li>
+<li><p><code>glob:</code><em>glob-pattern</em></p></li>
+<li><p><code>regex:</code><em>regex-pattern</em></p></li>
+</ul>
+<p>See the <a href="https://docs.oracle.com/javase/10/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-"><code>FileSystem.getPathMatcher</code></a> method for the syntax of <em>glob-pattern</em>. See the <a href="https://docs.oracle.com/javase/10/docs/api/java/util/regex/Pattern.html"><code>Pattern</code></a> class for the syntax of <em>regex-pattern</em>, which represents a regular expression.</p>
+</dd>
+<dt><code>--hash-modules</code> <em>regex-pattern</em></dt>
+<dd>Determines the leaf modules and records the hashes of the dependencies directly and indirectly requiring them, based on the module graph of the modules matching the given <em>regex-pattern</em>. The hashes are recorded in the JMOD archive file being created, or a JMOD archive or modular JAR on the module path specified by the <code>jmod hash</code> command.
+</dd>
+<dt><code>--header-files</code> <em>path</em></dt>
+<dd>Specifies the location of header files to copy into the resulting JMOD file.
+</dd>
+<dt><code>--help</code> or <code>-h</code></dt>
+<dd>Prints a usage message.
+</dd>
+<dt><code>--help-extra</code></dt>
+<dd>Prints help for extra options.
+</dd>
+<dt><code>--legal-notices</code> <em>path</em></dt>
+<dd>Specifies the location of legal notices to copy into the resulting JMOD file.
+</dd>
+<dt><code>--libs</code> <em>path</em></dt>
+<dd>Specifies location of native libraries to copy into the resulting JMOD file.
+</dd>
+<dt><code>--main-class</code> <em>class-name</em></dt>
+<dd>Specifies main class to record in the module-info.class file.
+</dd>
+<dt><code>--man-pages</code> <em>path</em></dt>
+<dd>Specifies the location of man pages to copy into the resulting JMOD file.
+</dd>
+<dt><code>--module-version</code> <em>module-version</em></dt>
+<dd>Specifies the module version to record in the module-info.class file.
+</dd>
+<dt><code>--module-path</code> <em>path</em> or <code>-p</code> <em>path</em></dt>
+<dd>Specifies the module path. This option is required if you also specify <code>--hash-modules</code>.
+</dd>
+<dt><code>--target-platform</code> <em>platform</em></dt>
+<dd>Specifies the target platform.
+</dd>
+<dt><code>--version</code></dt>
+<dd>Prints version information of the <code>jmod</code> tool.
+</dd>
+<dt><code>@</code><em>filename</em></dt>
+<dd><p>Reads options from the specified file.</p>
+<p>An options file is a text file that contains the options and values that you would ordinarily enter in a command prompt. Options may appear on one line or on several lines. You may not specify environment variables for path names. You may comment out lines by prefixinga hash symbol (<code>#</code>) to the beginning of the line.</p>
+<p>The following is an example of an options file for the <code>jmod</code> command:</p>
+<pre><code>#Wed Dec 07 00:40:19 EST 2016
+create --class-path mods/com.greetings --module-path mlib
+  --cmds commands --config configfiles --header-files src/h
+  --libs lib --main-class com.greetings.Main
+  --man-pages man --module-version 1.0
+  --os-arch &quot;x86_x64&quot; --os-name &quot;Mac OS X&quot;
+  --os-version &quot;10.10.5&quot; greetingsmod</code></pre>
+</dd>
+</dl>
+<h2 id="extra-options-for-jmod">Extra Options for jmod</h2>
+<p>In addition to the options described in <a href="#options-for-jmod">Options for jmod</a>, the following are extra options that can be used with the command.</p>
+<dl>
+<dt><code>--do-not-resolve-by-default</code></dt>
+<dd>Exclude from the default root set of modules
+</dd>
+<dt><code>--warn-if-resolved</code></dt>
+<dd>Hint for a tool to issue a warning if the module is resolved. One of deprecated, deprecated-for-removal, or incubating.
+</dd>
+</dl>
+<h2 id="jmod-create-example">jmod Create Example</h2>
+<p>The following is an example of creating a JMOD file:</p>
+<pre><code>jmod create --class-path mods/com.greetings --cmds commands
+  --config configfiles --header-files src/h --libs lib
+  --main-class com.greetings.Main --man-pages man --module-version 1.0
+  --os-arch &quot;x86_x64&quot; --os-name &quot;Mac OS X&quot;
+  --os-version &quot;10.10.5&quot; greetingsmod</code></pre>
+<h2 id="jmod-hash-example">jmod Hash Example</h2>
+<p>The following example demonstrates what happens when you try to link a leaf module (in this example, <code>ma</code>) with a required module (<code>mb</code>), and the hash value recorded in the required module doesn't match that of the leaf module.</p>
+<ol type="1">
+<li><p>Create and compile the following <code>.java</code> files:</p>
+<ul>
+<li><p><code>jmodhashex/src/ma/module-info.java</code></p>
+<pre><code>module ma {
+  requires mb;
+}</code></pre></li>
+<li><p><code>jmodhashex/src/mb/module-info.java</code></p>
+<pre><code>module mb {
+}</code></pre></li>
+<li><p><code>jmodhashex2/src/ma/module-info.java</code></p>
+<pre><code>module ma {
+  requires mb;
+}</code></pre></li>
+<li><p><code>jmodhashex2/src/mb/module-info.java</code></p>
+<pre><code>module mb {
+}</code></pre></li>
+</ul></li>
+<li><p>Create a JMOD archive for each module. Create the directories <code>jmodhashex/jmods</code> and <code>jmodhashex2/jmods</code>, and then run the following commands from the <code>jmodhashex</code> directory, then from the <code>jmodhashex2</code> directory:</p>
+<ul>
+<li><p><code>jmod create --class-path mods/ma jmods/ma.jmod</code></p></li>
+<li><p><code>jmod create --class-path mods/mb jmods/mb.jmod</code></p></li>
+</ul></li>
+<li><p>Optionally preview the <code>jmod hash</code> command. Run the following command from the <code>jmodhashex</code> directory:</p>
+<p><code>jmod hash --dry-run -module-path jmods --hash-modules .*</code></p>
+<p>The command prints the following:</p>
+<pre><code>Dry run:
+mb
+  hashes ma SHA-256 07667d5032004b37b42ec2bb81b46df380cf29e66962a16481ace2e71e74073a</code></pre>
+<p>This indicates that the <code>jmod hash</code> command (without the <code>--dry-run</code> option) will record the hash value of the leaf module <code>ma</code> in the module <code>mb</code>.</p></li>
+<li><p>Record hash values in the JMOD archive files contained in the <code>jmodhashex</code> directory. Run the following command from the <code>jmodhashex</code> directory:</p>
+<blockquote>
+<p><code>jmod hash --module-path jmods --hash-modules .*</code></p>
+</blockquote>
+<p>The command prints the following:</p>
+<blockquote>
+<p><code>Hashes are recorded in module mb</code></p>
+</blockquote></li>
+<li><p>Print information about each JMOD archive contained in the <code>jmodhashex</code> directory. Run the highlighted commands from the <code>jmodhashex</code> directory:</p>
+<pre><code>jmod describe jmods/ma.jmod
+
+ma
+  requires mandated java.base
+  requires mb
+
+jmod describe jmods/mb.jmod
+
+mb
+  requires mandated java.base
+  hashes ma SHA-256 07667d5032004b37b42ec2bb81b46df380cf29e66962a16481ace2e71e74073a</code></pre></li>
+<li><p>Attempt to create a runtime image that contains the module <code>ma</code> from the directory <code>jmodhashex2</code> but the module <code>mb</code> from the directory <code>jmodhashex</code>. Run the following command from the <code>jmodhashex2</code> directory:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<blockquote>
+<p><code>jlink --module-path $JAVA_HOME/jmods:jmods/ma.jmod:../jmodhashex/jmods/mb.jmod --add-modules ma --output ma-app</code></p>
+</blockquote></li>
+<li><p><strong>Windows:</strong></p>
+<blockquote>
+<p><code>jlink --module-path %JAVA_HOME%/jmods;jmods/ma.jmod;../jmodhashex/jmods/mb.jmod --add-modules ma --output ma-app</code></p>
+</blockquote></li>
+</ul>
+<p>The command prints an error message similar to the following:</p>
+<pre><code>Error: Hash of ma (a2d77889b0cb067df02a3abc39b01ac1151966157a68dc4241562c60499150d2) differs to
+expected hash (07667d5032004b37b42ec2bb81b46df380cf29e66962a16481ace2e71e74073a) recorded in mb</code></pre></li>
+</ol>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jdeprscan Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jdeprscan Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jdeprscan - static analysis tool that scans a jar file (or some other aggregation of class files) for uses of deprecated API elements</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jdeprscan</code> [<em>options</em>] {<em>dir</em>|<em>jar</em>|<em>class</em>}</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>See <a href="#options-for-the-jdeprscan-command">Options for the jdeprscan Command</a>
+</dd>
+<dt><em>dir</em>|<em>jar</em>|<em>class</em></dt>
+<dd><p><code>jdeprscan</code> command scans each argument for usages of deprecated APIs. The arguments can be a:</p>
+<ul>
+<li><p><em>dir</em>: Directory</p></li>
+<li><p><em>jar</em>: JAR file</p></li>
+<li><p><em>class</em>: Class name or class file</p></li>
+</ul>
+<p>The class name should use a dot (<code>.</code>) as a separator. For example:</p>
+<p><code>java.lang.Thread</code></p>
+<p>For nested classes, the dollar sign <code>$</code> separator character should be used. For example:</p>
+<p><code>java.lang.Thread$State</code></p>
+<p>A class file can also be named. For example:</p>
+<p><code>build/classes/java/lang/Thread$State.class</code></p>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jdeprscan</code> tool is a static analysis tool provided by the JDK that scans a JAR file or some other aggregation of class files for uses of deprecated API elements. The deprecated APIs identified by the <code>jdeprscan</code> tool are only those that are defined by Java SE. Deprecated APIs defined by third-party libraries aren't reported.</p>
+<p>To scan a JAR file or a set of class files, you must first ensure that all of the classes that the scanned classes depend upon are present in the class path. Set the class path using the <code>--class-path</code> option described in <a href="#options-for-the-jdeprscan-command">Options for the jdeprscan Command</a>. Typically, you would use the same class path as the one that you use when invoking your application.</p>
+<p>If the <code>jdeprscan</code> can't find all the dependent classes, it will generate an error message for each class that's missing. These error messages are typically of the form:</p>
+<blockquote>
+<p><code>error: cannot find class ...</code></p>
+</blockquote>
+<p>If these errors occur, then you must adjust the class path so that it includes all dependent classes.</p>
+<h2 id="options-for-the-jdeprscan-command">Options for the jdeprscan Command</h2>
+<p>The following options are available:</p>
+<dl>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd><p>Provides a search path for resolution of dependent classes.</p>
+<p><em>path</em> can be a search path that consists of one or more directories separated by the system-specific path separator. For example:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<blockquote>
+<p><code>--class-path /some/directory:/another/different/dir</code></p>
+</blockquote></li>
+</ul>
+<p><strong>Note:</strong></p>
+<p>On Windows, use a semicolon (<code>;</code>) as the separator instead of a colon (<code>:</code>).</p>
+<ul>
+<li><p><strong>Windows:</strong></p>
+<blockquote>
+<p><code>--class-path \some\directory;\another\different\dir</code></p>
+</blockquote></li>
+</ul>
+</dd>
+<dt><code>--for-removal</code></dt>
+<dd>Limits scanning or listing to APIs that are deprecated for removal. Can't be used with a release value of 6, 7, or 8.
+</dd>
+<dt><code>--full-version</code></dt>
+<dd>Prints out the full version string of the tool.
+</dd>
+<dt><code>--help</code> or <code>-h</code></dt>
+<dd>Prints out a full help message.
+</dd>
+<dt><code>--list</code> or <code>-l</code></dt>
+<dd>Prints the set of deprecated APIs. No scanning is done, so no directory, jar, or class arguments should be provided.
+</dd>
+<dt><code>--release</code> <code>6</code>|<code>7</code>|<code>8</code>|<code>9</code></dt>
+<dd>Specifies the Java SE release that provides the set of deprecated APIs for scanning.
+</dd>
+<dt><code>--verbose</code> or <code>-v</code></dt>
+<dd>Enables additional message output during processing.
+</dd>
+<dt><code>--version</code></dt>
+<dd>Prints out the abbreviated version string of the tool.
+</dd>
+</dl>
+<h2 id="example-of-jdeprscan-output">Example of jdeprscan Output</h2>
+<p>The JAR file for this library will be named something similar to <code>commons-math3-3.6.1.jar</code>. To scan this JAR file for the use of deprecated APIs, run the following command:</p>
+<blockquote>
+<p><code>jdeprscan commons-math3-3.6.1.jar</code></p>
+</blockquote>
+<p>This command produces several lines of output. For example, one line of output might be:</p>
+<pre><code>class org/apache/commons/math3/util/MathUtils uses deprecated method java/lang/Double::&lt;init&gt;(D)V</code></pre>
+<p><strong>Note:</strong></p>
+<p>The class name is specified using the slash-separated binary name as described in JVMS 4.2.1. This is the form used internally in class files.</p>
+<p>The deprecated API it uses is a method on the <code>java.lang.Double</code> class.</p>
+<p>The name of the deprecated method is <code>&lt;init&gt;</code>, which is a special name that means that the method is actually a constructor. Another special name is <code>&lt;clinit&gt;</code>, which indicates a class static initializer.</p>
+<p>Other methods are listed just by their method name. Following the method name is the argument list and return type:</p>
+<blockquote>
+<p><code>(D)V</code></p>
+</blockquote>
+<p>This indicates that it takes just one double value (a primitive) and returns void. The argument and return types can become cryptic. For example, another line of output might be:</p>
+<pre><code>class org/apache/commons/math3/util/Precision uses deprecated method java/math/BigDecimal::setScale(II)Ljava/math/BigDecimal;</code></pre>
+<p>In this line of output, the deprecated method is on class <code>java.math.BigDecimal</code>, and the method is <code>setScale()</code>. In this case, the <code>(II)</code> means that it takes two <code>int</code> arguments. The <code>Ljava/math/BigDecimal;</code> after the parentheses means that it returns a reference to <code>java.math.BigDecimal</code>.</p>
+<h2 id="jdeprscan-analysis-can-be-version-specific">jdeprscan Analysis Can Be Version-Specific</h2>
+<p>You can use <code>jdeprscan</code> relative to the previous three JDK releases. For example, if you are running JDK 9, then you can check against JDK 8, 7, and 6.</p>
+<p>As an example, look at this code snippet:</p>
+<pre><code>public class Deprecations {
+   SecurityManager sm = new RMISecurityManager();    // deprecated in 8
+   Boolean b2 = new Boolean(true);          // deprecated in 9
+}</code></pre>
+<p>The complete class compiles without warnings in JDK 7.</p>
+<p>If you run <code>jdeprscan</code> on a system with JDK 9, then you see:</p>
+<pre><code>$ jdeprscan --class-path classes --release 7 example.Deprecations
+(no output)</code></pre>
+<p>Run <code>jdeprscan</code> with a release value of 8:</p>
+<pre><code>$ jdeprscan --class-path classes --release 8 example.Deprecations
+class example/Deprecations uses type java/rmi/RMISecurityManager deprecated
+class example/Deprecations uses method in type java/rmi/RMISecurityManager deprecated</code></pre>
+<p>Run <code>jdeprscan</code> on JDK 9:</p>
+<pre><code>$ jdeprscan --class-path classes example.Deprecations
+class example/Deprecations uses type java/rmi/RMISecurityManager deprecated
+class example/Deprecations uses method in type java/rmi/RMISecurityManager deprecated
+class example/Deprecations uses method java/lang/Boolean &lt;init&gt; (Z)V deprecated</code></pre>
+</body>
+</html>

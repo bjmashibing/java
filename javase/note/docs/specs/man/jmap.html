@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jmap Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jmap Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jmap - print details of a specified process</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> This command is experimental??and unsupported.</p>
+<p><code>jmap</code> [<em>options</em>] <em>pid</em></p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents the <code>jmap</code> command-line options. See <a href="#options-for-the-jmap-command">Options for the jmap Command</a>.
+</dd>
+<dt><em>pid</em></dt>
+<dd><p>The process ID for which the information specified by the <em>options</em> is to be printed. The process must be a Java process. To get a list of Java processes running on a machine, use either the <code>ps</code> command or, if the JVM processes are not running in a separate docker instance, the <a href="jps.html">jps</a> command.</p>
+<p><strong>Note:</strong> JDK 10 has added support for using the Attach API when attaching to Java processes running in a separate docker process. However, the <code>jps</code> command will not list the JVM processes that are running in a separate docker instance. If you are trying to connect a Linux host with a Virtual Machine that is in a docker container, you must use tools such as <code>ps</code> to look up the PID of the JVM.</p>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jmap</code> command prints details of a specified running process.</p>
+<p><strong>Note:</strong></p>
+<p>This command is unsupported and might not be available in future releases of the JDK. On Windows Systems where the <code>dbgeng.dll</code> file isn't present, the Debugging Tools for Windows must be installed to make these tools work. The <code>PATH</code> environment variable should contain the location of the <code>jvm.dll</code> file that's used by the target process or the location from which the core dump file was produced.</p>
+<h2 id="options-for-the-jmap-command">Options for the jmap Command</h2>
+<dl>
+<dt><code>-clstats</code> <em>pid</em></dt>
+<dd>Connects to a running process and prints class loader statistics of Java heap.
+</dd>
+<dt><code>-finalizerinfo</code> <em>pid</em></dt>
+<dd>Connects to a running process and prints information on objects awaiting finalization.
+</dd>
+<dt><code>-histo</code>[<code>:live</code>] <em>pid</em></dt>
+<dd>Connects to a running process and prints a histogram of the Java object heap. If the <code>live</code> suboption is specified, it then counts only live objects.
+</dd>
+<dt><code>-dump:</code><em>dump_options</em> <em>pid</em></dt>
+<dd><p>Connects to a running process and dumps the Java heap. The <em>dump_options</em> include:</p>
+<ul>
+<li><p><code>live</code> --- When specified, dumps only the live objects; if not specified, then dumps all objects in the heap.</p></li>
+<li><p><code>format=b</code> --- Dumps the Java heap in <code>hprof</code> binary format</p></li>
+<li><p><code>file=</code><em>filename</em> --- Dumps the heap to <em>filename</em></p></li>
+</ul>
+<p>Example: <code>jmap -dump:live,format=b,file=heap.bin</code> <em>pid</em></p>
+</dd>
+</dl>
+</body>
+</html>

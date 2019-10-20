@@ -1,0 +1,135 @@
+/* Styles for Skip Navigation Links */
+
+.a1 .skiplink {
+    position:absolute;
+    left:-2000px
+}
+
+.a1 .skiplink:focus {
+    left:0;
+    padding:5px;
+    border:1px #35556B solid;
+    margin:10px;
+    background:#FFD868;
+    text-decoration:underline
+}
+
+body { margin-left: 1em; margin-right: 1em; color: #000000; background: #FFFFFF }
+
+h1   { text-align: center; margin-top: 1em; margin-bottom: 1en; font-size: 180% }
+h2   { margin-left: 0;  margin-top: 1em; margin-bottom: .5en; font-size: 130% }
+h3   { margin-top: 1en; margin-bottom: 1en; font-size: 100% }
+
+p    { margin-left: 2em; margin-top: .5en; }
+li   { margin-left: 2em; margin-top: .5en; }
+
+/* Nested list items should use normal indentation */
+li li { margin-left: 0; }
+
+/* List items formatted as paragraphs for spacing should not indent
+   any further than the list already is.  */
+li p { margin-left: 0; }
+
+pre  { margin-left: 4em; }
+
+dt   { font-weight: bold; margin-bottom: 1em }
+
+/* For Table of Contents--apply to bullet list at top of page */
+.TOC { margin-left: 1em; }    /* Level 1 bullets: Apply to entire list */
+.TOC2 { margin-left: 2en; }   /* Level 2 bullets: Apply to individual items */
+.TOC3 { margin-left: 3en; }   /* Level 3 bullets: Apply to individual items */
+
+/* whodunnit */
+.byline {
+	margin-left: 0; 
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9;
+	font-weight: bold;
+	text-align: left;
+}
+
+/* Highlight changes and things for reviewers to look at */
+.HIGHLIGHT {
+	border-left-width: 7px;
+  border-left-color: blue;
+  border-left-style: solid;
+	border-right-width: 7px;
+  border-right-color: blue;
+  border-right-style: solid;
+	padding-left: 1pc;
+	padding-right: 10px;
+}
+
+/* To Be Determined (TBD)/ To Be Done (ToDo) */
+.TBD {
+  font-style: italic;
+  font-weight: bold;
+  color: #FF0000;
+	border-left-width: 4px;
+  border-left-color: red;
+  border-left-style: solid;
+	border-right-width: 4px;
+  border-right-color: red;
+  border-right-style: solid;
+}
+
+/* For hyphenated words that shouldn't span lines */
+.nowrap { white-space:nowrap }
+
+.crumbs {
+  text-align: right;
+  font-weight: bold;
+	padding-right: 3px;
+}
+
+.crumblink {
+}
+
+/* styles for header and footer start */
+.clear {
+clear:both;
+}
+
+#javaseheader {
+    position: relative;
+}
+
+#javaseheaderlogo {
+    float: left;
+}
+
+#javaseheaderindex {
+    float: right;
+    padding-top:15px;
+}
+
+#javasefooter {
+    position: relative;
+    padding-top:20px;
+} 
+
+#oraclelogofooter {
+    vertical-align:bottom;
+}
+
+#javasecopyright {
+    float: left;
+} 
+
+#javasecontactus {
+    float: right;
+} 
+
+/* styles for header and footer end */
+
+/* use with pre tag to indent code blocks */
+.codeblock {
+    padding:5px 10px 5px 10px;
+}
+
+.footnote {
+    vertical-align: super; 
+    font-size:xx-small
+};
+
+

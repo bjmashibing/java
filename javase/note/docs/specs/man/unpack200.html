@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The unpack200 Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The unpack200 Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>unpack200 - transform a packed file into a JAR file for web deployment</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>unpack200</code> [<em>options</em>] <em>input-file</em> <em>JAR-file</em></p>
+<dl>
+<dt><em>options</em></dt>
+<dd>The command-line options. See <a href="#options-for-the-unpack200-command">Options for the unpack200 Command</a>.
+</dd>
+<dt><em>input-file</em></dt>
+<dd>Name of the input file, which can be a <code>pack200 gzip</code> file or a <code>pack200</code> file. The input can also be a JAR file produced by <code>pack200</code> with an effort of <code>0</code>, in which case the contents of the input file are copied to the output JAR file with the <code>pack200</code> marker.
+</dd>
+<dt><em>JAR-file</em></dt>
+<dd>Name of the output JAR file.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>unpack200</code> command is a native implementation that transforms a packed file produced by the <code>pack200</code> into a JAR file for web deployment. An example of typical usage follows. In the following example, the <code>myarchive.jar</code> file is produced from <code>myarchive.pack.gz</code> with the default <code>unpack200</code> command settings.</p>
+<blockquote>
+<p><code>unpack200 myarchive.pack.gz myarchive.jar</code></p>
+</blockquote>
+<h2 id="options-for-the-unpack200-command">Options for the unpack200 Command</h2>
+<dl>
+<dt><code>-H</code><em>value</em> or <code>--deflate-hint=</code><em>value</em></dt>
+<dd>Sets the deflation to be <code>true</code>, <code>false</code>, or <code>keep</code> on all entries within a JAR file. The default mode is <code>keep</code>. If the value is <code>true</code> or <code>false</code>, then the <code>--deflate=hint</code> option overrides the default behavior and sets the deflation mode on all entries within the output JAR file.
+</dd>
+<dt><code>-r</code> or <code>--remove-pack-file</code></dt>
+<dd>Removes the input pack file.
+</dd>
+<dt><code>-v</code> or <code>--verbose</code></dt>
+<dd>Displays minimal messages. Multiple specifications of this option displays more verbose messages.
+</dd>
+<dt><code>-q</code> or <code>--quiet</code></dt>
+<dd>Specifies quiet operation with no messages.
+</dd>
+<dt><code>-l</code> <em>filename</em> or <code>--log-file=</code><em>filename</em></dt>
+<dd>Specifies a log file where output messages are logged.
+</dd>
+<dt><code>-?</code> or <code>-h</code> or <code>--help</code></dt>
+<dd>Prints help information about the <code>unpack200</code> command.
+</dd>
+<dt><code>-V</code> or <code>--version</code></dt>
+<dd>Prints version information about the <code>unpack200</code> command.
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd>Passes <em>option</em> to the Java Virtual Machine, where <code>option</code> is one of the options described on the reference page for the Java application launcher. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB.
+</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>This command shouldn't be confused with the <code>unpack</code> command. They're distinctly separate products.</p>
+<p>The Java SE API Specification provided with the JDK is the superseding authority in case of discrepancies.</p>
+<h2 id="exit-status">Exit Status</h2>
+<p>The following exit values are returned: 0 for successful completion, and a value that is greater than 0 when an error occurred.</p>
+</body>
+</html>

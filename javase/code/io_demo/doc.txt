@@ -1,0 +1,614 @@
+Skip navigation links 概述 软件包 类 使用 树 已过时的 索引 帮助 Java™ Platform
+Standard Ed. 8 上一个 下一个 框架 无框架 所有类 概要：  嵌套 |  字段 |  构造方法 |  方法 详细信息：  字段 |  构造方法 |  方法 compact1, compact2, compact3
+java.io
+Class RandomAccessFile
+java.lang.Object
+java.io.RandomAccessFile
+
+All Implemented Interfaces:
+Closeable ， DataInput ， DataOutput ， AutoCloseable
+
+--------------------------------------------------------------------------------
+
+
+public class RandomAccessFile
+extends Object
+implements DataOutput, DataInput, Closeable该类的实例支持读取和写入随机访问文件。 随机访问文件的行为类似于存储在文件系统中的大量字节。 有一种游标，或索引到隐含的数组，称为文件指针 ; 输入操作读取从文件指针开始的字节，并使文件指针超过读取的字节。 如果在读/写模式下创建随机访问文件，则输出操作也可用; 输出操作从文件指针开始写入字节，并将文件指针提前到写入的字节。 写入隐式数组的当前端的输出操作会导致扩展数组。 文件指针可以通过读取getFilePointer方法和由设置seek方法。
+在这个类中的所有读取例程通常都是如果在读取所需的字节数之前到达文件结尾，则抛出一个EOFException （这是一种IOException ）。 如果任何字节由于除文件末尾之外的任何原因而无法读取，则抛出IOException以外的EOFException 。 特别地，如果流已经被关闭，则可以抛出IOException 。
+
+从以下版本开始：
+JDK1.0
+
+构造方法摘要
+
+          构造方法
+
+          Constructor and Description
+RandomAccessFile(File file, String mode)
+创建一个随机访问文件流从File参数指定的文件中读取，并可选地写入文件。
+RandomAccessFile(String name, String mode)
+创建随机访问文件流，以从中指定名称的文件读取，并可选择写入文件。
+
+方法摘要
+
+          所有方法
+          接口方法
+          具体的方法
+          Modifier and Type Method and Description
+void close()
+关闭此随机访问文件流并释放与流相关联的任何系统资源。
+FileChannel getChannel()
+返回与此文件关联的唯一的FileChannel对象。
+FileDescriptor getFD()
+返回与此流关联的不透明文件描述符对象。
+long getFilePointer()
+返回此文件中的当前偏移量。
+long length()
+返回此文件的长度。
+int read()
+从该文件读取一个字节的数据。
+int read(byte[] b)
+从该文件读取最多 b.length字节的数据到字节数组。
+int read(byte[] b, int off, int len)
+从该文件读取最多 len个字节的数据到字节数组。
+boolean readBoolean()
+从此文件读取一个 boolean 。
+byte readByte()
+从此文件中读取一个带符号的八位值。
+char readChar()
+从此文件中读取一个字符。
+double readDouble()
+从此文件读取 double 。
+float readFloat()
+从此文件读取一个 float 。
+void readFully(byte[] b)
+从此文件读取 b.length字节到字节数组，从当前文件指针开始。
+void readFully(byte[] b, int off, int len)
+从此文件中读取 len个字节到字节数组，从当前文件指针开始。
+int readInt()
+从该文件读取一个带符号的32位整数。
+String readLine()
+从此文件中读取下一行文本。
+long readLong()
+从该文件中读取一个带符号的64位整数。
+short readShort()
+从此文件中读取一个已签名的16位数字。
+int readUnsignedByte()
+从此文件中读取一个无符号的八位数字。
+int readUnsignedShort()
+从该文件中读取一个无符号的16位数字。
+String readUTF()
+从该文件读取字符串。
+void seek(long pos)
+设置文件指针偏移，从该文件的开头测量，发生下一次读取或写入。
+void setLength(long newLength)
+设置此文件的长度。
+int skipBytes(int n)
+尝试跳过 n字节的输入丢弃跳过的字节。
+void write(byte[] b)
+从指定的字节数组写入 b.length个字节到该文件，从当前文件指针开始。
+void write(byte[] b, int off, int len)
+从指定的字节数组写入 len个字节，从偏移量 off开始写入此文件。
+void write(int b)
+将指定的字节写入此文件。
+void writeBoolean(boolean v)
+将 boolean写入文件作为一个字节值。
+void writeByte(int v)
+将 byte写入文件作为单字节值。
+void writeBytes(String s)
+将字符串作为字节序列写入文件。
+void writeChar(int v)
+将 char写入文件作为两字节值，高字节为先。
+void writeChars(String s)
+将一个字符串作为字符序列写入文件。
+void writeDouble(double v)
+双参数传递给转换 long使用 doubleToLongBits方法在类 Double ，然后写入该 long值到该文件作为一个八字节的数量，高字节。
+void writeFloat(float v)
+浮子参数的转换 int使用 floatToIntBits方法在类 Float ，然后写入该 int值到该文件作为一个四字节数量，高字节。
+void writeInt(int v)
+将 int写入文件为四个字节，高字节 int 。
+void writeLong(long v)
+将 long写入文件为八个字节，高字节为先。
+void writeShort(int v)
+将 short写入文件作为两个字节，高字节优先。
+void writeUTF(String str)
+以机器无关的方式使用 modified UTF-8编码将字符串写入文件。
+
+Methods inherited from class java.lang.Object
+clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait
+
+构造方法详细信息
+RandomAccessFile
+public RandomAccessFile(String name,
+                        String mode)
+                 throws FileNotFoundException创建随机访问文件流，以从中指定名称的文件读取，并可选择写入文件。 创建一个新的FileDescriptor对象来表示与该文件的连接。
+mode参数指定要打开文件的访问模式。 允许的值及其含义如RandomAccessFile(File,String) 构造函数所规定。
+
+如果有一个安全管理器，它的checkRead方法被调用，以name参数作为参数，以查看是否允许对该文件的读取访问。 如果该模式允许写入，那么安全管理器的checkWrite方法也name参数作为参数进行调用，以查看是否允许对该文件的写访问。
+
+参数
+name - 与系统相关的文件名
+mode - 访问 mode
+异常
+IllegalArgumentException -如果模式参数是不等于 "r"一个 ，"rw"，"rws"，或 "rwd"
+FileNotFoundException - 如果模式是 "r"，但给定的字符串不表示现有的常规文件，或者如果模式以 "rw"开头，但给定的字符串不表示现有的可写的常规文件，并且无法创建该名称的新常规文件，或者在打开或创建文件时出现其他错误
+SecurityException - 如果存在安全管理员，并且其 checkRead方法拒绝对该文件的读取访问或模式为“rw”，并且安全管理器的 checkWrite方法拒绝对文件的写入访问
+另请参见：
+SecurityException ， SecurityManager.checkRead(java.lang.String) ， SecurityManager.checkWrite(java.lang.String)
+RandomAccessFile
+public RandomAccessFile(File file,
+                        String mode)
+                 throws FileNotFoundException创建一个随机访问文件流，以从File参数指定的文件中读取并可选地写入文件。 创建一个新的FileDescriptor对象来表示此文件连接。
+mode参数指定要打开文件的访问模式。 允许的值及其含义是：
+
+Value Meaning "r" Open for reading only. Invoking any of the write methods of the resulting object will cause an IOException to be thrown. "rw" Open for reading and writing. If the file does not already exist then an attempt will be made to create it. "rws" Open for reading and writing, as with "rw", and also require that every update to the file's content or metadata be written synchronously to the underlying storage device. "rwd"   Open for reading and writing, as with "rw", and also require that every update to the file's content be written synchronously to the underlying storage device. "rws"和"rwd"模式的工作方式类似于FileChannel类的force(boolean)方法，分别传递了true和false的参数，但它们总是适用于每个I / O操作，因此通常更有效。 如果文件驻留在本地存储设备上，则当该类的方法的调用返回时，将保证通过该调用对文件所做的所有更改都将被写入该设备。 这对于确保系统崩溃时不会丢失关键信息非常有用。 如果文件不在本地设备上，则不会提供此类保证。
+"rwd"模式可用于减少执行的I / O操作数。 使用"rwd"只需要更新要写入存储的文件内容; 使用"rws"需要更新要写入的文件的内容及其元数据，这通常需要至少一个低级I / O操作。
+
+如果有一个安全管理器，它的checkRead方法被调用，其路径名为file参数作为参数，以查看是否允许对该文件的读取访问。 如果模式允许写入，则还使用path参数调用安全管理器的checkWrite方法，以查看是否允许对该文件的写访问。
+
+参数
+file - 文件对象
+mode - 访问模式，如描述 above
+异常
+IllegalArgumentException -如果模式参数是不等于 "r"一个 ，"rw"，"rws"，或 "rwd"
+FileNotFoundException - 如果模式是 "r"，但给定的文件对象不表示现有的常规文件，或者如果模式以 "rw"开头，但是给定的文件对象不表示现有的可写的常规文件，并且该名称的新的常规文件不能或者在打开或创建文件时发生其他错误
+SecurityException - 如果安全管理器存在，并且其 checkRead方法拒绝对文件的读取访问或模式为“rw”，并且安全管理器的 checkWrite方法拒绝对文件的写入访问
+另请参见：
+SecurityManager.checkRead(java.lang.String) ， SecurityManager.checkWrite(java.lang.String) ， FileChannel.force(boolean)
+方法详细信息
+getFD
+public final FileDescriptor getFD()
+                           throws IOException返回与此流关联的不透明文件描述符对象。
+结果
+与此流关联的文件描述符对象。
+异常
+IOException - 如果发生I / O错误。
+另请参见：
+FileDescriptor
+getChannel
+public final FileChannel getChannel()返回与此文件关联的唯一FileChannel对象。
+返回通道的position将始终等于getFilePointer方法返回的此对象的文件指针偏移量。 改变此对象的文件指针偏移量，无论是显式地还是通过读取或写入字节，都会改变通道的位置，反之亦然。 通过该对象更改文件的长度将改变通过文件通道看到的长度，反之亦然。
+
+结果
+与此文件关联的文件通道
+从以下版本开始：
+1.4
+read
+public int read()
+         throws IOException从该文件读取一个字节的数据。 该字节作为整数返回，范围为0到255（ 0x00-0x0ff ）。 如果没有输入可用，此方法将阻止。
+虽然RandomAccessFile不是RandomAccessFile的子类， InputStream该方法的行为与InputStream的InputStream.read()方法InputStream 。
+
+结果
+数据的下一个字节，如果文件的结尾已经到达， -1 。
+异常
+IOException - 如果发生I / O错误。 如果达到文件结尾，则不会抛出。
+read
+public int read(byte[] b,
+                int off,
+                int len)
+         throws IOException从该文件读取最多len字节的数据到字节数组。 该方法阻塞，直到输入的至少一个字节可用。
+虽然RandomAccessFile不是RandomAccessFile的子类， InputStream该方法的行为方式与InputStream的InputStream.read(byte[], int, int)方法InputStream 。
+
+参数
+b - 读取数据的缓冲区。
+off - 写入数据的数组 b中的起始偏移量。
+len - 读取的最大字节数。
+结果
+读取到缓冲区的总字节数，如果没有更多的数据，因为文件的结尾已经到达， -1 。
+异常
+IOException - 如果第一个字节由于除文件结尾之外的任何原因或随机访问文件已关闭或发生其他I / O错误而无法读取。
+NullPointerException - 如果 b是 null 。
+IndexOutOfBoundsException - 如果 off为负，则 len为负数，或 len大于 b.length - off
+read
+public int read(byte[] b)
+         throws IOException从该文件读取最多b.length个字节的数据到字节数组。 该方法阻塞，直到输入的至少一个字节可用。
+虽然RandomAccessFile不是RandomAccessFile的子类， InputStream该方法的行为方式与InputStream的InputStream.read(byte[])方法InputStream 。
+
+参数
+b - 读取数据的缓冲区。
+结果
+读取到缓冲区的总字节数，如果没有更多的数据，因为这个文件的结尾已经到达，那么就是 -1 。
+异常
+IOException - 如果第一个字节由于除文件结尾之外的任何原因或随机访问文件已关闭或发生其他I / O错误而无法读取。
+NullPointerException - 如果 b是 null 。
+readFully
+public final void readFully(byte[] b)
+                     throws IOException从此文件读取b.length字节到字节数组，从当前文件指针开始。 该方法从文件中重复读取，直到读取所请求的字节数。 该方法阻塞，直到读取所请求的字节数，检测到流的结尾，或抛出异常。
+Specified by:
+readFully在界面 DataInput
+参数
+b - 读取数据的缓冲区。
+异常
+EOFException - 如果此文件在读取所有字节之前到达结束。
+IOException - 如果发生I / O错误。
+readFully
+public final void readFully(byte[] b,
+                            int off,
+                            int len)
+                     throws IOException从此文件中读取len字节到字节数组，从当前文件指针开始。 该方法从文件中重复读取，直到读取所请求的字节数。 该方法阻塞，直到读取所请求的字节数，检测到流的结尾，或抛出异常。
+Specified by:
+readFully在界面 DataInput
+参数
+b - 读取数据的缓冲区。
+off - 数据的起始偏移量。
+len - 要读取的字节数。
+异常
+EOFException - 如果此文件在读取所有字节之前到达结束。
+IOException - 如果发生I / O错误。
+skipBytes
+public int skipBytes(int n)
+              throws IOException尝试跳过n字节的输入，丢弃跳过的字节。
+该方法可能跳过一些较小数量的字节，可能为零。 这可能是由许多条件中的任何一个引起的 n字节之前已经跳过的文件到达结束只有一种可能。 这种方法永远不会抛出一个EOFException 。 返回实际跳过的字节数。 如果n为负，则不跳过任何字节。
+
+Specified by:
+skipBytes在界面 DataInput
+参数
+n - 要跳过的字节数。
+结果
+实际跳过的字节数。
+异常
+IOException - 如果发生I / O错误。
+write
+public void write(int b)
+           throws IOException将指定的字节写入此文件。 写入从当前文件指针开始。
+Specified by:
+write在界面 DataOutput
+参数
+b - byte 。
+异常
+IOException - 如果发生I / O错误。
+write
+public void write(byte[] b)
+           throws IOException将 b.length字节从指定的字节数组写入此文件，从当前文件指针开始。
+Specified by:
+write在接口 DataOutput
+参数
+b - 数据。
+异常
+IOException - 如果发生I / O错误。
+write
+public void write(byte[] b,
+                  int off,
+                  int len)
+           throws IOException从指定的字节数组写入 len个字节，从偏移量 off开始到此文件。
+Specified by:
+write在界面 DataOutput
+参数
+b - 数据。
+off - 数据中的起始偏移量。
+len - 要写入的字节数。
+异常
+IOException - 如果发生I / O错误。
+getFilePointer
+public long getFilePointer()
+                    throws IOException返回此文件中的当前偏移量。
+结果
+从文件开头的偏移量（以字节为单位），下一次读取或写入发生。
+异常
+IOException - 如果发生I / O错误。
+seek
+public void seek(long pos)
+          throws IOException设置文件指针偏移，从该文件的开头测量，发生下一次读取或写入。 偏移可以设置为超出文件的末尾。 设置超出文件末尾的偏移量不会更改文件长度。 文件长度只有在偏移设置超出文件结尾之后才会通过写入进行更改。
+参数
+pos - 从文件开头测量的偏移位置，用于设置文件指针。
+异常
+IOException - 如果 pos小于 0或发生I / O错误。
+length
+public long length()
+            throws IOException返回此文件的长度。
+结果
+该文件的长度，以字节为单位。
+异常
+IOException - 如果发生I / O错误。
+setLength
+public void setLength(long newLength)
+               throws IOException设置此文件的长度。
+如果length方法返回的文件的当前长度大于newLength参数，则该文件将被截断。 在这种情况下，如果getFilePointer方法返回的文件偏移量大于newLength则此方法返回后的偏移量将等于newLength 。
+
+如果length方法返回的文件的当前长度小于newLength参数，则该文件将被扩展。 在这种情况下，文件的扩展部分的内容未定义。
+
+参数
+newLength - 文件所需的长度
+异常
+IOException - 如果发生I / O错误
+从以下版本开始：
+1.2
+close
+public void close()
+           throws IOException关闭此随机访问文件流并释放与流相关联的任何系统资源。 封闭的随机存取文件无法执行输入或输出操作，无法重新打开。
+如果此文件具有关联的通道，则通道也将关闭。
+
+Specified by:
+close在接口 Closeable
+Specified by:
+close在界面 AutoCloseable
+异常
+IOException - 如果发生I / O错误。
+readBoolean
+public final boolean readBoolean()
+                          throws IOException从此文件中读取boolean 。 该方法从文件中读取单个字节，从当前文件指针开始。 0的价值为false 。 任何其他值代表true 。 该方法阻塞直到字节被读取，流的结束被检测到或抛出异常。
+Specified by:
+readBoolean在界面 DataInput
+结果
+boolean读取值。
+异常
+EOFException - 如果此文件已到达结束。
+IOException - 如果发生I / O错误。
+readByte
+public final byte readByte()
+                    throws IOException从此文件中读取一个带符号的八位值。 该方法从当前文件指针开始从文件读取一个字节。 如果读取的字节是b ，其中0 <= b <= 255 ，那么结果是：
+     (byte)(b)
+ 该方法阻塞直到字节被读取，流的结束被检测到或抛出异常。
+
+Specified by:
+readByte在界面 DataInput
+结果
+该文件的下一个字节为有符号的8位 byte 。
+异常
+EOFException - 如果此文件已到达结束。
+IOException - 如果发生I / O错误。
+readUnsignedByte
+public final int readUnsignedByte()
+                           throws IOException从此文件中读取一个无符号的八位数字。 此方法从该文件读取一个字节，从当前文件指针开始，并返回该字节。
+该方法阻塞直到字节被读取，流的结束被检测到或抛出异常。
+
+Specified by:
+readUnsignedByte在界面 DataInput
+结果
+该文件的下一个字节被解释为无符号的8位数字。
+异常
+EOFException - 如果此文件已到达结束。
+IOException - 如果发生I / O错误。
+readShort
+public final short readShort()
+                      throws IOException从此文件中读取一个已签名的16位数字。 该方法从该文件读取两个字节，从当前文件指针开始。 如果按顺序读取的两个字节是b1和b2 ，其中两个值之间的值分别为0和255之间，则结果等于：
+     (short)((b1 << 8) | b2)
+ 此方法将阻塞，直到读取两个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readShort在界面 DataInput
+结果
+该文件的下两个字节被解释为一个有符号的16位数字。
+异常
+EOFException - 如果此文件在读取两个字节之前到达结束。
+IOException - 如果发生I / O错误。
+readUnsignedShort
+public final int readUnsignedShort()
+                            throws IOException从该文件中读取一个无符号的16位数字。 该方法从文件中读取两个字节，从当前文件指针开始。 如果字节读取顺序为b1和b2 ，其中0 <= b1, b2 <= 255 ，则结果等于：
+     (b1 << 8) | b2
+ 此方法将阻塞，直到读取两个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readUnsignedShort在接口 DataInput
+结果
+该文件的下两个字节被解释为无符号16位整数。
+异常
+EOFException - 如果此文件在读取两个字节之前到达结束。
+IOException - 如果出现I / O错误。
+readChar
+public final char readChar()
+                    throws IOException从此文件中读取一个字符。 该方法从文件中读取两个字节，从当前文件指针开始。 如果读取的字节顺序为b1和b2 ，其中0 <= b1, b2 <= 255 ，那么结果等于：
+     (char)((b1 << 8) | b2)
+ 此方法将阻塞，直到读取两个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readChar在界面 DataInput
+结果
+该文件的下两个字节，解释为 char 。
+异常
+EOFException - 如果此文件在读取两个字节之前到达结束。
+IOException - 如果发生I / O错误。
+readInt
+public final int readInt()
+                  throws IOException从该文件读取一个带符号的32位整数。 该方法从当前文件指针开始从文件读取4个字节。 如果读取的字节依次是b1 ， b2 ， b3和b4 ，其中0 <= b1, b2, b3, b4 <= 255 ，则结果等于：
+     (b1 << 24) | (b2 << 16) + (b3 << 8) + b4
+ 该方法阻塞，直到读取四个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readInt在界面 DataInput
+结果
+该文件的下四个字节，解释为 int 。
+异常
+EOFException - 如果此文件在读取四个字节之前到达结束。
+IOException - 如果发生I / O错误。
+readLong
+public final long readLong()
+                    throws IOException从该文件中读取一个带符号的64位整数。 该方法从文件中读取八个字节，从当前文件指针开始。 如果读取的字节依次是b1 ， b2 ， b3 ， b4 ， b5 ， b6 ， b7和b8,其中：
+     0 <= b1, b2, b3, b4, b5, b6, b7, b8 <=255,
+ 那么结果等于：
+
+     ((long)b1 << 56) + ((long)b2 << 48)
+     + ((long)b3 << 40) + ((long)b4 << 32)
+     + ((long)b5 << 24) + ((long)b6 << 16)
+     + ((long)b7 << 8) + b8
+ 该方法阻塞，直到读取8个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readLong在界面 DataInput
+结果
+该文件的接下来的八个字节，解释为 long 。
+异常
+EOFException - 如果此文件在读取八个字节之前到达结束。
+IOException - 如果发生I / O错误。
+readFloat
+public final float readFloat()
+                      throws IOException从此文件中读取float 。 此方法读取一个int值，并从当前文件指针，就好像由readInt方法，然后转换该int至float使用intBitsToFloat在类方法Float 。
+该方法阻塞，直到读取四个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readFloat在界面 DataInput
+结果
+该文件的下四个字节，解释为 float 。
+异常
+EOFException - 如果此文件在读取四个字节之前到达结束。
+IOException - 如果发生I / O错误。
+另请参见：
+readInt() ， Float.intBitsToFloat(int)
+readDouble
+public final double readDouble()
+                        throws IOException从此文件中读取double 。 此方法读取一个long值，并从当前文件指针，就好像由readLong方法，然后转换该long至double使用longBitsToDouble在类方法Double 。
+该方法阻塞，直到读取8个字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readDouble在界面 DataInput
+结果
+该文件的接下来的八个字节，解释为 double 。
+异常
+EOFException - 如果此文件在读取八个字节之前到达结束。
+IOException - 如果发生I / O错误。
+另请参见：
+readLong() ， Double.longBitsToDouble(long)
+readLine
+public final String readLine()
+                      throws IOException从此文件中读取下一行文本。 该方法从文件开始依次读取字节，从当前文件指针开始，直到到达行终止符或文件末尾。 通过将字符的低8位的字节值设置为零，将字符的高8位设置为零，将每个字节转换为字符。 因此，此方法不支持完整的Unicode字符集。
+一行文本由回车字符（ '\r' ），换行字符（ '\n' ），紧随换行符的回车字符或文件结尾终止。 行终止字符被丢弃，不包括返回的字符串的一部分。
+
+该方法阻塞直到读取换行字符，回车并读取其后面的字节（以查看它是否为换行符），到达文件的结尾或抛出异常。
+
+Specified by:
+readLine在接口 DataInput
+结果
+该文件的下一行文本，如果在读取一个字节之前遇到文件结尾，则返回null。
+异常
+IOException - 如果发生I / O错误。
+readUTF
+public final String readUTF()
+                     throws IOException从该文件读取字符串。 该字符串已使用modified UTF-8格式编码。
+从当前文件指针开始读取前两个字节，如readUnsignedShort 。 该值给出编码字符串中的以下字节数，而不是生成字符串的长度。 然后，以下字节将被解释为以修改的UTF-8格式编码字符的字节，并将其转换为字符。
+
+该方法阻塞，直到读取所有字节，检测到流的结尾，或抛出异常。
+
+Specified by:
+readUTF在界面 DataInput
+结果
+一个Unicode字符串。
+异常
+EOFException - 如果此文件在读取所有字节之前到达结束。
+IOException - 如果发生I / O错误。
+UTFDataFormatException - 如果字节不表示Unicode字符串的有效修改的UTF-8编码。
+另请参见：
+readUnsignedShort()
+writeBoolean
+public final void writeBoolean(boolean v)
+                        throws IOException将boolean写入文件作为一个字节值。 值true被写出为值(byte)1 ; 值false写出为值(byte)0 。 写入从文件指针的当前位置开始。
+Specified by:
+writeBoolean在接口 DataOutput
+参数
+v - boolean值。
+异常
+IOException - 如果发生I / O错误。
+writeByte
+public final void writeByte(int v)
+                     throws IOException将byte写入文件作为一个字节值。 写入从文件指针的当前位置开始。
+Specified by:
+writeByte在界面 DataOutput
+参数
+v - 一个 byte值要写。
+异常
+IOException - 如果发生I / O错误。
+writeShort
+public final void writeShort(int v)
+                      throws IOException将short写入文件作为两个字节，高位字节。 写入从文件指针的当前位置开始。
+Specified by:
+writeShort在界面 DataOutput
+参数
+v - 一个 short要写。
+异常
+IOException - 如果发生I / O错误。
+writeChar
+public final void writeChar(int v)
+                     throws IOException将char写入文件作为双字节值，高字节优先。 写入从文件指针的当前位置开始。
+Specified by:
+writeChar在界面 DataOutput
+参数
+v - char值。
+异常
+IOException - 如果发生I / O错误。
+writeInt
+public final void writeInt(int v)
+                    throws IOException将int写入文件作为四个字节，高字节优先。 写入从文件指针的当前位置开始。
+Specified by:
+writeInt在接口 DataOutput
+参数
+v - int 。
+异常
+IOException - 如果发生I / O错误。
+writeLong
+public final void writeLong(long v)
+                     throws IOException将long写入文件为八个字节，高字节为先。 写入从文件指针的当前位置开始。
+Specified by:
+writeLong在界面 DataOutput
+参数
+v - a long待写。
+异常
+IOException - 如果发生I / O错误。
+writeFloat
+public final void writeFloat(float v)
+                      throws IOException浮子参数的转换int使用floatToIntBits方法在类Float ，然后写入该int值到该文件作为一个四字节数量，高字节。 写入从文件指针的当前位置开始。
+Specified by:
+writeFloat在界面 DataOutput
+参数
+v - 一个 float值要写。
+异常
+IOException - 如果发生I / O错误。
+另请参见：
+Float.floatToIntBits(float)
+writeDouble
+public final void writeDouble(double v)
+                       throws IOException使用long中的doubleToLongBits方法将双参数转换为Double ，然后将long值写入文件，为八字节数量，高字节long 。 写入从文件指针的当前位置开始。
+Specified by:
+writeDouble在界面 DataOutput
+参数
+v - double值。
+异常
+IOException - 如果发生I / O错误。
+另请参见：
+Double.doubleToLongBits(double)
+writeBytes
+public final void writeBytes(String s)
+                      throws IOException将字符串作为字节序列写入文件。 字符串中的每个字符按顺序写出，通过丢弃其高8位。 写入从文件指针的当前位置开始。
+Specified by:
+writeBytes在界面 DataOutput
+参数
+s - 要写入的字节串。
+异常
+IOException - 如果发生I / O错误。
+writeChars
+public final void writeChars(String s)
+                      throws IOException将一个字符串作为字符序列写入文件。 每个字符都被写入数据输出流，仿佛通过writeChar方法。 写入从文件指针的当前位置开始。
+Specified by:
+writeChars在界面 DataOutput
+参数
+s - 要写入的 String值。
+异常
+IOException - 如果发生I / O错误。
+另请参见：
+writeChar(int)
+writeUTF
+public final void writeUTF(String str)
+                    throws IOException使用机器无关的方式使用modified UTF-8编码将字符串写入文件。
+首先，从当前文件指针开始，将两个字节写入文件，就像writeShort方法给出要跟随的字节数一样。 该值是实际写出的字节数，而不是字符串的长度。 按照长度，字符串的每个字符顺序地使用每个字符的修改的UTF-8编码输出。
+
+Specified by:
+writeUTF在界面 DataOutput
+参数
+str - 要写入的字符串。
+异常
+IOException - 如果发生I / O错误。
+Skip navigation links 概述 软件包 类 使用 树 已过时的 索引 帮助 Java™ Platform
+Standard Ed. 8 上一个 下一个 框架 无框架 所有类 概要：  嵌套 |  字段 |  构造方法 |  方法 详细信息：  字段 |  构造方法 |  方法 Submit a bug or feature
+For further API reference and developer documentation, see Java SE Documentation. That documentation contains more detailed, developer-targeted descriptions, with conceptual overviews, definitions of terms, workarounds, and working code examples.
+Copyright © 1993, 2014, Oracle and/or its affiliates. All rights reserved.
+
+本帮助文档是使用 《谷歌翻译》翻译，请与英文版配合使用 by--QQ:654638585
+网站地址1 网站地址2
+我要纠错----修正翻译内容。
+QQ群：864725196
+安卓帮助文档。
+
+jdk
+中
+英
+对
+照
+版

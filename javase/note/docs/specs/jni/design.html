@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Native Interface Specification: 2 - Design Overview</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="intro.html">PREV</a> | <a href="types.html">NEXT</a>
+<h1 id="chapter-2-design-overview">Chapter 2: Design Overview</h1>
+<p>This chapter focuses on major design issues in the JNI. Most design issues in this section are related to native methods. The design of the Invocation API is covered in <a href="invocation.html">Chapter 5: The Invocation API</a>.</p>
+<p>This chapter covers the following topics:</p>
+<ul>
+<li><a href="#jni-interface-functions-and-pointers">JNI Interface Functions and Pointers</a></li>
+<li><a href="#compiling-loading-and-linking-native-methods">Compiling, Loading and Linking Native Methods</a>
+<ul>
+<li><a href="#resolving-native-method-names">Resolving Native Method Names</a></li>
+<li><a href="#native-method-arguments">Native Method Arguments</a></li>
+</ul></li>
+<li><a href="#referencing-java-objects">Referencing Java Objects</a>
+<ul>
+<li><a href="#global-and-local-references">Global and Local References</a></li>
+<li><a href="#implementing-local-references">Implementing Local References</a></li>
+</ul></li>
+<li><a href="#accessing-java-objects">Accessing Java Objects</a>
+<ul>
+<li><a href="#accessing-primitive-arrays">Accessing Primitive Arrays</a></li>
+<li><a href="#accessing-fields-and-methods">Accessing Fields and Methods</a></li>
+</ul></li>
+<li><a href="#reporting-programming-errors">Reporting Programming Errors</a></li>
+<li><a href="#java-exceptions">Java Exceptions</a>
+<ul>
+<li><a href="#exceptions-and-error-codes">Exceptions and Error Codes</a></li>
+<li><a href="#asynchronous-exceptions">Asynchronous Exceptions</a></li>
+<li><a href="#exception-handling">Exception Handling</a></li>
+</ul></li>
+</ul>
+<h2 id="jni-interface-functions-and-pointers">JNI Interface Functions and Pointers</h2>
+<p>Native code accesses Java VM features by calling JNI functions. JNI functions are available through an <em>interface pointer</em>. An interface pointer is a pointer to a pointer. This pointer points to an array of pointers, each of which points to an interface function. Every interface function is at a predefined offset inside the array. The following figure, <a href="#interface-pointer">Interface Pointer</a>, illustrates the organization of an interface pointer.</p>
+<figure>
+<img src="images/interface-pointer.gif" alt="Interface pointer" id="interface-pointer" /><figcaption>Interface pointer</figcaption>
+</figure>
+<p><a href="interface-pointer.html">Description of Figure Interface Pointer</a></p>
+<p>The JNI interface is organized like a C++ virtual function table or a COM interface. The advantage to using an interface table, rather than hard-wired function entries, is that the JNI name space becomes separate from the native code. A VM can easily provide multiple versions of JNI function tables. For example, the VM may support two JNI function tables:</p>
+<ul>
+<li>one performs thorough illegal argument checks, and is suitable for debugging;</li>
+<li>the other performs the minimal amount of checking required by the JNI specification, and is therefore more efficient.</li>
+</ul>
+<p>The JNI interface pointer is only valid in the current thread. A native method, therefore, must not pass the interface pointer from one thread to another. A VM implementing the JNI may allocate and store thread-local data in the area pointed to by the JNI interface pointer.</p>
+<p>Native methods receive the JNI interface pointer as an argument. The VM is guaranteed to pass the same interface pointer to a native method when it makes multiple calls to the native method from the same Java thread. However, a native method can be called from different Java threads, and therefore may receive different JNI interface pointers.</p>
+<h2 id="compiling-loading-and-linking-native-methods">Compiling, Loading and Linking Native Methods</h2>
+<p>Since the Java VM is multithreaded, native libraries should also be compiled and linked with multithread aware native compilers. For example, the <code>-mt</code> flag should be used for C++ code compiled with the Sun Studio compiler. For code complied with the GNU gcc compiler, the flags <code>-D_REENTRANT</code> or <code>-D_POSIX_C_SOURCE</code> should be used. For more information please refer to the native compiler documentation.</p>
+<p>Native methods are loaded with the <code>System.loadLibrary</code> method. In the following example, the class initialization method loads a platform-specific native library in which the native method <code>f</code> is defined:</p>
+<pre><code>package pkg;
+
+class Cls {
+    native double f(int i, String s);
+    static {
+        System.loadLibrary(&quot;pkg_Cls&quot;);
+    }
+}</code></pre>
+<p>The argument to <code>System.loadLibrary</code> is a library name chosen arbitrarily by the programmer. The system follows a standard, but platform-specific, approach to convert the library name to a native library name. For example, a Solaris system converts the name <code>pkg_Cls</code> to <code>libpkg_Cls.so</code>, while a Win32 system converts the same <code>pkg_Cls</code> name to <code>pkg_Cls.dll</code>.</p>
+<p>The programmer may use a single library to store all the native methods needed by any number of classes, as long as these classes are to be loaded with the same class loader. The VM internally maintains a list of loaded native libraries for each class loader. Vendors should choose native library names that minimize the chance of name clashes.</p>
+<p>Support for both dynamically and statically linked libraries, and their respective lifecycle management <em>&quot;load&quot;</em> and <em>&quot;unload&quot;</em> function hooks are detailed in the <a href="invocation.html#library-and-version-management">Invocation API section on <em>Library and Version Management</em></a>.</p>
+<h3 id="resolving-native-method-names">Resolving Native Method Names</h3>
+<p>Dynamic linkers resolve entries based on their names. A native method name is concatenated from the following components:</p>
+<ul>
+<li>the prefix <code>Java_</code></li>
+<li>a mangled fully-qualified class name</li>
+<li>an underscore (&quot;_&quot;) separator</li>
+<li>a mangled method name</li>
+<li>for overloaded native methods, two underscores (&quot;__&quot;) followed by the mangled argument signature</li>
+</ul>
+<p>The VM checks for a method name match for methods that reside in the native library. The VM looks first for the short name; that is, the name without the argument signature. It then looks for the long name, which is the name with the argument signature. Programmers need to use the long name only when a native method is overloaded with another native method. However, this is not a problem if the native method has the same name as a nonnative method. A nonnative method (a Java method) does not reside in the native library.</p>
+<p>In the following example, the native method <code>g</code> does not have to be linked using the long name because the other method <code>g</code> is not a native method, and thus is not in the native library.</p>
+<pre><code>class Cls1 {
+    int g(int i);
+    native int g(double d);
+}</code></pre>
+<p>We adopted a simple name-mangling scheme to ensure that all Unicode characters translate into valid C function names. We use the underscore (&quot;_&quot;) character as the substitute for the slash (&quot;/&quot;) in fully qualified class names. Since a name or type descriptor never begins with a number, we can use <code>_0</code>, ..., <code>_9</code> for escape sequences, as the following table illustrates:</p>
+<table style="width:99%;">
+<caption>Unicode Character Translation</caption>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Escape Sequence</th>
+<th style="text-align: left;">Denotes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>_0xxxx</code></td>
+<td style="text-align: left;">a Unicode character <code>xxxx</code>, representing characters other than ASCII alphanumeric ([A-Za-z0-9]). Note that lower case is used, for example, <code>_0abcd</code> as opposed to <code>_0ABCD</code>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>_1</code></td>
+<td style="text-align: left;">the character &quot;_&quot;</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>_2</code></td>
+<td style="text-align: left;">the character &quot;;&quot; in signatures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>_3</code></td>
+<td style="text-align: left;">the character &quot;[&quot; in signatures</td>
+</tr>
+</tbody>
+</table>
+<p>Both the native methods and the interface APIs follow the standard library-calling convention on a given platform. For example, UNIX systems use the C calling convention, while Win32 systems use __stdcall.</p>
+<h3 id="native-method-arguments">Native Method Arguments</h3>
+<p>The JNI interface pointer is the first argument to native methods. The JNI interface pointer is of type <em>JNIEnv</em>. The second argument differs depending on whether the native method is static or nonstatic. The second argument to a nonstatic native method is a reference to the object. The second argument to a static native method is a reference to its Java class.</p>
+<p>The remaining arguments correspond to regular Java method arguments. The native method call passes its result back to the calling routine via the return value. <a href="types.html">Chapter 3: JNI Types and Data Structures</a> describes the mapping between Java and C types.</p>
+<p>The following code example illustrates using a C function to implement the native method <code>f</code>. The native method <code>f</code> is declared as follows:</p>
+<pre><code>package pkg;
+
+class Cls {
+    native double f(int i, String s);
+    // ...
+}</code></pre>
+<p>The C function with the long mangled name <code>Java_pkg_Cls_f_ILjava_lang_String_2</code> implements native method <code>f</code>:</p>
+<pre><code>jdouble Java_pkg_Cls_f__ILjava_lang_String_2 (
+     JNIEnv *env,        /* interface pointer */
+     jobject obj,        /* &quot;this&quot; pointer */
+     jint i,             /* argument #1 */
+     jstring s)          /* argument #2 */
+{
+     /* Obtain a C-copy of the Java string */
+     const char *str = (*env)-&gt;GetStringUTFChars(env, s, 0);
+
+     /* process the string */
+     ...
+
+     /* Now we are done with str */
+     (*env)-&gt;ReleaseStringUTFChars(env, s, str);
+
+     return ...
+}</code></pre>
+<p>Note that we always manipulate Java objects using the interface pointer <em>env</em>. Using C++, you can write a slightly cleaner version of the code, as shown in the following code example:</p>
+<pre><code>extern &quot;C&quot; /* specify the C calling convention */
+
+jdouble Java_pkg_Cls_f__ILjava_lang_String_2 (
+
+     JNIEnv *env,        /* interface pointer */
+     jobject obj,        /* &quot;this&quot; pointer */
+     jint i,             /* argument #1 */
+     jstring s)          /* argument #2 */
+
+{
+     const char *str = env-&gt;GetStringUTFChars(s, 0);
+
+     // ...
+
+     env-&gt;ReleaseStringUTFChars(s, str);
+
+     // return ...
+}</code></pre>
+<p>With C++, the extra level of indirection and the interface pointer argument disappear from the source code. However, the underlying mechanism is exactly the same as with C. In C++, JNI functions are defined as inline member functions that expand to their C counterparts.</p>
+<h2 id="referencing-java-objects">Referencing Java Objects</h2>
+<p>Primitive types, such as integers, characters, and so on, are copied between Java and native code. Arbitrary Java objects, on the other hand, are passed by reference. The VM must keep track of all objects that have been passed to the native code, so that these objects are not freed by the garbage collector. The native code, in turn, must have a way to inform the VM that it no longer needs the objects. In addition, the garbage collector must be able to move an object referred to by the native code.</p>
+<h3 id="global-and-local-references">Global and Local References</h3>
+<p>The JNI divides object references used by the native code into two categories: <em>local</em> and <em>global references</em>. Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references remain valid until they are explicitly freed.</p>
+<p>Objects are passed to native methods as local references. All Java objects returned by JNI functions are local references. The JNI allows the programmer to create global references from local references. JNI functions that expect Java objects accept both global and local references. A native method may return a local or global reference to the VM as its result.</p>
+<p>In most cases, the programmer should rely on the VM to free all local references after the native method returns. However, there are times when the programmer should explicitly free a local reference. Consider, for example, the following situations:</p>
+<ul>
+<li>A native method accesses a large Java object, thereby creating a local reference to the Java object. The native method then performs additional computation before returning to the caller. The local reference to the large Java object will prevent the object from being garbage collected, even if the object is no longer used in the remainder of the computation.</li>
+<li>A native method creates a large number of local references, although not all of them are used at the same time. Since the VM needs a certain amount of space to keep track of a local reference, creating too many local references may cause the system to run out of memory. For example, a native method loops through a large array of objects, retrieves the elements as local references, and operates on one element at each iteration. After each iteration, the programmer no longer needs the local reference to the array element.</li>
+</ul>
+<p>The JNI allows the programmer to manually delete local references at any point within a native method. To ensure that programmers can manually free local references, JNI functions are not allowed to create extra local references, except for references they return as the result.</p>
+<p>Local references are only valid in the thread in which they are created. The native code must not pass local references from one thread to another.</p>
+<h3 id="implementing-local-references">Implementing Local References</h3>
+<p>To implement local references, the Java VM creates a registry for each transition of control from Java to a native method. A registry maps nonmovable local references to Java objects, and keeps the objects from being garbage collected. All Java objects passed to the native method (including those that are returned as the results of JNI function calls) are automatically added to the registry. The registry is deleted after the native method returns, allowing all of its entries to be garbage collected.</p>
+<p>There are different ways to implement a registry, such as using a table, a linked list, or a hash table. Although reference counting may be used to avoid duplicated entries in the registry, a JNI implementation is not obliged to detect and collapse duplicate entries.</p>
+<p>Note that local references cannot be faithfully implemented by conservatively scanning the native stack. The native code may store local references into global or heap data structures.</p>
+<h2 id="accessing-java-objects">Accessing Java Objects</h2>
+<p>The JNI provides a rich set of accessor functions on global and local references. This means that the same native method implementation works no matter how the VM represents Java objects internally. This is a crucial reason why the JNI can be supported by a wide variety of VM implementations.</p>
+<p>The overhead of using accessor functions through opaque references is higher than that of direct access to C data structures. We believe that, in most cases, Java programmers use native methods to perform nontrivial tasks that overshadow the overhead of this interface.</p>
+<h3 id="accessing-primitive-arrays">Accessing Primitive Arrays</h3>
+<p>This overhead is not acceptable for large Java objects containing many primitive data types, such as integer arrays and strings. (Consider native methods that are used to perform vector and matrix calculations.) It would be grossly inefficient to iterate through a Java array and retrieve every element with a function call.</p>
+<p>One solution introduces a notion of &quot;pinning&quot; so that the native method can ask the VM to pin down the contents of an array. The native method then receives a direct pointer to the elements. This approach, however, has two implications:</p>
+<ul>
+<li>The garbage collector must support pinning.</li>
+<li>The VM must lay out primitive arrays contiguously in memory. Although this is the most natural implementation for most primitive arrays, boolean arrays can be implemented as packed or unpacked. Therefore, native code that relies on the exact layout of boolean arrays will not be portable.</li>
+</ul>
+<p>We adopt a compromise that overcomes both of the above problems.</p>
+<p>First, we provide a set of functions to copy primitive array elements between a segment of a Java array and a native memory buffer. Use these functions if a native method needs access to only a small number of elements in a large array.</p>
+<p>Second, programmers can use another set of functions to retrieve a pinned-down version of array elements. Keep in mind that these functions may require the Java VM to perform storage allocation and copying. Whether these functions in fact copy the array depends on the VM implementation, as follows:</p>
+<ul>
+<li>If the garbage collector supports pinning, and the layout of the array is the same as expected by the native method, then no copying is needed.</li>
+<li>Otherwise, the array is copied to a nonmovable memory block (for example, in the C heap) and the necessary format conversion is performed. A pointer to the copy is returned.</li>
+</ul>
+<p>Lastly, the interface provides functions to inform the VM that the native code no longer needs to access the array elements. When you call these functions, the system either unpins the array, or it reconciles the original array with its non-movable copy and frees the copy.</p>
+<p>Our approach provides flexibility. A garbage collector algorithm can make separate decisions about copying or pinning for each given array. For example, the garbage collector may copy small objects, but pin the larger objects.</p>
+<p>A JNI implementation must ensure that native methods running in multiple threads can simultaneously access the same array. For example, the JNI may keep an internal counter for each pinned array so that one thread does not unpin an array that is also pinned by another thread. Note that the JNI does not need to lock primitive arrays for exclusive access by a native method. Simultaneously updating a Java array from different threads leads to nondeterministic results.</p>
+<h3 id="accessing-fields-and-methods">Accessing Fields and Methods</h3>
+<p>The JNI allows native code to access the fields and to call the methods of Java objects. The JNI identifies methods and fields by their symbolic names and type signatures. A two-step process factors out the cost of locating the field or method from its name and signature. For example, to call the method <code>f</code> in class <em>cls</em>, the native code first obtains a method ID, as follows:</p>
+<pre><code>jmethodID mid = env-&gt;GetMethodID(cls, &quot;f&quot;, &quot;(ILjava/lang/String;)D&quot;);</code></pre>
+<p>The native code can then use the method ID repeatedly without the cost of method lookup, as follows:</p>
+<pre><code>jdouble result = env-&gt;CallDoubleMethod(obj, mid, 10, str);</code></pre>
+<p>A field or method ID does not prevent the VM from unloading the class from which the ID has been derived. After the class is unloaded, the method or field ID becomes invalid. The native code, therefore, must make sure to:</p>
+<ul>
+<li>keep a live reference to the underlying class, or</li>
+<li>recompute the method or field ID</li>
+</ul>
+<p>if it intends to use a method or field ID for an extended period of time.</p>
+<p>The JNI does not impose any restrictions on how field and method IDs are implemented internally.</p>
+<h2 id="reporting-programming-errors">Reporting Programming Errors</h2>
+<p>The JNI does not check for programming errors such as passing in NULL pointers or illegal argument types. Illegal argument types includes such things as using a normal Java object instead of a Java class object. The JNI does not check for these programming errors for the following reasons:</p>
+<ul>
+<li>Forcing JNI functions to check for all possible error conditions degrades the performance of normal (correct) native methods.</li>
+<li>In many cases, there is not enough runtime type information to perform such checking.</li>
+</ul>
+<p>Most C library functions do not guard against programming errors. The <code>printf()</code> function, for example, usually causes a runtime error, rather than returning an error code, when it receives an invalid address. Forcing C library functions to check for all possible error conditions would likely result in such checks to be duplicated--once in the user code, and then again in the library.</p>
+<p>The programmer must not pass illegal pointers or arguments of the wrong type to JNI functions. Doing so could result in arbitrary consequences, including a corrupted system state or VM crash.</p>
+<h2 id="java-exceptions">Java Exceptions</h2>
+<p>The JNI allows native methods to raise arbitrary Java exceptions. The native code may also handle outstanding Java exceptions. The Java exceptions left unhandled are propagated back to the VM.</p>
+<h3 id="exceptions-and-error-codes">Exceptions and Error Codes</h3>
+<p>Certain JNI functions use the Java exception mechanism to report error conditions. In most cases, JNI functions report error conditions by returning an error code <em>and</em> throwing a Java exception. The error code is usually a special return value (such as NULL) that is outside of the range of normal return values. Therefore, the programmer can:</p>
+<ul>
+<li>quickly check the return value of the last JNI call to determine if an error has occurred, and</li>
+<li>call a function, <code>ExceptionOccurred()</code>, to obtain the exception object that contains a more detailed description of the error condition.</li>
+</ul>
+<p>There are two cases where the programmer needs to check for exceptions without being able to first check an error code:</p>
+<ul>
+<li>The JNI functions that invoke a Java method return the result of the Java method. The programmer must call <code>ExceptionOccurred()</code> to check for possible exceptions that occurred during the execution of the Java method.</li>
+<li>Some of the JNI array access functions do not return an error code, but may throw an <code>ArrayIndexOutOfBoundsException</code> or <code>ArrayStoreException</code>.</li>
+</ul>
+<p>In all other cases, a non-error return value guarantees that no exceptions have been thrown.</p>
+<h3 id="asynchronous-exceptions">Asynchronous Exceptions</h3>
+<p>One thread may raise an asynchronous exception in another thread by calling the <code>Thread.stop()</code> method, which has been deprecated since Java 2 SDK release 1.2. Programmers are strongly discouraged from using <code>Thread.stop()</code> as it generally leads to an indeterminate application state.</p>
+<p>Furthermore, the JVM may produce exceptions in the current thread without being the direct result of a JNI API call, but because of various JVM internal errors, for example: <code>VirtualMachineError</code> like <code>StackOverflowError</code> or <code>OutOfMemoryError</code>. These are also referred to as asynchronous exceptions.</p>
+<p>Asynchronous exceptions do not immediately affect the execution of the native code in the current thread, until:</p>
+<ul>
+<li>the native code calls one of the JNI functions that could raise synchronous exceptions, or</li>
+<li>the native code uses <code>ExceptionOccurred()</code> to explicitly check for synchronous and asynchronous exceptions.</li>
+</ul>
+<p>Note that only those JNI functions that could potentially raise synchronous exceptions check for asynchronous exceptions.</p>
+<p>Native methods should insert <code>ExceptionOccurred()</code> checks in necessary places, such as in any long running code without other exception checks (this may include tight loops). This ensures that the current thread responds to asynchronous exceptions in a reasonable amount of time. However, because of their asynchronous nature, making an exception check before a call is no guarantee that an asynchronous exception won't be raised between the check and the call.</p>
+<h3 id="exception-handling">Exception Handling</h3>
+<p>There are two ways to handle an exception in native code:</p>
+<ul>
+<li>The native method can choose to return immediately, causing the exception to be thrown in the Java code that initiated the native method call.</li>
+<li>The native code can clear the exception by calling <code>ExceptionClear()</code>, and then execute its own exception-handling code.</li>
+</ul>
+<p>After an exception has been raised, the native code must first clear the exception before making other JNI calls. When there is a pending exception, the JNI functions that are safe to call are:</p>
+<pre><code>ExceptionOccurred()
+ExceptionDescribe()
+ExceptionClear()
+ExceptionCheck()
+ReleaseStringChars()
+ReleaseStringUTFChars()
+ReleaseStringCritical()
+Release&lt;Type&gt;ArrayElements()
+ReleasePrimitiveArrayCritical()
+DeleteLocalRef()
+DeleteGlobalRef()
+DeleteWeakGlobalRef()
+MonitorExit()
+PushLocalFrame()
+PopLocalFrame()
+DetachCurrentThread()</code></pre>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="intro.html">PREV</a> | <a href="types.html">NEXT</a>
+</body>
+</html>

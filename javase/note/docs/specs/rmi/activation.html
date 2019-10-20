@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: 7 - Remote Object Activation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="registry.html">PREV</a> | <a href="stubs.html">NEXT</a>
+<h1 id="remote-object-activation">7 Remote Object Activation</h1>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#activation-protocol">Activation Protocol</a></li>
+<li><a href="#implementation-model-for-an-activatable-remote-object">Implementation Model for an &quot;Activatable&quot; Remote Object</a></li>
+<li><a href="#activation-interfaces">Activation Interfaces</a></li>
+</ul>
+<hr />
+<h2 id="overview">7.1 Overview</h2>
+<p>Distributed object systems are designed to support long-lived persistent objects. Given that these systems will be made up of many thousands (perhaps millions) of such objects, it would be unreasonable for object implementations to become active and remain active, taking up valuable system resources, for indefinite periods of time. In addition, clients need the ability to store persistent references to objects so that communication among objects can be re-established after a system crash, since typically a reference to a distributed object is valid only while the object is active.</p>
+<p>Object activation is a mechanism for providing persistent references to objects and managing the execution of object implementations. In RMI, activation allows objects to begin execution on an as-needed basis. When an <em>activatable</em> remote object is accessed (via a method invocation) if that remote object is not currently executing, the system initiates the object's execution inside an appropriate JVM.</p>
+<h3 id="terminology">7.1.1 Terminology</h3>
+<p>An <em>active</em> object is a remote object that is instantiated and exported in a JVM on some system. A <em>passive</em> object is one that is not yet instantiated (or exported) in a JVM, but which can be brought into an active state. Transforming a passive object into an active object is a process known as <em>activation</em>. Activation requires that an object be associated with a JVM, which may entail loading the class for that object into a JVM and the object restoring its persistent state (if any).</p>
+<p>In the RMI system, we use <em>lazy activation</em>. Lazy activation defers activating an object until a client's first use (i.e., the first method invocation).</p>
+<h3 id="lazy-activation">7.1.2 Lazy Activation</h3>
+<p>Lazy activation of remote objects is implemented using a <em>faulting remote reference</em> (sometimes referred to as a fault block). A faulting remote reference to a remote object &quot;faults in&quot; the active object's reference upon the first method invocation to the object. Each faulting reference maintains both a persistent handle (an activation identifier) and a transient remote reference to the target remote object. The remote object's activation identifier contains enough information to engage a third party in activating the object. The transient reference is the actual &quot;live&quot; reference to the active remote object that can be used to contact the executing object.</p>
+<p>In a faulting reference, if the live reference to a remote object is <code>null</code>, the target object is not known to be active. Upon method invocation, the faulting reference (for that object) engages in the activation protocol to obtain a &quot;live&quot; reference, which is a remote reference (such as a unicast remote reference) for the newly-activated object. Once the faulting reference obtains the live reference, the faulting reference forwards method invocations to the underlying remote reference which, in turn, forwards the method invocation to the remote object.</p>
+<p>In more concrete terms, a remote object's stub contains a &quot;faulting&quot; remote reference type that contains both:</p>
+<ul>
+<li><p>an activation identifier for a remote object, and</p></li>
+<li><p>a &quot;live&quot; reference (possibly <code>null</code>) containing the &quot;active&quot; remote reference type of the remote object (for example, a remote reference type with unicast semantics).</p></li>
+</ul>
+<p><strong>Note:</strong> The RMI system preserves &quot;at most once&quot; semantics for remote calls. In other words, a call to an <em>activatable</em> or <em>unicast</em> remote object is sent at most once. Thus, if a call to a remote object fails (indicated by a <code>RemoteException</code> being thrown), the client can be guaranteed that the remote method executed no more than once (and perhaps not at all).</p>
+<h2 id="activation-protocol">7.2 Activation Protocol</h2>
+<p>During a remote method invocation, if the &quot;live&quot; reference for a target object is unknown, the faulting reference engages in the activation protocol. The activation protocol involves several entities: the faulting reference, the <em>activator</em>, an <em>activation</em> <em>group</em>, and the remote object being activated.</p>
+<p>The activator (usually one per host) is the entity which supervises activation by being both:</p>
+<ul>
+<li><p>a database of information that maps activation identifiers to the information necessary to activate an object (the object's class, the location--a URL path--from which the class can be loaded, specific data the object may need to bootstrap, etc.), and</p></li>
+<li><p>a manager of Java virtual machines, that starts up JVMs (when necessary) and forwards requests for object activation (along with the necessary information) to the correct activation group inside a remote JVM.</p></li>
+</ul>
+<p>Note that the activator keeps the current mapping of activation identifiers to active objects as a cache, so that the group does not need to be consulted on each activation request.</p>
+<p>An activation group (one per JVM) is the entity which receives a request to activate an object in the JVM and returns the activated object back to the activator.</p>
+<p>The activation protocol is as follows. A faulting reference uses an activation identifier and calls the activator (an internal RMI interface) to activate the object associated with the identifier. The activator looks up the object's <em>activation descriptor</em> (registered previously). The object's descriptor contains:</p>
+<ul>
+<li>the object's group identifier, specifying the JVM in which it is activated,</li>
+<li>the object's class name,</li>
+<li>a URL path from which to load the object's class code, and</li>
+<li>object-specific initialization data in marshalled form (initialization data might be the name of a file containing the object's persistent state, for example).</li>
+</ul>
+<p>If the activation group in which this object should reside exists, the activator forwards the activation request to that group. If the activation group does not exist, the activator initiates a JVM executing an activation group and then forwards the activation request to that group.</p>
+<p>The activation group loads the class for the object and instantiates the object using a special constructor that takes several arguments, including the activation descriptor registered previously.</p>
+<p>When the object is finished activating, the activation group passes back a <em>marshalled object</em> reference to the activator that then records the activation identifier and active reference pairing and returns the active (live) reference to the faulting reference. The faulting reference (inside the stub) then forwards method invocations via the live reference directly to the remote object.</p>
+<p><strong>Note:</strong> In Java 2 SDK, Standard Edition, v 1.2, RMI provides an implementation of the activation system interfaces. In order to use activation, you must first run the activation system daemon <code>rmid</code>.</p>
+<h2 id="implementation-model-for-an-activatable-remote-object">7.3 Implementation Model for an &quot;Activatable&quot; Remote Object</h2>
+<p>In order to make a remote object that can be accessed via an activation identifier over time, a developer needs to:</p>
+<ul>
+<li>register an activation descriptor for the remote object, and</li>
+<li>include a special constructor in the object's class that the RMI system calls when it activates the activatable object.</li>
+</ul>
+<p>An activation descriptor (<code>ActivationDesc</code>) can be registered in one of several ways:</p>
+<ul>
+<li>via a call to the static <code>register</code> method of the class <code>Activatable</code>, or</li>
+<li>by creating an &quot;activatable&quot; object via the first or second constructor of the <code>Activatable</code> class, or</li>
+<li>by exporting an &quot;activatable&quot; object explicitly via <code>Activatable</code>'s first or second <code>exportObject</code> method.</li>
+</ul>
+<p>For a specific object, only one of the above methods should be used to register the object for activation. See the section below on &quot;Constructing an Activatable Remote Object&quot; for examples on how to implement activatable objects.</p>
+<h3 id="the-activationdesc-class">7.3.1 The <code>ActivationDesc</code> Class</h3>
+<p>An <code>ActivationDesc</code> contains the information necessary to activate an object. It contains the object's activation group identifier, the class name for the object, a codebase path (or URLs) from which the object's code can be loaded, and a <code>MarshalledObject</code> that may contain object-specific initialization data used during each activation.</p>
+<p>A descriptor registered with the activation system is consulted (during the activation process) to obtain information in order to re-create or activate an object. The <code>MarshalledObject</code> in the object's descriptor is passed as the second argument to the remote object's constructor for the object to use during activation.</p>
+<pre><code>package java.rmi.activation;
+public final class ActivationDesc implements java.io.Serializable
+{
+
+        public ActivationDesc(String className,
+                              String codebase,
+                              java.rmi.MarshalledObject data)
+                throws ActivationException;
+
+        public ActivationDesc(String className,
+                              String codebase,
+                              java.rmi.MarshalledObject data,
+                              boolean restart)
+                throws ActivationException;
+
+        public ActivationDesc(ActivationGroupID groupID,
+                              String className,
+                              String codebase,
+                              java.rmi.MarshalledObject data,
+                              boolean restart);
+
+        public ActivationDesc(ActivationGroupID groupID,
+                              String className,
+                              String codebase,
+                              java.rmi.MarshalledObject data);
+
+        public ActivationGroupID getGroupID();
+
+        public String getClassName();
+
+        public String getLocation();
+
+        public java.rmi.MarshalledObject getData()
+
+        public boolean getRestartMode();
+}</code></pre>
+<p>The first constructor for <code>ActivationDesc</code> constructs an object descriptor for an object whose class is <em>className</em>, that can be loaded from <em>codebase</em> path, and whose initialization information, in marshalled form, is <em>data</em>. If this form of the constructor is used, the object's group identifier defaults to the current identifier for <code>ActivationGroup</code> for this JVM. All objects with the same <code>ActivationGroupID</code> are activated in the same JVM. If the current group is inactive an <code>ActivationException</code> is thrown. If the <em>groupID</em> is <code>null</code>, an <code>IllegalArgumentException</code> is thrown.</p>
+<p>The second constructor for <code>ActivationDesc</code> constructs an object descriptor in the same manner as the first constructor except an additional parameter, <em>restart</em>, must be supplied. If the object requires <em>restart service</em>, meaning that the object will be restarted automatically when the activator is restarted (as opposed to being activated lazily upon demand), <em>restart</em> should be <code>true</code>. If <em>restart</em> is <code>false</code>, the object is simply activated upon demand (via a remote method call).</p>
+<p>The third constructor for <code>ActivationDesc</code> constructs an object descriptor for an object whose group identifier is <em>groupID</em>, whose class name is <em>className</em> that can be loaded from the <em>codebase</em> path, and whose initialization information is <em>data</em>. All objects with the same <em>groupID</em> are activated in the same JVM.</p>
+<p>The fourth constructor for <code>ActivationDesc</code> constructs an object descriptor in the same manner as the third constructor, but allows a restart mode to be specified. If an object requires restart service (as defined above), <em>restart</em> should be <code>true</code>.</p>
+<p>The <code>getGroupID</code> method returns the group identifier for the object specified by the descriptor. A group provides a way to aggregate objects into a single Java virtual machine.</p>
+<p>The <code>getClassName</code> method returns the class name for the object specified by the activation descriptor.</p>
+<p>The <code>getLocation</code> method returns the codebase path from where the object's class can be downloaded.</p>
+<p>The <code>getData</code> method returns a &quot;marshalled object&quot; containing initialization (activation) data for the object specified by the descriptor.</p>
+<p>The <code>getRestartMode</code> method returns <code>true</code> if the restart mode is enabled for this object, otherwise it returns false.</p>
+<h3 id="the-activationid-class">7.3.2 The <code>ActivationID</code> Class</h3>
+<p>The activation protocol makes use of activation identifiers to denote remote objects that can be activated over time. An activation identifier (an instance of the class <code>ActivationID</code>) contains several pieces of information needed for activating an object:</p>
+<ul>
+<li>a remote reference to the object's activator, and</li>
+<li>a unique identifier for the object.</li>
+</ul>
+<p>An activation identifier for an object can be obtained by registering an object with the activation system. Registration is accomplished in a few ways (also noted above):</p>
+<ul>
+<li>via the <code>Activatable.register</code> method, or</li>
+<li>via the first or second <code>Activatable</code> constructor, which both registers and exports the object, or</li>
+<li>via the first or second <code>Activatable.exportObject</code> method, this method both registers and exports the object.</li>
+</ul>
+<pre><code>package java.rmi.activation;
+public class ActivationID implements java.io.Serializable
+{
+        public ActivationID(Activator activator);
+
+        public Remote activate(boolean force)
+                throws ActivationException, UnknownObjectException,
+                       java.rmi.RemoteException;
+
+        public boolean equals(Object obj);
+
+        public int hashCode();
+}</code></pre>
+<p>The constructor for <code>ActivationID</code> takes a single argument, <em>activator</em>, that specifies a remote reference to the activator responsible for activating the object associated with this activation identifier. An instance of <code>ActivationID</code> is globally unique.</p>
+<p>The <code>activate</code> method activates the object associated with the activation identifier. If the <em>force</em> parameter is true, the activator considers any cached reference for the remote object as stale, thus forcing the activator to contact the group when activating the object. If <em>force</em> is false, then returning the cached value is acceptable. If activation fails, <code>ActivationException</code> is thrown. If the object identifier is not known to the activator, then the method throws <code>UnknownObjectException</code>. If the remote call to the activator fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>equals</code> method implements content equality. It returns <code>true</code> if all fields are equivalent (either identical or equivalent according to each field's <code>Object.equals</code> semantics). If <em>p1</em> and <em>p2</em> are instances of the class <code>ActivationID</code>, the <code>hashCode</code> method will return the same value if <code>p1.equals(p2)</code> returns <code>true</code>.</p>
+<h3 id="the-activatable-class">7.3.3 The <code>Activatable</code> Class</h3>
+<p>The <code>Activatable</code> class provides support for remote objects that require persistent access over time and that can be activated by the system. The class <code>Activatable</code> is the main API that developers need to use to implement and manage activatable objects. Note that you must first run the activation system daemon, <code>rmid</code>, before objects can be registered and/or activated.</p>
+<pre><code>package java.rmi.activation;
+public abstract class Activatable
+        extends java.rmi.server.RemoteServer
+{
+        protected Activatable(String codebase,
+                              java.rmi.MarshalledObject data,
+                              boolean restart,
+                              int port)
+                throws ActivationException, java.rmi.RemoteException;
+
+        protected Activatable(String codebase,
+                              java.rmi.MarshalledObject data,
+                              boolean restart, int port,
+                              RMIClientSocketFactory csf,
+                              RMIServerSocketFactory ssf)
+                throws ActivationException, java.rmi.RemoteException;
+
+        protected Activatable(ActivationID id, int port)
+                throws java.rmi.RemoteException;
+
+        protected Activatable(ActivationID id, int port,
+                              RMIClientSocketFactory csf,
+                              RMIServerSocketFactory ssf)
+                throws java.rmi.RemoteException;
+
+        protected ActivationID getID();
+
+        public static Remote register(ActivationDesc desc)
+                throws UnknownGroupException, ActivationException,
+                       java.rmi.RemoteException;
+
+        public static boolean inactive(ActivationID id)
+                throws UnknownObjectException, ActivationException,
+                       java.rmi.RemoteException;
+
+        public static void unregister(ActivationID id)
+                throws UnknownObjectException, ActivationException,
+                       java.rmi.RemoteException;
+
+        public static ActivationID exportObject(Remote obj,
+                                                String codebase,
+                                                MarshalledObject data,
+                                                boolean restart,
+                                                int port)
+                throws ActivationException, java.rmi.RemoteException;
+
+        public static ActivationID exportObject(Remote obj,
+                                                String codebase,
+                                                MarshalledObject data,
+                                                boolean restart,
+                                                int port,
+                                                RMIClientSocketFactory csf,
+                                                RMIServerSocketFactory ssf)
+                throws ActivationException, java.rmi.RemoteException;
+
+        public static Remote exportObject(Remote obj,
+                                          ActivationID id,
+                                          int port)
+                throws java.rmi.RemoteException;
+
+        public static Remote exportObject(Remote obj,
+                                          ActivationID id,
+                                          int port,
+                                          RMIClientSocketFactory csf,
+                                          RMIServerSocketFactory ssf)
+                throws java.rmi.RemoteException;
+
+        public static boolean unexportObject(Remote obj, boolean force)
+                throws java.rmi.NoSuchObjectException;
+}</code></pre>
+<p>An implementation for an activatable remote object may or may not extend the class <code>Activatable</code>. A remote object implementation that <em>does</em> extend the <code>Activatable</code> class inherits the appropriate definitions of the <code>hashCode</code> and <code>equals</code> methods from the superclass <code>java.rmi.server.RemoteObject</code>. So, two remote object references that refer to the same <code>Activatable</code> remote object will be equivalent (the <code>equals</code> method will return <em>true</em>). Also, an instance of the class <code>Activatable</code> will be &quot;equals&quot; to the appropriate stub object for the instance (i.e., the <code>Object.equals</code> method will return <em>true</em> if called with the matching stub object for the implementation as an argument, and vice versa).</p>
+<h4 id="activatable-class-methods"><code>Activatable</code> Class Methods</h4>
+<p>The first constructor for the <code>Activatable</code> class is used to register and export the object on a specified <em>port</em> (an anonymous port is chosen if <em>port</em> is zero). The object's URL path for downloading its class code is <em>codebase</em>, and its initialization data is <em>data</em>. If <em>restart</em> is <code>true</code>, the object will be restarted automatically when the activator is restarted and if the group crashes. If <em>restart</em> is <code>false</code>, the object will be activated on demand (via a remote method call to the object).</p>
+<p>A concrete subclass of the <code>Activatable</code> class must call this constructor to register and export the object during <em>initial</em> construction. As a side-effect of activatable object construction, the remote object is both &quot;registered&quot; with the activation system and &quot;exported&quot; (on an anonymous port, if <em>port</em> is zero) to the RMI runtime so that it is available to accept incoming calls from clients.</p>
+<p>The constructor throws <code>ActivationException</code> if registering the object with the activation system fails. <code>RemoteException</code> is thrown if exporting the object to the RMI runtime fails.</p>
+<p>The second constructor is the same as the first <code>Activatable</code> constructor but allows the specification of the client and server socket factories used to communicate with this activatable object. See the section in about <a href="server.html#rmi-socket-factories">&quot;RMI Socket Factories&quot;</a> for details.</p>
+<p>The third constructor is used to activate and export the object (with the <code>ActivationID</code>, <em>id</em>) on a specified <em>port</em>. A concrete subclass of the <code>Activatable</code> class must call this constructor when the object itself is <em>activated</em> via its special &quot;activation&quot; constructor whose parameters must be:</p>
+<ul>
+<li>the object's activation identifier (<code>ActivationID</code>), and</li>
+<li>the object's initialization/bootstrap data (a <code>MarshalledObject</code>).</li>
+</ul>
+<p>As a side-effect of construction, the remote object is &quot;exported&quot; to the RMI runtime (on the specified <em>port</em>) and is available to accept incoming calls from clients. The constructor throws <code>RemoteException</code> if exporting the object to the RMI runtime fails.</p>
+<p>The fourth constructor is the same as the third constructor, but allows the specification of the client and server socket factories used to communicate with this activatable object.</p>
+<p>The <code>getID</code> method returns the object's activation identifier. The method is protected so that only subclasses can obtain an object's identifier. The object's identifier is used to report the object as inactive or to unregister the object's activation descriptor.</p>
+<p>The <code>register</code> method registers, with the activation system, an object descriptor, <em>desc</em>, for an activatable remote object so that it can be activated on demand. This method is used to register an activatable object without having to first create the object. This method returns the <code>Remote</code> stub for the activatable object so that it can be saved and called at a later time thus forcing the object to be created/activated for the first time. The method throws <code>UnknownGroupException</code> if the group identifier in <em>desc</em> is not registered with the activation system. <code>ActivationException</code> is thrown if the activation system is not running. Finally, <code>RemoteException</code> is thrown if the remote call to the activation system fails.</p>
+<p>The <code>inactive</code> method is used to inform the system that the object with the corresponding activation <em>id</em> is currently inactive. If the object is currently known to be active, the object is unexported from the RMI runtime (only if there are no pending or executing calls) so the that it can no longer receive incoming calls. This call also informs this JVM's <code>ActivationGroup</code> that the object is inactive; the group, in turn, informs its <code>ActivationMonitor</code>. If the call completes successfully, subsequent activate requests to the activator will cause the object to reactivate. The <code>inactive</code> method returns <code>true</code> if the object was successfully unexported (meaning that it had no pending or executing calls at the time) and returns <code>false</code> if the object could not be unexported due to pending or in-progress calls. The method throws <code>UnknownObjectException</code> if the object is not known (it may already be inactive); an <code>ActivationException</code> is thrown if the group is not active; a <code>RemoteException</code> is thrown if the call informing the monitor fails. The operation may still succeed if the object is considered active but has already unexported itself.</p>
+<p>The <code>unregister</code> method revokes previous registration for the activation descriptor associated with <em>id</em>. An object can no longer be activated via that <em>id</em>. If the object <em>id</em> is unknown to the activation system, an <code>UnknownObjectException</code> is thrown. If the activation system is not running, an <code>ActivationException</code> is thrown. If the remote call to the activation system fails, then a <code>RemoteException</code> is thrown.</p>
+<p>The first <code>exportObject</code> method may be invoked explicitly by an &quot;activatable&quot; object that does not extend the <code>Activatable</code> class, in order to both</p>
+<ul>
+<li><p>register the object's activation descriptor, <em>desc</em>, constructed from the supplied <em>codebase</em> and <em>data</em>, with the activation system so the object can be activated, and</p></li>
+<li><p>export the remote object, <em>obj</em>, on a specific <em>port.</em> If the <em>port</em> is zero, then an anonymous port is chosen.</p></li>
+</ul>
+<p>Once the object is exported, it can receive incoming RMI calls.</p>
+<p>This <code>exportObject</code> method returns the activation identifier obtained from registering the descriptor, <em>desc</em>, with the activation system. If the activation group is not active in the JVM, then <code>ActivationException</code> is thrown. If the object registration or export fails, then <code>RemoteException</code> is thrown.</p>
+<p>This method does not need to be called if <em>obj</em> extends <code>Activatable</code>, since the first <code>Activatable</code> constructor calls this method.</p>
+<p>The second <code>exportObject</code> method is the same as the first except it allows the specification of client and server socket factories used to communicate with the activatable object.</p>
+<p>The third <code>exportObject</code> method exports an &quot;activatable&quot; remote object (not necessarily of type <code>Activatable</code>) with the identifier, <em>id</em>, to the RMI runtime to make the object, <em>obj</em>, available to receive incoming calls. The object is exported on an anonymous port, if <em>port</em> is zero.</p>
+<p>During activation, this <code>exportObject</code> method should be invoked explicitly by an &quot;activatable&quot; object, that does not extend the <code>Activatable</code> class. There is no need for objects that do extend the <code>Activatable</code> class to invoke this method directly; this method is called by the third constructor above (which a subclass should invoke from its special activation constructor).</p>
+<p>This <code>exportObject</code> method returns the <code>Remote</code> stub for the activatable object. If the object export fails, then the method throws <code>RemoteException</code>.</p>
+<p>The fourth <code>exportObject</code> method is the same as the third but allows the specification of the client and server socket factories used to communicate with this activatable object.</p>
+<p>The <code>unexportObject</code> method makes the remote object, <em>obj</em>, unavailable for incoming calls. If the force parameter is <code>true</code>, the object is forcibly unexported even if there are pending calls to the remote object or the remote object still has calls in progress. If the force parameter is <code>false</code>, the object is only unexported if there are no pending or in progress calls to the object. If the object is successfully unexported, the RMI runtime removes the object from its internal tables. Removing the object from RMI use in this forcible manner may leave clients holding stale remote references to the remote object. This method throws <code>java.rmi.NoSuchObjectException</code> if the object was not previously exported to the RMI runtime.</p>
+<h4 id="constructing-an-activatable-remote-object">Constructing an <code>Activatable</code> Remote Object</h4>
+<p>In order for an object to be activated, the &quot;activatable&quot; object implementation class (whether or not it extends the <code>Activatable</code> class) must define a special public constructor that takes two arguments, its activation identifier of type <code>ActivationID</code>, and its activation data, a <code>java.rmi.MarshalledObject</code>, supplied in the activation descriptor used during registration. When an activation group activates a remote object inside its JVM, it constructs the object via this special constructor (described in more detail below). The remote object implementation may use the activation data to initialize itself in a suitable manner. The remote object may also wish to retain its activation identifier, so that it can inform the activation group when it becomes inactive (via a call to the <code>Activatable.inactive</code> method).</p>
+<p>The first and second constructor forms for <code>Activatable</code> are used to both register and export an activatable object on a specified <em>port</em>. This constructor should be used when initially constructing the object; the third form of the constructor is used when re-activating the object.</p>
+<p>A concrete subclass of <code>Activatable</code> must call the first or second constructor form to register and export the object during initial construction. This constructor first creates an activation descriptor (<code>ActivationDesc</code>) with the object's class name, the object's supplied <em>codebase</em> and <em>data</em>, and whose activation group is the default group for the JVM. Next, the constructor registers this descriptor with the default <code>ActivationSystem</code>. Finally, the constructor exports the activatable object to the RMI runtime on the specific <em>port</em> (if <em>port</em> is zero, then an anonymous port is chosen) and reports the object as an <code>activeObject</code> to the local <code>ActivationGroup</code>. If an error occurs during registration or export, the constructor throws <code>RemoteException</code>. Note that the constructor also initializes its <code>ActivationID</code> (obtained via registration), so that subsequent calls to the protected method <code>getID</code> will return the object's activation identifier.</p>
+<p>The third constructor form for <code>Activatable</code> is used to export the object on a specified port. A concrete subclass of <code>Activatable</code> must call the third constructor form when it is activated via the object's own &quot;activation&quot; constructor, which takes two arguments:</p>
+<ul>
+<li>the object's <code>ActivationID</code></li>
+<li>the object's initialization data, a <code>MarshalledObject</code></li>
+</ul>
+<p>This constructor only exports the activatable object to the RMI runtime on the specific <em>port</em> (if <em>port</em> is 0, then an anonymous port is chosen). It does not inform the <code>ActivationGroup</code> that the object is active, since it is the <code>ActivationGroup</code> that is activating the object and knows it to be active already.</p>
+<p>The following is an example of a remote object interface, <code>Server</code>, and an implementation, <code>ServerImpl</code>, that <em>extends</em> the <code>Activatable</code> class:</p>
+<pre><code>package examples;
+
+public interface Server extends java.rmi.Remote {
+        public void doImportantStuff()
+                throws java.rmi.RemoteException;
+}
+
+public class ServerImpl extends Activatable implements Server
+{
+        // Constructor for initial construction, registration and export
+        public ServerImpl(String codebase, MarshalledObject data)
+                throws ActivationException, java.rmi.RemoteException
+        {
+                // register object with activation system, then
+                // export on anonymous port
+                super(codebase, data, false, 0);
+        }
+
+        // Constructor for activation and export; this constructor
+        // is called by the ActivationInstantiator.newInstance
+        // method during activation in order to construct the object.
+        public ServerImpl(ActivationID id, MarshalledObject data)
+                throws java.rmi.RemoteException
+        {
+                // call the superclass&#39;s constructor in order to
+                // export the object to the RMI runtime.
+                super(id, 0);
+                // initialize object (using data, for example)
+        }
+
+        public void doImportantStuff() { ... }
+}</code></pre>
+<p>An object is responsible for exporting itself. The constructors for <code>Activatable</code> take care of <em>exporting</em> the object to the RMI runtime with the live reference type of a <code>UnicastRemoteObject</code>, so the object implementation extending <code>Activatable</code> does not need to worry about the detail of exporting the object explicitly (other than invoking the appropriate superclasses constructor). If an object implementation does not extend the class <code>Activatable</code>, the object must export the object explicitly via a call to one of the <code>Activatable.exportObject</code> static methods.</p>
+<p>In the following example, <code>ServerImpl</code> does <em>not extend</em> <code>Activatable</code>, but rather another class, so <code>ServerImpl</code> is responsible for exporting itself during initial construction and activation. The following class definition shows <code>ServerImpl</code>'s initialization constructor and its special &quot;activation&quot; constructor and the appropriate call to export the object within each constructor:</p>
+<pre><code>package examples;
+public class ServerImpl extends SomeClass implements Server
+{
+        // constructor for initial creation
+        public ServerImpl(String codebase, MarshalledObject data)
+                throws ActivationException, java.rmi.RemoteException
+        {
+                // register and export the object
+                Activatable.exportObject(this, codebase, data, false, 0);
+        }
+
+        // constructor for activation
+        public ServerImpl(ActivationID id, MarshalledObject data)
+                throws java.rmi.RemoteException
+        {
+                // export the object
+                Activatable.exportObject(this, id, 0);
+        }
+
+        public void doImportantStuff() { ... }
+}</code></pre>
+<h3 id="registering-an-activation-descriptor-without-creating-the-object">Registering an Activation Descriptor Without Creating the Object</h3>
+<p>To register an activatable remote object with the activation system without first creating the object, the programmer can simply register an activation descriptor (an instance of the class <code>ActivationDesc</code>) for the object. An activation descriptor contains all the necessary information so that the activation system can activate the object when needed. An activation descriptor for an instance of the class <code>examples.ServerImpl</code> can be registered in the following manner (exception handling elided):</p>
+<pre><code>Server server;
+ActivationDesc desc;
+String codebase = &quot;http://zaphod/codebase/&quot;;
+
+MarshalledObject data = new MarshalledObject(&quot;some data&quot;);
+desc = new ActivationDesc( &quot;examples.ServerImpl&quot;, codebase, data);
+server = (Server)Activatable.register(desc);</code></pre>
+<p>The <code>register</code> call returns a <code>Remote</code> stub that is the stub for the <code>examples.ServerImpl</code> object and implements the same set of remote interfaces that <code>examples.ServerImpl</code> implements (i.e, the stub implements the remote interface <code>Server</code>). This stub object (above, cast and assigned to <em>server</em>) can be passed as a parameter in any method call expecting an object that implements the <code>examples.Server</code> remote interface.</p>
+<h2 id="activation-interfaces">7.4 Activation Interfaces</h2>
+<p>In the RMI activation protocol, there are two guarantees that the activator must make for the system to function properly:</p>
+<ul>
+<li>like all system daemons, the activator should remain running while the machine is up, and</li>
+<li>the activator must not reactivate remote objects that are already active.</li>
+</ul>
+<p>The activator maintains a database of appropriate information for the groups and objects that it participates in activating.</p>
+<h3 id="the-activator-interface">7.4.1 The <code>Activator</code> Interface</h3>
+<p>The activator is one of the entities that participates during the activation process. As described earlier, a faulting reference (inside a stub) calls the activator's <code>activate</code> method to obtain a &quot;live&quot; reference to an activatable remote object. Upon receiving a request for activation, the activator looks up the activation descriptor for the activation identifier, <em>id</em>, determines the group in which the object should be activated, and invokes the <code>newInstance</code> method on the activation group's instantiator (the remote interface <code>ActivationGroup</code> is described below). The activator initiates the execution of activation groups as necessary. For example, if an activation group for a specific group descriptor is not already executing, the activator will spawn a child JVM for the activation group to establish the group in the new JVM.</p>
+<p>The activator is responsible for monitoring and detecting when activation groups fail so that it can remove stale remote references from its internal tables.</p>
+<pre><code>package java.rmi.activation;
+public interface Activator extends java.rmi.Remote
+{
+        java.rmi.MarshalledObject activate(ActivationID id,
+                                           boolean force)
+                throws UnknownObjectException, ActivationException,
+                       java.rmi.RemoteException;
+}</code></pre>
+<p>The <code>activate</code> method activates the object associated with the activation identifier, <em>id</em>. If the activator knows the object to be active already and the <em>force</em> parameter is <em>false</em>, the stub with a &quot;live&quot; reference is returned immediately to the caller; otherwise, if the activator does not know that the corresponding remote object is active or the <em>force</em> parameter is <code>true</code>, the activator uses the activation descriptor information (previously registered to obtain the <em>id</em>) to determine the group (JVM) in which the object should be activated. If an Activation<code>Instantiator</code> corresponding to the object's group already exists, the activator invokes the activation instantiator's <code>newInstance</code> method, passing it the <em>id</em> and the object's activation descriptor.</p>
+<p>If the activation instantiator (group) for the object's group descriptor does not yet exist, the activator starts a new incarnation of an <code>ActivationInstantiator</code> executing (by spawning a child process, for example). When the activator re-creates an <code>ActivationInstantiator</code> for a group, it must increment the group's incarnation number. Note that the incarnation number is zero-based. The activation system uses incarnation numbers to detect late <code>ActivationSystem.activeGroup</code> and <code>ActivationMonitor.inactiveGroup</code> calls. The activation system discards calls with an earlier incarnation number than the current number for the group.</p>
+<p><strong>Note:</strong> The activator must communicate both the activation group's identifier, descriptor, and incarnation number when it starts up a new activation group. The activator spawns an activation group in a separate JVM (as a separate or child process, for example), and therefore must pass information specifying the information necessary to create the group via the <code>ActivationGroup.createGroup</code> method. How the activator sends this information to the spawned process is unspecified, however, this information could be sent in the form of marshalled objects to the child process's <em>standard input</em>.</p>
+<p>When the activator receives the activation group's call back (via the <code>ActivationSystem.activeGroup</code> method) specifying the activation group's reference and incarnation number, the activator can then invoke that activation instantiator's <code>newInstance</code> method to forward each pending activation request to the activation instantiator and return the result (a <em>marshalled</em> remote object reference, a stub) to each caller.</p>
+<p>Note that the activator receives a <code>MarshalledObject</code> instead of a <code>Remote</code> object so that the activator does not need to load the code for that object, or participate in distributed garbage collection for that object. If the activator kept a strong reference to the remote object, the activator would then prevent the object from being garbage collected under the normal distributed garbage collection mechanism.</p>
+<p>The <code>activate</code> method throws <code>ActivationException</code> if activation fails. Activation may fail for a variety of reasons: the class could not be found, the activation group could not be contacted, etc. The <code>activate</code> method throws <code>UnknownObjectException</code> if no activation descriptor for the activation identifier, <em>id</em>, has been previously registered with this activator. <code>RemoteException</code> is thrown if the remote call to the activator fails.</p>
+<h3 id="the-activationsystem-interface">7.4.2 The <code>ActivationSystem</code> Interface</h3>
+<p>The <code>ActivationSystem</code> provides a means for registering groups and <em>activatable</em> objects to be activated within those groups. The <code>ActivationSystem</code> works closely with both the <code>Activator</code>, which activates objects registered via the <code>ActivationSystem</code>, and the <code>ActivationMonitor</code>, which obtains information about active and inactive objects and inactive groups.</p>
+<pre><code>package java.rmi.activation;
+public interface ActivationSystem extends java.rmi.Remote
+{
+        public static final int SYSTEM_PORT = 1098;
+
+        ActivationGroupID registerGroup(ActivationGroupDesc desc)
+                throws ActivationException, java.rmi.RemoteException;
+
+        ActivationMonitor activeGroup(ActivationGroupID id,
+                                      ActivationInstantiator group,
+                                      long incarnation)
+                throws UnknownGroupException, ActivationException,
+                       java.rmi.RemoteException;
+
+        void unregisterGroup(ActivationGroupID id)
+                throws ActivationException, UnknownGroupException,
+                       java.rmi.RemoteException;
+
+        ActivationID registerObject(ActivationDesc desc)
+                throws ActivationException, UnknownGroupException,
+                       java.rmi.RemoteException;
+
+        void unregisterObject(ActivationID id)
+                throws ActivationException, UnknownObjectException,
+                       java.rmi.RemoteException;
+
+        void shutdown() throws java.rmi.RemoteException;
+}</code></pre>
+<p><strong>Note:</strong> As a security measure, all of the above methods (<code>registerGroup</code>, <code>activeGroup</code>, <code>unregisterGroup</code>, <code>registerObject</code>, <code>unregisterObject</code>, and <code>shutdown</code>) will throw <code>java.rmi.AccessException</code>, a subclass of <code>java.rmi.RemoteException,</code> if called from a client that does not reside on the same host as the activation system.</p>
+<p>The <code>registerObject</code> method is used to register an activation descriptor, <em>desc</em>, and obtain an activation identifier for an activatable remote object. The <code>ActivationSystem</code> creates an <code>ActivationID</code> (an activation identifier) for the object specified by the descriptor, <em>desc</em>, and records, in stable storage, the activation descriptor and its associated identifier for later use. When the <code>Activator</code> receives an <code>activate</code> request for a specific identifier, it looks up the activation descriptor (registered previously) for the specified identifier and uses that information to activate the object. If the group referred to in <em>desc</em> is not registered with this system, then the method throws <code>UnknownGroupException</code>. If registration fails (e.g., database update failure, etc), then the method throws <code>ActivationException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>unregisterObject</code> method removes the activation identifier, <em>id</em>, and associated descriptor previously registered with the <code>ActivationSystem</code>. After the call completes, the object can no longer be activated via the object's activation <em>id</em>. If the object <em>id</em> is unknown (not registered) the method throws <code>UnknownObjectException</code>. If the unregister operation fails (e.g., database update failure, etc.), then the method throws <code>ActivationException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>registerGroup</code> method registers the activation group specified by the group descriptor, <em>desc</em>, with the activation system and returns the <code>ActivationGroupID</code> assigned to that group. An activation group must be registered with the <code>ActivationSystem</code> before objects can be registered within that group. If group registration fails, the method throws <code>ActivationException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>activeGroup</code> method is a call back from the <code>ActivationGroup</code> (with the identifier, <em>id)</em>, to inform the activation system that <em>group</em> is now active and is the <code>ActivationInstantiator</code> for that JVM. This call is made internally by the <code>ActivationGroup.createGroup</code> method to obtain an <code>ActivationMonitor</code> that the group uses to update the system regarding objects' and the group's status (i.e., that the group or objects within that group have become inactive). If the group is not registered, then the method throws <code>UnknownGroupException</code>. If the group is already active, then <code>ActivationException</code> is thrown. If the remote call to the activation system fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>unregisterGroup</code> method removes the activation group with identifier, <em>id</em>, from the activation system. An activation group makes this call back to inform the activator that the group should be destroyed. If this call completes successfully, objects can no longer be registered or activated within the group. All information of the group and its associated objects is removed from the system. The method throws <code>UnknownGroupException</code> if the group is not registered. If the remote call fails, then <code>RemoteException</code> is thrown. If the unregister fails, <code>ActivationException</code> is thrown (e.g., database update failure, etc.).</p>
+<p>The <code>shutdown</code> method gracefully terminates (asynchronously) the activation system and all related activation processes (activator, monitors and groups). All groups spawned by the activation daemon will be destroyed and the activation daemon will exit. In order to shut down the activation system daemon, <code>rmid</code>, execute the command:</p>
+<pre><code>rmid -stop [-port num]</code></pre>
+<p>This command will shut down the activation daemon on the specified port (if no port is specified, the daemon on the default port will be shut down).</p>
+<h3 id="the-activationmonitor-class">7.4.3 The <code>ActivationMonitor</code> Class</h3>
+<p>An <code>ActivationMonitor</code> is specific to an <code>ActivationGroup</code> and is obtained when a group is reported via a call to <code>ActivationSystem.activeGroup</code> (this is done internally by the <code>ActivationGroup.createGroup</code> method). An activation group is responsible for informing its <code>ActivationMonitor</code> when:</p>
+<ol type="a">
+<li>its objects become active,</li>
+<li>its objects become inactive, or</li>
+<li>the group as a whole becomes inactive.</li>
+</ol>
+<pre><code>package java.rmi.activation;
+public interface ActivationMonitor
+        extends java.rmi.Remote
+{
+
+        public abstract void inactiveObject(ActivationID id)
+                throws UnknownObjectException, RemoteException;
+
+        public void activeObject(ActivationID id,
+                                 java.rmi.MarshalledObject mobj)
+                throws UnknownObjectException, java.rmi.RemoteException;
+
+        public void inactiveGroup(ActivationGroupID id,
+                                  long incarnation)
+                throws UnknownGroupException, java.rmi.RemoteException;
+}</code></pre>
+<p>An activation group calls its monitor's <code>inactiveObject</code> method when an object in its group becomes inactive (deactivates). An activation group discovers that an object (that it participated in activating) in its JVM is no longer active via a call to the activation group's <code>inactiveObject</code> method.</p>
+<p>The <code>inactiveObject</code> call informs the <code>ActivationMonitor</code> that the remote object reference it holds for the object with the activation identifier, <em>id</em>, is no longer valid. The monitor considers the reference associated with <em>id</em> as a stale reference. Since the reference is considered stale, a subsequent <code>activate</code> call for the same activation identifier results in re-activating the remote object. If the object is not known to the <code>ActivationMonitor</code>, the method throws <code>UnknownObjectException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>activeObject</code> call informs the <code>ActivationMonitor</code> that the object associated with <em>id</em> is now active. The parameter <em>obj</em> is the marshalled representation of the object's stub. An <code>ActivationGroup</code> must inform its monitor if an object in its group becomes active by other means than being activated directly by the system (i.e., the object is registered and &quot;activated&quot; itself). If the object id is not previously registered, then the method throws <code>UnknownObjectException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<p>The <code>inactiveGroup</code> call informs the monitor that the group specified by <em>id</em> and <em>incarnation</em> is now inactive. The group will be re-created with a greater incarnation number upon a subsequent request to activate an object within the group. A group becomes inactive when all objects in the group report that they are inactive. If either the group <em>id</em> is not registered or the incarnation number is smaller than the current incarnation for the group, then the method throws <code>UnknownGroupException</code>. If the remote call fails, then <code>RemoteException</code> is thrown.</p>
+<h3 id="the-activationinstantiator-class">7.4.4 The <code>ActivationInstantiator</code> Class</h3>
+<p>The <code>ActivationInstantiator</code> is responsible for creating instances of activatable objects. A concrete subclass of <code>ActivationGroup</code> implements the <code>newInstance</code> method to handle creating objects within the group.</p>
+<pre><code>package java.rmi.activation;
+public interface ActivationInstantiator
+        extends java.rmi.Remote
+{
+        public MarshalledObject newInstance(ActivationID id,
+                                            ActivationDesc desc)
+                throws ActivationException, java.rmi.RemoteException;
+
+}</code></pre>
+<p>The activator calls an instantiator's <code>newInstance</code> method in order to re-create in that group an object with the activation identifier, <em>id</em>, and descriptor, <em>desc</em>. The instantiator is responsible for:</p>
+<ul>
+<li>determining the class for the object using the descriptor's <code>getClassName</code> method,</li>
+<li>loading the class from the codebase path obtained from the descriptor (using the <code>getLocation</code> method),</li>
+<li>creating an instance of the class by invoking the special &quot;activation&quot; constructor of the object's class that takes two arguments: the object's <code>ActivationID</code>, and the <code>MarshalledObject</code> containing object-specific initialization data, and</li>
+<li>returning a <code>MarshalledObject</code> containing the remote object it created.</li>
+</ul>
+<p>An instantiator is also responsible for reporting when objects it creates or activates are no longer active, so that it can make the appropriate <code>inactiveObject</code> call to its <code>ActivationMonitor</code> (see the <code>ActivationGroup</code> class for more details).</p>
+<p>If object activation fails, then the newInstance method throws <code>ActivationException</code>. If the remote call fails, then the method throws <code>RemoteException</code>.</p>
+<h3 id="the-activationgroupdesc-class">7.4.5 The <code>ActivationGroupDesc</code> Class</h3>
+<p>An activation group descriptor (<code>ActivationGroupDesc</code>) contains the information necessary to create or re-create an activation group in which to activate objects in the same JVM.</p>
+<p>Such a descriptor contains:</p>
+<ul>
+<li>the group's class name (a class name of <code>null</code> indicates the default <code>ActivationGroup</code> implementation),</li>
+<li>the group's codebase path (the location of the group's class), and</li>
+<li>a &quot;marshalled&quot; object that can contain object-specific initialization data.</li>
+</ul>
+<p>The group's class must be a concrete subclass of <code>ActivationGroup</code>. A subclass of <code>ActivationGroup</code> is created or re-created via the <code>ActivationGroup.createGroup</code> static method, which invokes a special constructor that takes two arguments:</p>
+<ul>
+<li>the group's <code>ActivationGroupID</code>, and</li>
+<li>the group's initialization data (in a <code>java.rmi.MarshalledObject</code>)</li>
+</ul>
+<pre><code>package java.rmi.activation;
+public final class ActivationGroupDesc
+        implements java.io.Serializable
+{
+
+        public ActivationGroupDesc(java.util.Properties props,
+                                   CommandEnvironment env);;
+
+        public ActivationGroupDesc(String className,
+                                   String codebase,
+                                   java.rmi.MarshalledObject data,
+                                   java.util.Properties props,
+                                   CommandEnvironment env);
+
+        public String getClassName();
+
+        public String getLocation();
+
+        public java.rmi.MarshalledObject getData();
+
+        public CommandEnvironment getCommandEnvironment();
+
+        public java.util.Properties getPropertiesOverrides();
+
+}</code></pre>
+<p>The first constructor creates a group descriptor that uses system default for group implementation and code location. Properties specify Java application environment overrides (which will override system properties in the group implementation's JVM). The command environment can control the exact command/options used in starting the child JVM, or can be <code>null</code> to accept <code>rmid</code>'s default. This constructor will create an <code>ActivationGroupDesc</code> with a <code>null</code> group class name, which indicates the system's default <code>ActivationGroup</code> implementation.</p>
+<p>The second constructor is the same as the first, but allows the specification of <code>Properties</code> and <code>CommandEnvironment</code>.</p>
+<p>The <code>getClassName</code> method returns the group's class name (possibly <code>null</code>). A <code>null</code> group class name indicates the system's default <code>ActivationGroup</code> implementation.</p>
+<p>The <code>getLocation</code> method returns the codebase path from where the group's class can be loaded.</p>
+<p>The <code>getData</code> method returns the group's initialization data in marshalled form.</p>
+<p>The <code>getCommandEnvironment</code> method returns the command environment (possibly <code>null</code>).</p>
+<p>The <code>getPropertiesOverrides</code> method returns the properties overrides (possibly <code>null</code>) for this descriptor.</p>
+<h3 id="the-activationgroupdesc.commandenvironment-class">7.4.6 The <code>ActivationGroupDesc.CommandEnvironment</code> Class</h3>
+<p>The <code>CommandEnvironment</code> class allows overriding default system properties and specifying implemention-defined options for an <code>ActivationGroup</code>.</p>
+<pre><code>public static class CommandEnvironment
+        implements java.io.Serializable
+{
+        public CommandEnvironment(String cmdpath, String[] args);
+        public boolean equals(java.lang.Object);
+        public String[] getCommandOptions();
+        public String getCommandPath();
+        public int hashCode();
+
+}</code></pre>
+<p>The constructor creates a <code>CommandEnvironment</code> with the given command, <em>cmdpath</em>, and additional command line options, <em>args</em>.</p>
+<p>The <code>equals</code> implements content equality for command environment objects. The <code>hashCode</code> method is implemented appropriately so that a <code>CommandEnvironment</code> can be stored in a hash table if necessary.</p>
+<p>The <code>getCommandOptions</code> method returns the environment object's command line options.</p>
+<p>The <code>getCommandPath</code> method returns the environment object's command string.</p>
+<h3 id="the-activationgroupid-class">7.4.7 The <code>ActivationGroupID</code> Class</h3>
+<p>The identifier for a registered activation group serves several purposes:</p>
+<ul>
+<li>it identifies the group uniquely within the activation system, and</li>
+<li>it contains a reference to the group's activation system so that the group can contact its activation system when necessary.</li>
+</ul>
+<p>The <code>ActivationGroupID</code> is returned from the call to <code>ActivationSystem.registerGroup</code> and is used to identify the group within the activation system. This group identifier is passed as one of the arguments to the activation group's special constructor when an activation group is created or re-created.</p>
+<pre><code>package java.rmi.activation;
+public class ActivationGroupID implements java.io.Serializable
+{
+        public ActivationGroupID(ActivationSystem system);
+
+        public ActivationSystem getSystem();
+
+        public boolean equals(Object obj);
+
+        public int hashCode();
+}</code></pre>
+<p>The <code>ActivationGroupID</code> constructor creates a unique group identifier whose ActivationSystem is <em>system</em>.</p>
+<p>The <code>getSystem</code> method returns the activation system for the group.</p>
+<p>The <code>hashCode</code> method returns a hashcode for the group's identifier. Two group identifiers that refer to the same remote group will have the same hash code.</p>
+<p>The <code>equals</code> method compares two group identifiers for content equality. The method returns <code>true</code> if both of the following conditions are true: 1) the unique identifiers are equivalent (by content), and 2) the activation system specified in each refers to the same remote object.</p>
+<h3 id="the-activationgroup-class">7.4.8 The <code>ActivationGroup</code> Class</h3>
+<p>An <code>ActivationGroup</code> is responsible for creating new instances of activatable objects in its group, informing its <code>ActivationMonitor</code> when:</p>
+<ol type="a">
+<li>its objects become active,</li>
+<li>its objects become inactive, or</li>
+<li>the group as a whole becomes inactive.</li>
+</ol>
+<p>An <code>ActivationGroup</code> is <em>initially</em> created in one of several ways:</p>
+<ul>
+<li>as a side-effect of creating a &quot;default&quot; <code>ActivationDesc</code> for an object, or</li>
+<li>by an explicit call to the <code>ActivationGroup.createGroup</code> method, or</li>
+<li>as a side-effect of activating the first object in a group whose <code>ActivationGroupDesc</code> was only registered.</li>
+</ul>
+<p>Only the activator can <em>re-create</em> an <code>ActivationGroup</code>. The activator spawns, as needed, a separate JVM (as a child process, for example) for each registered activation group and directs activation requests to the appropriate group. It is implementation specific how JVMs are spawned. An activation group is created via the <code>ActivationGroup.createGroup</code> static method. The <code>createGroup</code> method has two requirements on the group to be created: 1) the group must be a concrete subclass of <code>ActivationGroup</code>, and 2) the group must have a constructor that takes two arguments:</p>
+<ul>
+<li>the group's <code>ActivationGroupID</code>, and</li>
+<li>the group's initialization data (in a <code>MarshalledObject</code>)</li>
+</ul>
+<p>When created, the default implementation of <code>ActivationGroup</code> will set the system properties to the system properties in force when the <code>ActivationGroupDesc</code> was created, and will set the security manager to the <code>java.rmi.RMISecurityManager</code>. If your application requires some specific properties to be set when objects are activated in the group, the application should set the properties before creating any <code>ActivationDesc</code>s (before the default <code>ActivationGroupDesc</code> is created).</p>
+<pre><code>package java.rmi.activation;
+public abstract class ActivationGroup
+        extends UnicastRemoteObject
+        implements ActivationInstantiator
+{
+        protected ActivationGroup(ActivationGroupID groupID)
+                throws java.rmi.RemoteException;
+
+        public abstract MarshalledObject newInstance(ActivationID id,
+                                                     ActivationDesc desc)
+                throws ActivationException, java.rmi.RemoteException;
+
+        public abstract boolean inactiveObject(ActivationID id)
+                throws ActivationException, UnknownObjectException,
+                       java.rmi.RemoteException;
+
+        public static ActivationGroup createGroup(ActivationGroupID id,
+                                                  ActivationGroupDesc desc,
+                                                  long incarnation)
+                throws ActivationException;
+
+        public static ActivationGroupID currentGroupID();
+
+        public static void setSystem(ActivationSystem system)
+                throws ActivationException;
+
+        public static ActivationSystem getSystem()
+                throws ActivationException;
+
+        protected void activeObject(ActivationID id,
+                                    java.rmi.MarshalledObject mobj)
+                throws ActivationException, UnknownObjectException,
+                       java.rmi.RemoteException;
+
+        protected void inactiveGroup()
+                throws UnknownGroupException, java.rmi.RemoteException;
+
+}</code></pre>
+<p>The activator calls an activation group's <code>newInstance</code> method in order to activate an object with the activation descriptor, <em>desc</em>. The activation group is responsible for:</p>
+<ul>
+<li>determining the class for the object using the descriptor's <code>getClassName</code> method,</li>
+<li>loading the class from the URL path obtained from the descriptor (using the <code>getLocation</code> method),</li>
+<li>creating an instance of the class by invoking the special constructor of the object's class that takes two arguments: the object's <code>ActivationID</code>, and a <code>MarshalledObject</code> containing the object's initialization data, and</li>
+<li>returning a serialized version of the remote object it just created to the activator.</li>
+</ul>
+<p>The method throws <code>ActivationException</code> if the instance for the given descriptor could not be created.</p>
+<p>The group's <code>inactiveObject</code> method is called indirectly via a call to the <code>Activatable.inactive</code> method. A remote object implementation must call <code>Activatable</code>'s <code>inactive</code> method when that object deactivates (the object deems that it is no longer active). If the object does not call <code>Activatable.inactive</code> when it deactivates, the object will never be garbage collected since the group keeps strong references to the objects it creates.</p>
+<p>The group's <code>inactiveObject</code> method unexports the remote object, associated with <em>id</em> (only if there are no pending or executing calls to the remote object) from the RMI runtime so that the object can no longer receive incoming RMI calls. If the object currently has pending or executing calls, <code>inactiveObject</code> returns <code>false</code> and no action is taken.</p>
+<p>If the <code>unexportObject</code> operation was successful (meaning that the object has no pending or executing calls), the group informs its <code>ActivationMonitor</code> (via the monitor's <code>inactiveObject</code> method) that the remote object is not currently active so that the remote object will be reactivated by the activator upon a subsequent activation request. If the operation was successful, <code>inactiveObject</code> returns <code>true</code>. The operation may still succeed if the object is considered active by the <code>ActivationGroup</code> but has already been unexported.</p>
+<p>The <code>inactiveObject</code> method throws an <code>UnknownObjectException</code> if the activation group has no knowledge of this object (e.g., the object was previously reported as inactive, or the object was never activated via the activation group). If the inactive operation fails (e.g., if the remote call to the activator or activation group fails), <code>RemoteException</code> is thrown.</p>
+<p>The <code>createGroup</code> method creates and sets the activation group for the current JVM. The activation group can only be set if it is not currently set. An activation group is set using the <code>createGroup</code> method when the <code>Activator</code> initiates the re-creation of an activation group in order to carry out incoming <code>activate</code> requests. A group must first register a group descriptor with the <code>ActivationSystem</code> before it can be created via this method (passing it the <code>ActivationID</code> obtained from previous registration).</p>
+<p>The group specified by the <code>ActivationGroupDesc</code>, <em>desc</em>, must be a concrete subclass of <code>ActivationGroup</code> and have a public constructor that takes two arguments; the <code>ActivationGroupID</code> for the group and a <code>MarshalledObject</code> containing the group's initialization data (obtained from its <code>ActivationGroupDesc</code>). If the <code>ActivationGroupDesc.getClassName</code> method returns <code>null</code>, the system's default group implementation is used. Note: if your application creates its own custom activation group, the group must set a security manager in the constructor, or objects cannot be activated in the group.</p>
+<p>After the group is created, the <code>ActivationSystem</code> is informed that the group is active by calling the <code>activeGroup</code> method, which returns the <code>ActivationMonitor</code> for the group. The application need not call <code>activeGroup</code> independently since that callback is taken care of by the <code>createGroup</code> method.</p>
+<p>Once a group is created, subsequent calls to the <code>currentGroupID</code> method will return the identifier for this group until the group becomes inactive, at which point the <code>currentGroupID</code> method will return <code>null</code>.</p>
+<p>The parameter <em>incarnation</em> indicates the current group incarnation, i.e., the number of times the group has been activated. The incarnation number is used as a parameter to the <code>activeGroup</code> method, once the group has been successfully created. The incarnation number is zero-based. If the group already exists, or if an error occurs during group creation, the <code>createGroup</code> method throws <code>ActivationException</code>.</p>
+<p>The <code>setSystem</code> method sets the <code>ActivationSystem</code>, <em>system</em>, for the JVM. The activation system can only be set if no group is currently active. If the activation system is not set via an explicit call to <code>setSystem</code>, then the <code>getSystem</code> method will attempt to obtain a reference to the <code>ActivationSystem</code> by looking up the name <em>java.rmi.activation.ActivationSystem</em> in the Activator's registry. By default, the port number used to look up the activation system is defined by <em>ActivationSystem.SYSTEM_PORT</em>. This port can be overridden by setting the property <em>java.rmi.activation.port</em>. If the activation system is already set when <code>setSystem</code> is called, the method throws <code>ActivationException</code>.</p>
+<p>The <code>getSystem</code> method returns the activation system for the JVM. The activation system may be set by the <code>setSystem</code> method (described above).</p>
+<p>The <code>activeObject</code> method is a protected method used by subclasses to make the <code>activeObject</code> call back to the group's monitor to inform the monitor that the remote object with the specified activation <em>id</em> and whose stub is contained in <em>mobj</em> is now active. The call is simply forwarded to the group's <code>ActivationMonitor</code>.</p>
+<p>The <code>inactiveGroup</code> method is a protected method used by subclasses to inform the group's monitor that the group has become inactive. A subclass makes this call when each object the group participated in activating in the JVM has become inactive.</p>
+<h3 id="the-marshalledobject-class">7.4.9 The <code>MarshalledObject</code> Class</h3>
+<p>A <code>MarshalledObject</code> is a container for an object that allows that object to be passed as a parameter in an RMI call, but postpones deserializing the object at the receiver until the application explicitly requests the object (via a call to the container object). The <code>Serializable</code> object contained in the <code>MarshalledObject</code> is serialized and deserialized (when requested) with the same semantics as parameters passed in RMI calls, which means that any remote object in the <code>MarshalledObject</code> is represented by a serialized instance of its stub. The object contained by the <code>MarshalledObject</code> may be a remote object, a non-remote object, or an entire graph of remote and non-remote objects.</p>
+<p>When an object is placed inside the <code>MarshalledObject</code> wrapper, the serialized form of the object is annotated with the codebase URL (where the class can be loaded); likewise, when the contained object is retrieved from its <code>MarshalledObject</code> wrapper, if the code for the object is not available locally, the URL (annotated during serialization) is used to locate and load the bytecodes for the object's class.</p>
+<pre><code>package java.rmi;
+public final class MarshalledObject implements java.io.Serializable
+{
+        public MarshalledObject(Object obj)
+                throws java.io.IOException;
+
+        public Object get()
+                throws java.io.IOException, ClassNotFoundException;
+
+        public int hashCode();
+
+        public boolean equals();
+}</code></pre>
+<p><code>MarshalledObject</code>'s constructor takes a serializable object, <em>obj</em>, as its single argument and holds the marshalled representation of the object in a byte stream. The marshalled representation of the object preserves the semantics of objects that are passed in RMI calls:</p>
+<ul>
+<li>each class in the stream is annotated with its codebase URL so that when the object is reconstructed (by a call to the <code>get</code> method), the bytecodes for each class can be located and loaded, and</li>
+<li>remote objects are replaced with their proxy stubs.</li>
+</ul>
+<p>When an instance of the class <code>MarshalledObject</code> is written to a <code>java.io.ObjectOutputStream</code>, the contained object's marshalled form (created during construction) is written to the stream; thus, only the byte stream is serialized.</p>
+<p>When a <code>MarshalledObject</code> is read from a <code>java.io.ObjectInputStream</code>, the contained object is not deserialized into a concrete object; the object remains in its marshalled representation until the marshalled object's <code>get</code> method is called.</p>
+<p>The <code>get</code> method always reconstructs a new copy of the contained object from its marshalled form. The internal representation is deserialized with the semantics used for unmarshalling parameters for RMI calls. So, the deserialization of the object's representation loads class code (if not available locally) using the URL annotation embedded in the serialized stream for the object.</p>
+<p>The <code>hashCode</code> of the marshalled representation of the object is the same as the object passed to the constructor. The <code>equals</code> method will return true if the marshalled representation of the objects being compared are equivalent. The comparison that equals uses ignores a class's codebase annotation, meaning that two objects are equivalent if they have the same serialized representation <em>except</em> for the codebase of each class in the serialized representation.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="registry.html">PREV</a> | <a href="stubs.html">NEXT</a>
+</body>
+</html>

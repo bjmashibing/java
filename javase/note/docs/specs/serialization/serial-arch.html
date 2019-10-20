@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Object Serialization Specification: 1 - System Architecture</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="index.html">PREV</a> | <a href="output.html">NEXT</a>
+<header id="title-block-header">
+<h1 class="title">Java Object Serialization Specification: 1 - System Architecture</h1>
+</header>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#writing-to-an-object-stream">Writing to an Object Stream</a></li>
+<li><a href="#reading-from-an-object-stream">Reading from an Object Stream</a></li>
+<li><a href="#object-streams-as-containers">Object Streams as Containers</a></li>
+<li><a href="#defining-serializable-fields-for-a-class">Defining Serializable Fields for a Class</a></li>
+<li><a href="#documenting-serializable-fields-and-data-for-a-class">Documenting Serializable Fields and Data for a Class</a></li>
+<li><a href="#accessing-serializable-fields-of-a-class">Accessing Serializable Fields of a Class</a></li>
+<li><a href="#the-objectoutput-interface">The ObjectOutput Interface</a></li>
+<li><a href="#the-objectinput-interface">The ObjectInput Interface</a></li>
+<li><a href="#the-serializable-interface">The Serializable Interface</a></li>
+<li><a href="#the-externalizable-interface">The Externalizable Interface</a></li>
+<li><a href="#serialization-of-enum-constants">Serialization of Enum Constants</a></li>
+<li><a href="#protecting-sensitive-information">Protecting Sensitive Information</a></li>
+</ul>
+<hr />
+<h2 id="overview">1.1 Overview</h2>
+<p>The ability to store and retrieve Java<sup>TM</sup> objects is essential to building all but the most transient applications. The key to storing and retrieving objects in a serialized form is representing the state of objects sufficient to reconstruct the object(s). Objects to be saved in the stream may support either the <code>Serializable</code> or the <code>Externalizable</code> interface. For Java<sup>TM</sup> objects, the serialized form must be able to identify and verify the Java<sup>TM</sup> class from which the contents of the object were saved and to restore the contents to a new instance. For serializable objects, the stream includes sufficient information to restore the fields in the stream to a compatible version of the class. For Externalizable objects, the class is solely responsible for the external format of its contents.</p>
+<p>Objects to be stored and retrieved frequently refer to other objects. Those other objects must be stored and retrieved at the same time to maintain the relationships between the objects. When an object is stored, all of the objects that are reachable from that object are stored as well.</p>
+<p>The goals for serializing Java<sup>TM</sup> objects are to:</p>
+<ul>
+<li>Have a simple yet extensible mechanism.</li>
+<li>Maintain the Java<sup>TM</sup> object type and safety properties in the serialized form.</li>
+<li>Be extensible to support marshaling and unmarshaling as needed for remote objects.</li>
+<li>Be extensible to support simple persistence of Java<sup>TM</sup> objects.</li>
+<li>Require per class implementation only for customization.</li>
+<li>Allow the object to define its external format.</li>
+</ul>
+<h2 id="writing-to-an-object-stream">1.2 Writing to an Object Stream</h2>
+<p>Writing objects and primitives to a stream is a straightforward process. For example:</p>
+<pre><code>// Serialize today&#39;s date to a file.
+    FileOutputStream f = new FileOutputStream(&quot;tmp&quot;);
+    ObjectOutput s = new ObjectOutputStream(f);
+    s.writeObject(&quot;Today&quot;);
+    s.writeObject(new Date());
+    s.flush();</code></pre>
+<p>First an <code>OutputStream</code>, in this case a <code>FileOutputStream</code>, is needed to receive the bytes. Then an <code>ObjectOutputStream</code> is created that writes to the <code>FileOutputStream</code>. Next, the string &quot;Today&quot; and a Date object are written to the stream. More generally, objects are written with the <code>writeObject</code> method and primitives are written to the stream with the methods of <code>DataOutput</code>.</p>
+<p>The <code>writeObject</code> method (see <a href="output.html#the-writeobject-method">Section 2.3, &quot;The writeObject Method&quot;</a>) serializes the specified object and traverses its references to other objects in the object graph recursively to create a complete serialized representation of the graph. Within a stream, the first reference to any object results in the object being serialized or externalized and the assignment of a handle for that object. Subsequent references to that object are encoded as the handle. Using object handles preserves sharing and circular references that occur naturally in object graphs. Subsequent references to an object use only the handle allowing a very compact representation.</p>
+<p>Special handling is required for arrays, enum constants, and objects of type <code>Class</code>, <code>ObjectStreamClass</code>, and <code>String</code>. Other objects must implement either the <code>Serializable</code> or the <code>Externalizable</code> interface to be saved in or restored from a stream.</p>
+<p>Primitive data types are written to the stream with the methods in the <code>DataOutput</code> interface, such as <code>writeInt</code>, <code>writeFloat</code>, or <code>writeUTF</code>. Individual bytes and arrays of bytes are written with the methods of <code>OutputStream</code>. Except for serializable fields, primitive data is written to the stream in block-data records, with each record prefixed by a marker and an indication of the number of bytes in the record.</p>
+<p><code>ObjectOutputStream</code> can be extended to customize the information about classes in the stream or to replace objects to be serialized. Refer to the <code>annotateClass</code> and <code>replaceObject</code> method descriptions for details.</p>
+<h2 id="reading-from-an-object-stream">1.3 Reading from an Object Stream</h2>
+<p>Reading an object from a stream, like writing, is straightforward:</p>
+<pre><code>// Deserialize a string and date from a file.
+    FileInputStream in = new FileInputStream(&quot;tmp&quot;);
+    ObjectInputStream s = new ObjectInputStream(in);
+    String today = (String)s.readObject();
+    Date date = (Date)s.readObject();</code></pre>
+<p>First an <code>InputStream</code>, in this case a <code>FileInputStream</code>, is needed as the source stream. Then an <code>ObjectInputStream</code> is created that reads from the <code>InputStream</code>. Next, the string &quot;Today&quot; and a Date object are read from the stream. Generally, objects are read with the <code>readObject</code> method and primitives are read from the stream with the methods of <code>DataInput</code>.</p>
+<p>The <code>readObject</code> method deserializes the next object in the stream and traverses its references to other objects recursively to create the complete graph of objects serialized.</p>
+<p>Primitive data types are read from the stream with the methods in the <code>DataInput</code> interface, such as <code>readInt</code>, <code>readFloat</code>, or <code>readUTF</code>. Individual bytes and arrays of bytes are read with the methods of <code>InputStream</code>. Except for serializable fields, primitive data is read from block-data records.</p>
+<p><code>ObjectInputStream</code> can be extended to utilize customized information in the stream about classes or to replace objects that have been deserialized. Refer to the <code>resolveClass</code> and <code>resolveObject</code> method descriptions for details.</p>
+<h2 id="object-streams-as-containers">1.4 Object Streams as Containers</h2>
+<p>Object Serialization produces and consumes a stream of bytes that contain one or more primitives and objects. The objects written to the stream, in turn, refer to other objects, which are also represented in the stream. Object Serialization produces just one stream format that encodes and stores the contained objects.</p>
+<p>Each object that acts as a container implements an interface which allows primitives and objects to be stored in or retrieved from it. These interfaces are the <code>ObjectOutput</code> and <code>ObjectInput</code> interfaces which:</p>
+<ul>
+<li>Provide a stream to write to and to read from</li>
+<li>Handle requests to write primitive types and objects to the stream</li>
+<li>Handle requests to read primitive types and objects from the stream</li>
+</ul>
+<p>Each object which is to be stored in a stream must explicitly allow itself to be stored and must implement the protocols needed to save and restore its state. Object Serialization defines two such protocols. The protocols allow the container to ask the object to write and read its state.</p>
+<p>To be stored in an Object Stream, each object must implement either the <code>Serializable</code> or the <code>Externalizable</code> interface:</p>
+<ul>
+<li><p>For a <code>Serializable</code> class, Object Serialization can automatically save and restore fields of each class of an object and automatically handle classes that evolve by adding fields or supertypes. A serializable class can declare which of its fields are saved or restored, and write and read optional values and objects.</p></li>
+<li><p>For an <code>Externalizable</code> class, Object Serialization delegates to the class complete control over its external format and how the state of the supertype(s) is saved and restored.</p></li>
+</ul>
+<h2 id="defining-serializable-fields-for-a-class">1.5 Defining Serializable Fields for a Class</h2>
+<p>The serializable fields of a class can be defined two different ways. Default serializable fields of a class are defined to be the non-transient and non-static fields. This default computation can be overridden by declaring a special field in the <code>Serializable</code> class, <code>serialPersistentFields</code>. This field must be initialized with an array of <code>ObjectStreamField</code> objects that list the names and types of the serializable fields. The modifiers for the field are required to be private, static, and final. If the field's value is null or is otherwise not an instance of <code>ObjectStreamField[]</code>, or if the field does not have the required modifiers, then the behavior is as if the field were not declared at all.</p>
+<p>For example, the following declaration duplicates the default behavior.</p>
+<pre><code>class List implements Serializable {
+    List next;
+
+    private static final ObjectStreamField[] serialPersistentFields
+                 = {new ObjectStreamField(&quot;next&quot;, List.class)};
+
+}</code></pre>
+<p>By using <code>serialPersistentFields</code> to define the Serializable fields for a class, there no longer is a limitation that a serializable field must be a field within the current definition of the <code>Serializable</code> class. The <code>writeObject</code> and <code>readObject</code> methods of the <code>Serializable</code> class can map the current implementation of the class to the serializable fields of the class using the interface that is described in <a href="#accessing-serializable-fields-of-a-class">Section 1.7, &quot;Accessing Serializable Fields of a Class&quot;</a>. Therefore, the fields for a <code>Serializable</code> class can change in a later release, as long as it maintains the mapping back to its Serializable fields that must remain compatible across release boundaries.</p>
+<p><strong>Note:</strong> There is, however, a limitation to the use of this mechanism to specify serializable fields for inner classes. Inner classes can only contain final static fields that are initialized to constants or expressions built up from constants. Consequently, it is not possible to set <code>serialPersistentFields</code> for an inner class (though it is possible to set it for static member classes). For other restrictions pertaining to serialization of inner class instances, see section <a href="#the-serializable-interface">Section 1.10, &quot;The Serializable Interface&quot;</a>.</p>
+<h2 id="documenting-serializable-fields-and-data-for-a-class">1.6 Documenting Serializable Fields and Data for a Class</h2>
+<p>It is important to document the serializable state of a class to enable interoperability with alternative implementations of a Serializable class and to document class evolution. Documenting a serializable field gives one a final opportunity to review whether or not the field should be serializable. The serialization javadoc tags, <code>@serial</code>, <code>@serialField</code>, and <code>@serialData</code>, provide a way to document the serialized form for a Serializable class within the source code.</p>
+<ul>
+<li><p>The <code>@serial</code> tag should be placed in the javadoc comment for a default serializable field. The syntax is as follows: <code>@serial</code> <em>field-description</em> The optional <em>field-description</em> describes the meaning of the field and its acceptable values. The <em>field-description</em> can span multiple lines. When a field is added after the initial release, a <em><span class="citation" data-cites="since">@since</span></em> tag indicates the version the field was added. The <em>field-description</em> for <code>@serial</code> provides serialization-specific documentation and is appended to the javadoc comment for the field within the serialized form documentation.</p></li>
+<li><p>The <code>@serialField</code> tag is used to document an <code>ObjectStreamField</code> component of a <code>serialPersistentFields</code> array. One of these tags should be used for each <code>ObjectStreamField</code> component. The syntax is as follows: <code>@serialField</code> <em>field-name field-type field-description</em></p></li>
+<li><p>The <code>@serialData</code> tag describes the sequences and types of data written or read. The tag describes the sequence and type of optional data written by <code>writeObject</code> or all data written by the <code>Externalizable.writeExternal</code> method. The syntax is as follows: <code>@serialData</code> <em>data-description</em></p></li>
+</ul>
+<p>The javadoc application recognizes the serialization javadoc tags and generates a specification for each Serializable and Externalizable class. See <a href="examples.html#c.1-example-alternate-implementation-of-java.io.file">Section C.1, &quot;Example Alternate Implementation of java.io.File&quot;</a> for an example that uses these tags.</p>
+<p>When a class is declared Serializable, the serializable state of the object is defined by serializable fields (by name and type) plus optional data. Optional data can only be written explicitly by the <code>writeObject</code> method of a <code>Serializable</code> class. Optional data can be read by the <code>Serializable</code> class' <code>readObject</code> method or serialization will skip unread optional data.</p>
+<p>When a class is declared Externalizable, the data that is written to the stream by the class itself defines the serialized state. The class must specify the order, types, and meaning of each datum that is written to the stream. The class must handle its own evolution, so that it can continue to read data written by and write data that can be read by previous versions. The class must coordinate with the superclass when saving and restoring data. The location of the superclasses data in the stream must be specified.</p>
+<p>The designer of a Serializable class must ensure that the information saved for the class is appropriate for persistence and follows the serialization-specified rules for interoperability and evolution. Class evolution is explained in greater detail in <a href="version.html">Chapter 5</a>, &quot;Versioning of Serializable Objects&quot;.</p>
+<h2 id="accessing-serializable-fields-of-a-class">1.7 Accessing Serializable Fields of a Class</h2>
+<p>Serialization provides two mechanisms for accessing the serializable fields in a stream:</p>
+<ul>
+<li>The default mechanism requires no customization</li>
+<li>The Serializable Fields API allows a class to explicitly access/set the serializable fields by name and type</li>
+</ul>
+<p>The default mechanism is used automatically when reading or writing objects that implement the <code>Serializable</code> interface and do no further customization. The serializable fields are mapped to the corresponding fields of the class and values are either written to the stream from those fields or are read in and assigned respectively. If the class provides <code>writeObject</code> and <code>readObject</code> methods, the default mechanism can be invoked by calling <code>defaultWriteObject</code> and <code>defaultReadObject</code>. When the <code>writeObject</code> and <code>readObject</code> methods are implemented, the class has an opportunity to modify the serializable field values before they are written or after they are read.</p>
+<p>When the default mechanism cannot be used, the serializable class can use the <code>putFields</code> method of <code>ObjectOutputStream</code> to put the values for the serializable fields into the stream. The <code>writeFields</code> method of <code>ObjectOutputStream</code> puts the values in the correct order, then writes them to the stream using the existing protocol for serialization. Correspondingly, the <code>readFields</code> method of <code>ObjectInputStream</code> reads the values from the stream and makes them available to the class by name in any order. See <a href="output.html#the-objectoutputstream.putfield-class">Section 2.2, &quot;The ObjectOutputStream.PutField Class&quot;</a> and <a href="input.html#the-objectinputstream.getfield-class">Section 3.2, &quot;The ObjectInputStream.GetField Class&quot;</a> for a detailed description of the Serializable Fields API.</p>
+<h2 id="the-objectoutput-interface">1.8 The ObjectOutput Interface</h2>
+<p>The <code>ObjectOutput</code> interface provides an abstract, stream-based interface to object storage. It extends the DataOutput interface so those methods can be used for writing primitive data types. Objects that implement this interface can be used to store primitives and objects.</p>
+<pre><code>package java.io;
+
+public interface ObjectOutput extends DataOutput
+{
+    public void writeObject(Object obj) throws IOException;
+    public void write(int b) throws IOException;
+    public void write(byte b[]) throws IOException;
+    public void write(byte b[], int off, int len) throws IOException;
+    public void flush() throws IOException;
+    public void close() throws IOException;
+}</code></pre>
+<p><code>The</code> <code>writeObject</code> method is used to write an object. The exceptions thrown reflect errors while accessing the object or its fields, or exceptions that occur in writing to storage. If any exception is thrown, the underlying storage may be corrupted. If this occurs, refer to the object that is implementing this interface for more information.</p>
+<h2 id="the-objectinput-interface">1.9 The ObjectInput Interface</h2>
+<p>The <code>ObjectInput</code> interface provides an abstract stream based interface to object retrieval. It extends the <code>DataInput</code> interface so those methods for reading primitive data types are accessible in this interface.</p>
+<pre><code>package java.io;
+
+public interface ObjectInput extends DataInput
+{
+    public Object readObject()
+        throws ClassNotFoundException, IOException;
+    public int read() throws IOException;
+    public int read(byte b[]) throws IOException;
+    public int read(byte b[], int off, int len) throws IOException;
+    public long skip(long n) throws IOException;
+    public int available() throws IOException;
+    public void close() throws IOException;
+}</code></pre>
+<p>The <code>readObject</code> method is used to read and return an object. The exceptions thrown reflect errors while accessing the objects or its fields or exceptions that occur in reading from the storage. If any exception is thrown, the underlying storage may be corrupted. If this occurs, refer to the object implementing this interface for additional information.</p>
+<h2 id="the-serializable-interface">1.10 The Serializable Interface</h2>
+<p>Object Serialization produces a stream with information about the Java<sup>TM</sup> classes for the objects which are being saved. For serializable objects, sufficient information is kept to restore those objects even if a different (but compatible) version of the implementation of the class is present. The <code>Serializable</code> interface is defined to identify classes which implement the serializable protocol:</p>
+<pre><code>package java.io;
+
+public interface Serializable {};</code></pre>
+<p>A Serializable class must do the following:</p>
+<ul>
+<li><p>Implement the <code>java.io.Serializable</code> interface</p></li>
+<li><p>Identify the fields that should be serializable</p>
+<p>(Use the <code>serialPersistentFields</code> member to explicitly declare them serializable or use the transient keyword to denote nonserializable fields.)</p></li>
+<li><p>Have access to the no-arg constructor of its first nonserializable superclass</p></li>
+</ul>
+<p>The class can optionally define the following methods:</p>
+<ul>
+<li><p>A <code>writeObject</code> method to control what information is saved or to append additional information to the stream</p></li>
+<li><p>A <code>readObject</code> method either to read the information written by the corresponding <code>writeObject</code> method or to update the state of the object after it has been restored</p></li>
+<li><p>A <code>writeReplace</code> method to allow a class to nominate a replacement object to be written to the stream</p>
+<p>(See <a href="output.html#the-writereplace-method">Section 2.5, &quot;The writeReplace Method&quot;</a> for additional information.)</p></li>
+<li><p>A <code>readResolve</code> method to allow a class to designate a replacement object for the object just read from the stream</p>
+<p>(See <a href="input.html#the-readresolve-method">Section 3.7, &quot;The readResolve Method</a> for additional information.)</p></li>
+</ul>
+<p><code>ObjectOutputStream</code> and <code>ObjectInputStream</code> allow the serializable classes on which they operate to evolve (allow changes to the classes that are compatible with the earlier versions of the classes). See <a href="version.html#compatible-java-type-evolution">Section 5.5, &quot;Compatible Java Type Evolution&quot;</a> for information about the mechanism which is used to allow compatible changes.</p>
+<p><strong>Note:</strong> Serialization of inner classes (i.e., nested classes that are not static member classes), including local and anonymous classes, is strongly discouraged for several reasons. Because inner classes declared in non-static contexts contain implicit non-transient references to enclosing class instances, serializing such an inner class instance will result in serialization of its associated outer class instance as well. Synthetic fields generated by <code>javac</code> (or other Java<sup>TM</sup> compilers) to implement inner classes are implementation dependent and may vary between compilers; differences in such fields can disrupt compatibility as well as result in conflicting default <code>serialVersionUID</code> values. The names assigned to local and anonymous inner classes are also implementation dependent and may differ between compilers. Since inner classes cannot declare static members other than compile-time constant fields, they cannot use the <code>serialPersistentFields</code> mechanism to designate serializable fields. Finally, because inner classes associated with outer instances do not have zero-argument constructors (constructors of such inner classes implicitly accept the enclosing instance as a prepended parameter), they cannot implement <code>Externalizable</code>. None of the issues listed above, however, apply to static member classes.</p>
+<h2 id="the-externalizable-interface">1.11 The Externalizable Interface</h2>
+<p>For Externalizable objects, only the identity of the class of the object is saved by the container; the class must save and restore the contents. The <code>Externalizable</code> interface is defined as follows:</p>
+<pre><code>package java.io;
+
+public interface Externalizable extends Serializable
+{
+    public void writeExternal(ObjectOutput out)
+        throws IOException;
+
+    public void readExternal(ObjectInput in)
+        throws IOException, java.lang.ClassNotFoundException;
+}</code></pre>
+<p>The class of an Externalizable object must do the following:</p>
+<ul>
+<li><p>Implement the <code>java.io.Externalizable</code> interface</p></li>
+<li><p>Implement a <code>writeExternal</code> method to save the state of the object</p>
+<p>(It must explicitly coordinate with its supertype to save its state.)</p></li>
+<li><p>Implement a <code>readExternal</code> method to read the data written by the <code>writeExternal</code> method from the stream and restore the state of the object</p>
+<p>(It must explicitly coordinate with the supertype to save its state.)</p></li>
+<li><p>Have the <code>writeExternal</code> and <code>readExternal</code> methods be solely responsible for the format, if an externally defined format is written</p>
+<p><strong>Note:</strong> The <code>writeExternal</code> and <code>readExternal</code> methods are public and raise the risk that a client may be able to write or read information in the object other than by using its methods and fields. These methods must be used only when the information held by the object is not sensitive or when exposing it does not present a security risk.</p></li>
+<li><p>Have a public no-arg constructor</p>
+<p><strong>Note:</strong> Inner classes associated with enclosing instances cannot have no-arg constructors, since constructors of such classes implicitly accept the enclosing instance as a prepended parameter. Consequently the <code>Externalizable</code> interface mechanism cannot be used for inner classes and they should implement the <code>Serializable</code> interface, if they must be serialized. Several limitations exist for serializable inner classes as well, however; see <a href="#the-serializable-interface">Section 1.10, &quot;The Serializable Interface&quot;</a>, for a full enumeration.</p></li>
+</ul>
+<p>An Externalizable class can optionally define the following methods:</p>
+<ul>
+<li><p>A <code>writeReplace</code> method to allow a class to nominate a replacement object to be written to the stream</p>
+<p>(See <a href="output.html#the-writereplace-method">Section 2.5, &quot;The writeReplace Method&quot;</a> for additional information.)</p></li>
+<li><p>A <code>readResolve</code> method to allow a class to designate a replacement object for the object just read from the stream</p>
+<p>(See <a href="input.html#the-readresolve-method">Section 3.7, &quot;The readResolve Method&quot;</a> for additional information.)</p></li>
+</ul>
+<h2 id="serialization-of-enum-constants">1.12 Serialization of Enum Constants</h2>
+<p>Enum constants are serialized differently than ordinary serializable or externalizable objects. The serialized form of an enum constant consists solely of its name; field values of the constant are not present in the form. To serialize an enum constant, <code>ObjectOutputStream</code> writes the value returned by the enum constant's <code>name</code> method. To deserialize an enum constant, <code>ObjectInputStream</code> reads the constant name from the stream; the deserialized constant is then obtained by calling the <code>java.lang.Enum.valueOf</code> method, passing the constant's enum type along with the received constant name as arguments. Like other serializable or externalizable objects, enum constants can function as the targets of back references appearing subsequently in the serialization stream.</p>
+<p>The process by which enum constants are serialized cannot be customized: any class-specific <code>writeObject</code>, <code>readObject</code>, <code>readObjectNoData</code>, <code>writeReplace</code>, and <code>readResolve</code> methods defined by enum types are ignored during serialization and deserialization. Similarly, any <code>serialPersistentFields</code> or <code>serialVersionUID</code> field declarations are also ignored--all enum types have a fixed <code>serialVersionUID</code> of <code>0L</code>. Documenting serializable fields and data for enum types is unnecessary, since there is no variation in the type of data sent.</p>
+<h2 id="protecting-sensitive-information">1.13 Protecting Sensitive Information</h2>
+<p>When developing a class that provides controlled access to resources, care must be taken to protect sensitive information and functions. During deserialization, the private state of the object is restored. For example, a file descriptor contains a handle that provides access to an operating system resource. Being able to forge a file descriptor would allow some forms of illegal access, since restoring state is done from a stream. Therefore, the serializing runtime must take the conservative approach and not trust the stream to contain only valid representations of objects. To avoid compromising a class, the sensitive state of an object must not be restored from the stream, or it must be reverified by the class. Several techniques are available to protect sensitive data in classes.</p>
+<p>The easiest technique is to mark fields that contain sensitive data as <em>private transient</em>. Transient fields are not persistent and will not be saved by any persistence mechanism. Marking the field will prevent the state from appearing in the stream and from being restored during deserialization. Since writing and reading (of private fields) cannot be superseded outside of the class, the transient fields of the class are safe.</p>
+<p>Particularly sensitive classes should not be serialized at all. To accomplish this, the object should not implement either the <code>Serializable</code> or the <code>Externalizable</code> interface.</p>
+<p>Some classes may find it beneficial to allow writing and reading but specifically handle and revalidate the state as it is deserialized. The class should implement <code>writeObject</code> and <code>readObject</code> methods to save and restore only the appropriate state. If access should be denied, throwing a <code>NotSerializableException</code> will prevent further access.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 2005, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="index.html">PREV</a> | <a href="output.html">NEXT</a>
+</body>
+</html>

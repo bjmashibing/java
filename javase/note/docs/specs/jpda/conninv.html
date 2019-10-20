@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Connection and Invocation Details</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Connection and Invocation Details</h1>
+</header>
+<br/>
+<div class="centered">
+<h1 id="connection-and-invocation-details">Connection and Invocation Details</h1>
+</div>
+<h2 id="contents">Contents</h2>
+<p><a href="#transports"><strong>Transports</strong></a><br />
+<a href="#connectors"><strong>Connectors</strong></a><br />
+<a href="#oracle-vm-invocation-options"><strong>Oracle VM Invocation Options</strong></a><br />
+<a href="#debugging-plug-in-applets"><strong>Debugging Plug-in Applets</strong></a><br />
+<a href="#connecting-with-jdb"><strong>Connecting with JDB</strong></a><br />
+<a href="#service-provider-interfaces"><strong>Service Provider Interfaces</strong></a></p>
+<hr />
+<h3 id="transports">Transports</h3>
+<p>A JPDA <em>Transport</em> is a method of communication between a debugger and the virtual machine that is being debugged (hereafter the <em>target VM</em>). The communication is connection oriented - one side acts as a server, listening for a connection. The other side acts as a client and connects to the server. JPDA allows either the debugger application or the target VM to act as the server. Transport implementations can allow communications between processes running on a single machine, on different machines, or either. When establishing a connection a <em>transport addresses</em> is used to identify the end-point of the connection. The format of a transport address depends on the type of transport.</p>
+<p>Within JPDA the debugger application uses the Java Debug Interface (JDI) interface and the <a href="#connectors">Connector</a> abstraction to establish a connection to the target VM. The Connector used by the debugger application encapsulates the transport. On the target VM an agent supporting the Java Debug Wire Protocol is used to communicate with the debugger. This agent (which may be built into the target VM or loaded from a runtime library) encapsulates the transport to communicate with the debugger.</p>
+<p>Two transport implementations are shipped with the reference implementation: A socket transport based on TCP/IP, and a shared memory transport. The specifications do not require any specific transport implementation to exist. In addition to transports provided with the implementation the architecture includes <a href="#service-provider-interfaces">service provider interfaces</a> to allow additional transports be developed and deployed.</p>
+<h4 id="socket-transport">Socket Transport</h4>
+<p>The JPDA reference implementation provides a socket transport for the Solaris, Linux, and Microsoft Windows platforms. With the socket transport, the debugger application and the target VM can reside either on the same machine or on different machines. The socket transport uses a single stream TCP/IP connection between the debugger application and the target VM. Both IPv4 and IPv6 are supported on the JDI side of the socket transport. The current implementation on the target VM side only supports IPv4, but this could change in a future release so that both IPv4 and IPv6 are supported.</p>
+<p>Command and reply packets are written to the stream in accordance with the <a href="../jdwp/jdwp-spec.html">JDWP specification</a> using the <a href="../jdwp/jdwp-transport.html">JDWP Transport Interface</a>. Since many small packets can be sent over JDWP, the TCP_NO_DELAY socket option can improve performance in some socket implementations by avoiding delays that could occur if the socket implementation buffers small packets before sending them. Sockets are closed gracefully so that unsent data is sent if possible.</p>
+<p>The socket transport is identified through a unique string, <code>dt_socket</code>. This name can be used to select the socket transport when <a href="#oracle-vm-invocation-options">invoking</a> the target VM. Within the debugger application a corresponding Connector is used which encapsulates the socket transport.</p>
+<p>In contexts where a client is attaching to a server, socket transport addresses have the format &quot;<code>&lt;name&gt;:&lt;port&gt;</code>&quot; where <code>&lt;name&gt;</code> is the host name and <code>&lt;port&gt;</code> is the socket port number at which it attaches or listens. In contexts where a server is waiting for a client to attach, the address consists of the port number alone (the host name is implicit).</p>
+<h4 id="shared-memory-transport">Shared Memory Transport</h4>
+<p>In addition to the socket transport, the JPDA reference implementation provides a shared memory transport on the Microsoft Windows platform. The shared memory transport uses a shared memory region to exchange JDWP packets between the debugger application and the target VM. With the shared memory transport, the debugger application and target VM must reside on the same machine.</p>
+<p>The shared memory transport is identified through a unique string, <code>dt_shmem</code>. This name can be used to select the socket transport when <a href="#oracle-vm-invocation-options">invoking</a> the target VM. Within the debugger application a corresponding Connector is used which encapsulates the shared memory transport.</p>
+<p>Shared memory transport addresses are simply names that can be used as Microsoft Windows file-mapping object names. The name string can consist of any combination of characters, excluding the backslash.</p>
+<h3 id="connectors">Connectors</h3>
+<p>A <em>connector</em> is a JDI abstraction that is used in establishing a connection between a debugger application (written to the JDI) and a target VM. Different JDI implementations are free to provide different connector implementations to match the transports and VMs they support. The connector interfaces are very general, to allow JDI to be used with varying connector implementations. Connectors are configured through a set of name/value pairs. Specific connectors accept different name/value pairs.</p>
+<p>A good JDI client application will allow users to choose and configure any connector that may be present, but it can be beneficial to incorporate knowledge of specific connectors into the debugger to make their configuration a more pleasant user experience. The example <a href="#connecting-with-jdb">JDB</a> implementation provided with the JPDA illustrates this approach.</p>
+<p>The JDI reference implementations provides several connectors which map to the available transport types and the modes of connection (launching, listening, and attaching). These connectors are described in the following sections. A List containing these connectors is returned by JDI method VirtualMachineManager.allConnectors(). In addition, each attaching, listening, and launching connector is contained in the lists returned by the corresponding VirtualMachineManager methods attachingConnectors(), listeningConnectors(), and launchingConnectors().</p>
+<h4 id="command-line-launching-connector">Command Line Launching Connector</h4>
+<p>This connector can be used by a debugger application to launch an Oracle VM or any other VM which supports the same invocation <a href="#oracle-vm-invocation-options">options</a> with respect to debugging. The details of launching the VM and specifying the necessary debug options are handled by the connector. The underlying transport used by this connector depends on the platform. On Microsoft Windows, the shared memory transport is used. On Solaris and Linux the socket transport is used.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.CommandLineLaunch&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Command Line Launching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>home</code>
+</td>
+<td>
+no
+</td>
+<td>
+current <code>java.home</code> property value
+</td>
+<td>
+Location of the Java Runtime Environment (JRE) used to invoke the Target VM.
+</td>
+</tr>
+<tr>
+<td>
+<code>options</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+Options, in addition to the standard debugging <a href="#oracle-vm-invocation-options">options,</a> with which to invoke the VM.
+</td>
+</tr>
+<tr>
+<td>
+<code>main</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The debugged application's main class and command line arguments.
+</td>
+</tr>
+<tr>
+<td>
+<code>suspend</code>
+</td>
+<td>
+no
+</td>
+<td>
+true
+</td>
+<td>
+True if the target VM is to be suspended immediately before the main class is loaded; false otherwise.
+</td>
+</tr>
+<tr>
+<td>
+<code>quote</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;\&quot;&quot;
+</td>
+<td>
+The character used to combine space-delimited text on the command line.
+</td>
+</tr>
+<tr>
+<td>
+<code>vmexec</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;java&quot;
+</td>
+<td>
+The VM launcher executable. This can be changed to javaw or to java_g for debugging, if that launcher is available.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="raw-command-line-launching-connector">Raw Command Line Launching Connector</h4>
+<p>This connector can be used by a debugger application to launch any VM. The entire command line must be specified and it is not edited in any way. The details of launching the VM with the given command line are handled by the connector. The underlying transport used by this connector depends on the platform. On Microsoft Windows, the shared memory transport is used. On the Solaris operating environment, the socket transport is used.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.RawCommandLineLaunch&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Raw Command Line Launching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>command</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+Full command line to invoke the target VM with the application to be debugged..
+</td>
+</tr>
+<tr>
+<td>
+<code>address</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+<a href="#transports">Transport address</a> at which to listen for the newly launched target VM to connect. This value is typically part of the raw command argument as well, but this is not required if the target VM has some other means of determining the transport address to which it should connect.
+</td>
+</tr>
+<tr>
+<td>
+<code>quote</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;\&quot;&quot;
+</td>
+<td>
+The character used to combine space-delimited text on the command line.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="socket-attaching-connector">Socket Attaching Connector</h4>
+<p>This connector can be used by a debugger application to attach to a currently running target VM through the socket transport. The target VM must have been invoked with options consistent with this connector's arguments described in the following table. For an Oracle VM, the necessary options are described in <a href="#oracle-vm-invocation-options">Oracle Invocation VM Options</a>.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.SocketAttach&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Socket Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>hostname</code>
+</td>
+<td>
+no
+</td>
+<td>
+local host name
+</td>
+<td>
+Name of host machine to connect to.
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+Port number on the <code>host</code> machine to connect to.
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The timeout, in milliseconds, to use when attaching to the target VM.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="shared-memory-attaching-connector">Shared Memory Attaching Connector</h4>
+<p>This connector can be used by a debugger application to attach to a currently running target VM through the shared memory transport. It is available only on the Microsoft Windows platform. The target VM must have been invoked with options consistent with this connectors arguments described in the following table. For an Oracle VM, the necessary options are described in <a href="#oracle-vm-invocation-options">Oracle VM Invocation Options</a>.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.SharedMemoryAttach&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Shared Memory Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>name</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The shared memory <a href="#transports">transport address</a> at which the target VM is listening.
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The timeout, in milliseconds, to use when attaching to the target VM
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="socket-listening-connector">Socket Listening Connector</h4>
+<p>This connector can be used by a debugger application to accept a connection from a separately invoked target VM through the socket transport.. The target VM must be invoked with options consistent with this connector's arguments described in the following table. For an Oracle VM, the necessary options are described in <a href="#oracle-vm-invocation-options">Oracle VM Invocation Options</a>.</p>
+<p>This connector can accept connections from multiple target VMs.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.SocketListen&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Socket Listening Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>port</code>
+</td>
+<td>
+no
+</td>
+<td>
+Ephemeral port number (port assigned by the TCP/IP stack)
+</td>
+<td>
+Port number at which to listen for a connection.
+</td>
+</tr>
+<tr>
+<td>
+<code>localAddress</code>
+</td>
+<td>
+no
+</td>
+<td>
+All addresses assigned to the host
+</td>
+<td>
+An IP address assigned to the host
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The timeout, in milliseconds, to use while waiting for the target VM to connect
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="shared-memory-listening-connector">Shared Memory Listening Connector</h4>
+<p>This connector can be used by a debugger application to accept a connection from a separately invoked target VM through the shared memory transport. It is available only on the Microsoft Windows platform. The target VM must be invoked with options consistent with this connector's arguments described in the following table. For an Oracle VM, the necessary options are described in <a href="#oracle-vm-invocation-options">Oracle VM Invocation Options</a>.</p>
+<p>This connector can accept connections from multiple target VMs.</p>
+<p>This connector is uniquely identified by the name &quot;com.sun.jdi.SharedMemoryListen&quot;.<br />
+</p>
+<p><br/></p>
+<table border="1" class="centered">
+<caption>
+Shared Memory Listening Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>name</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+A shared memory <a href="#transports">transport address</a> at which to listen for the target VM connection.
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The timeout, in milliseconds, to use while waiting for the target VM to connect
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="process-attaching-connector">Process Attaching Connector</h4>
+<p>This connector can be used by a debugger application to attach to a currently running target VM that was started with the &quot;server=y&quot; debugging sub-option described in <a href="#oracle-vm-invocation-options">Oracle VM Invocation Options</a>. The target VM must be Java SE 6 or newer.<br />
+<br />
+The Process Attaching Connector does not have an associated transport. Instead, the transport is determined dynamically when an attach actually occurs. Because of this, the transport().name() method for this connector returns &quot;local&quot;.<br />
+<br />
+This connector is uniquely identified by the name &quot;com.sun.jdi.ProcessAttach&quot;.<br />
+<br />
+</p>
+<table border="1" class="centered">
+<caption>
+Process Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th class="centered">
+<strong>name</strong>
+</th>
+<th class="centered">
+<strong>required?</strong>
+</th>
+<th class="centered">
+<strong>default value</strong>
+</th>
+<th class="centered">
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>pid</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The Process ID of a process to be debugged.
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The timeout, in milliseconds, to use when attaching to the target VM.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sa-core-attaching-connector">SA Core Attaching Connector</h4>
+This connector can be used by a debugger application to debug a core file. It is possible that the core file is corrupted to the extent that not all available debugging operations can be performed on it.<br />
+<br />
+The VirtualMachine object returned by this connector's attach() method is 'read-only'. This means that the method:<br />
+
+<pre>
+     vm.canBeModified()
+</pre>
+<p>will return false, and that the JDI client should not call any JDI methods that are defined to throw a VMCannotBeModifiedException in this case. The word size (i.e. 32 bit/64 bit) and version (e.g. 5.0, 5.1) of the debugger's Virtual Machine must be the same as that of the Virtual Machine of the process from which the core file was produced.<br />
+This connector allows multiple debugging sessions on the same core file.<br />
+<br />
+This connector is uniquely identified by the name &quot;sun.jvm.hotspot.jdi.SACoreAttachingConnector&quot;.<br />
+<br />
+</p>
+<table border="1" class="centered">
+<caption>
+SA Core Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+core
+</td>
+<td>
+no
+</td>
+<td>
+core
+</td>
+<td>
+Pathname of the core file to debug
+</td>
+</tr>
+<tr>
+<td>
+javaExecutable
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+Pathname of the Java executable that produced the core file.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sa-pid-attaching-connector">SA PID Attaching Connector</h4>
+This connector can be used by a debugger application to debug a process. It is not available on the Linux Itanium platform. It is possible that the process is corrupted to the extent that not all available debugging operations can be performed on it.<br />
+<br />
+The VirtualMachine object returned by this connector's attach() method is 'read-only'. This means that the method:<br />
+
+<pre>
+     vm.canBeModified()
+</pre>
+<p>will return false, and that the JDI client should not call any JDI methods that are defined to throw a VMCannotBeModifiedException in this case.<br />
+<br />
+The process to be debugged need not have been started in debug mode(ie, with -agentlib:jdwp or -Xrunjdwp). It is permissable for the process to be hung. The word size (i.e. 32 bit/64 bit) and version (e.g. 5.0, 5.1) of the debugger and debuggee must be the same. The process is suspended when this connector attaches and resumed when this connector detaches. More than one SAPIDAttachingConnector can not attach to a single process simultaneously.<br />
+<br />
+This connector is uniquely identified by the name &quot;sun.jvm.hotspot.jdi.SAPIDAttachingConnector&quot;.<br />
+<br />
+</p>
+<table border="1" class="centered">
+<caption>
+SA PID Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th class="centered">
+<strong>name</strong>
+</th>
+<th class="centered">
+<strong>required?</strong>
+</th>
+<th class="centered">
+<strong>default value</strong>
+</th>
+<th class="centered">
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>pid</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The Process ID of a process to be debugged.
+</td>
+</tr>
+</tbody>
+</table>
+<p><br/></p>
+<h4 id="sa-debug-server-attaching-connector">SA Debug Server Attaching Connector</h4>
+This connector can be used by a debugger application to debug a process or core file on a machine other than the machine upon which the debugger is running. It is not available on the Linux Itanium platform. It is possible that the remote process/core file is corrupted to the extent that not all available debugging operations can be performed on it.<br />
+<br />
+The VirtualMachine object returned by this connector's attach() method is 'read-only'. This means that the method:<br />
+
+<pre>
+    vm.canBeModified()
+</pre>
+<p>will return false, and that the JDI client should not call any JDI methods that are defined to throw a VMCannotBeModifiedException in this case.<br />
+<br />
+This connector uses RMI to communicate with a 'debug server' running on the remote machine.<br />
+Before the attach() method on this connector is called, the debug server must be started on the remote machine<br />
+and told what process or corefile is to be debugged. The following must be done on the remote machine:</p>
+<ul>
+<li>start the RMI registry with sa-jdi.jar in the classpath:</li>
+</ul>
+<pre><code>${JAVA_HOME}/bin/rmiregistry -J-Xbootclasspath/p:${JAVA_HOME}/lib/sa-jdi.jar</code></pre>
+<ul>
+<li>start the 'debug-server' on the remote machine, specifying the process or corefile to be debugged:</li>
+</ul>
+<pre><code>${JAVA_HOME}/bin/java \
+    -classpath ${JAVA_HOME}/lib/sa-jdi.jar \
+    sun.jvm.hotspot.jdi.SADebugServer \
+    &lt;pid&gt; \
+    [uniqueID]</code></pre>
+<p>or</p>
+<pre><code>${JAVA_HOME}/bin/java \
+    -classpath ${JAVA_HOME}/lib/sa-jdi.jar \
+    sun.jvm.hotspot.jdi.SADebugServer \
+    &lt;pathname to the java executable that produced the core file&gt;\
+    &lt;pathname of the corefile to debug&gt; \
+     [uniqueID]</code></pre>
+<p><br/></p>
+<p>'uniqueID' is an optional string. If more than one debug server is to run at the same time on the same machine, then each must have a different 'uniqueID' string.</p>
+<p>In the above, JAVA_HOME must contain the pathname of a Java installation that is the same bit size (i.e. 32 bit/64 bit) and the same version (e.g. 5.0, 5.1) as the version used by the debuggee. However the debugger does not have to be the same bit size and version.</p>
+<p>A process to be debugged need not have been started in debug mode(ie, with -agentlib:jdwp or -Xrunjdwp). It is permissable for the process to be hung. The process is suspended when the debug server attaches to it. When a debug server attached to a process is killed (by ^C or other means), the debuggee process will be resumed. Attaching more than one debug server to a corefile is permitted, but only one debug server can be attached to a process.</p>
+<p>This connector allows multiple debugging sessions connected to the same debug server.</p>
+<p>This connector is uniquely identified by the name &quot;sun.jvm.hotspot.jdi.SADebugServerAttachingConnector&quot;.</p>
+<table border="1" class="centered">
+<caption>
+SA DebugServer Attaching Connector Arguments
+</caption>
+<tbody>
+<tr>
+<th class="centered">
+<strong>name</strong>
+</th>
+<th class="centered">
+<strong>required?</strong>
+</th>
+<th class="centered">
+<strong>default value</strong>
+</th>
+<th class="centered">
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>debugServerName</code>
+</td>
+<td>
+yes
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+The IP address or name of the machine upon which the debug server is running. If the machine contains multiple debug servers, this name must be of the form <code> uniqueID@IPAddress or uniqueID@hostname </code> where 'uniqueID' is the string used to start the corresponding debug server.
+</td>
+</tr>
+</tbody>
+</table>
+<p><br/> <br/></p>
+<h3 id="oracle-vm-invocation-options">Oracle VM Invocation Options</h3>
+<p>This section describes the options necessary to invoke an Oracle VM for debugging.</p>
+<p>Oracle's VM implementation requires command line options to load the JDWP agent for debugging. The <code>-agentlib:jdwp</code> option is used to load and specify options to the JDWP agent.</p>
+<p>The <code>-agentlib:jdwp</code> option is specified as follows:</p>
+<dl>
+<dt>-agentlib:jdwp=<a href="#jdwpoptions">&lt;sub-options&gt;</a></dt>
+<dd>Loads the JPDA reference implementation of JDWP. This library resides in the target VM and uses JVM TI and JNI to interact with it. It uses a transport and the JDWP protocol to communicate with a separate debugger application. Specific sub-options are described in <a href="#jdwpoptions">-Xrunjdwp Sub-options</a>.
+</dd>
+</dl>
+<h4 id="agentlibjdwp-and--xrunjdwp-sub-options"><a id="jdwpoptions"/>-agentlib:jdwp and -Xrunjdwp sub-options</h4>
+<p>The -agentlib:jdwp and -Xrunjdwp option can be further qualified with sub-options. The sub-options are specified as follows:</p>
+<pre><code>    -agentlib:jdwp=&lt;name1&gt;[=&lt;value1&gt;],&lt;name2&gt;[=&lt;value2&gt;]...
+
+or
+
+    -Xrunjdwp:&lt;name1&gt;[=&lt;value1&gt;],&lt;name2&gt;[=&lt;value2&gt;]...</code></pre>
+<p>The following table describes the options that can be used:</p>
+<table border="1" class="centered">
+<caption>
+-Xrunjdwp Sub-options
+</caption>
+<tbody>
+<tr>
+<th>
+<strong>name</strong>
+</th>
+<th>
+<strong>required?</strong>
+</th>
+<th>
+<strong>default value</strong>
+</th>
+<th>
+<strong>description</strong>
+</th>
+</tr>
+<tr>
+<td>
+<code>help</code>
+</td>
+<td>
+no
+</td>
+<td>
+N/A
+</td>
+<td>
+Prints a brief help message and exits the VM.
+</td>
+</tr>
+<tr>
+<td>
+<code>transport</code>
+</td>
+<td>
+yes
+</td>
+<td>
+none
+</td>
+<td>
+Name of the transport to use in connecting to debugger application.
+</td>
+</tr>
+<tr>
+<td>
+<code>server</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;n&quot;
+</td>
+<td>
+<p>If &quot;y&quot;, listen for a debugger application to attach; otherwise, attach to the debugger application at the specified <code>address. </code></p>
+<p>If &quot;y&quot; and no address is specified, choose a <a href="#transports">transport address</a> at which to listen for a debugger application, and print the address to the standard output stream.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>address</code>
+</td>
+<td>
+yes, if <code>server=n</code> no, otherwise
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+<a href="#transports">Transport address</a> for the connection. If server=n, attempt to attach to debugger application at this address. If server=y, listen for a connection at this address.
+</td>
+</tr>
+<tr>
+<td>
+<code>timeout</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;&quot;
+</td>
+<td>
+If server=y specifies the timeout, in milliseconds, to wait for the debugger to attach. If server=n specifies the timeout, in milliseconds, to use when attaching to the debugger. Note that the timeout option may be ignored by some transport implementations.
+</td>
+</tr>
+<tr>
+<td>
+<code>launch</code>
+</td>
+<td>
+no
+</td>
+<td>
+none
+</td>
+<td>
+<p>At completion of JDWP initialization, launch the process given in this string. This option is used in combination with <code>onthrow</code> and/or <code>onuncaught</code> to provide &quot;Just-In-Time debugging&quot; in which a debugger process is launched when a particular event occurs in this VM.</p>
+<p>Note that the launched process is not started in its own window. In most cases the launched process should be a small application which in turns launches the debugger application in its own window.</p>
+<p>The following strings are appended to the string given in this argument (space-delimited). They can aid the launched debugger in establishing a connection with this VM. The resulting string is executed.</p>
+<ul>
+<li>The value of the <code>transport</code> sub-option.</li>
+<li>The value of the <code>address</code> sub-option (or the generated address if one is not given)</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<code>onthrow</code>
+</td>
+<td>
+no
+</td>
+<td>
+none
+</td>
+<td>
+Delay initialization of the JDWP library until an exception of the given class is thrown in this VM. The exception class name must be package-qualified. Connection establishment is included in JDWP initialization, so it will not begin until the exception is thrown.
+</td>
+</tr>
+<tr>
+<td>
+<code>onuncaught</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;n&quot;
+</td>
+<td>
+If &quot;y&quot;, delay initialization of the JDWP library until an uncaught exception is thrown in this VM. Connection establishment is included in JDWP initialization, so it will not begin until the exception is thrown. See the JDI specification for com.sun.jdi.ExceptionEvent for a definition of uncaught exceptions.
+</td>
+</tr>
+<tr>
+<td>
+<code>suspend</code>
+</td>
+<td>
+no
+</td>
+<td>
+&quot;y&quot;
+</td>
+<td>
+If &quot;y&quot;, VMStartEvent has a suspendPolicy of SUSPEND_ALL. If &quot;n&quot;, VMStartEvent has a suspendPolicy of SUSPEND_NONE.
+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples">Examples</h4>
+<dl>
+<dt><code>-agentlib:jdwp=transport=dt_socket,server=y,address=8000</code></dt>
+<dd>Listen for a socket connection on port 8000. Suspend this VM before main class loads (suspend=y by default). Once the debugger application connects, it can send a JDWP command to resume the VM.
+</dd>
+<dd><br />
+
+</dd>
+<dt><code>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:8000,timeout=5000</code></dt>
+<dd>Listen for a socket connection on port 8000 on the loopback address only. Terminate if the debugger does not attach within 5 seconds. Suspend this VM before main class loads (suspend=y by default). Once the debugger application connects, it can send a JDWP command to resume the VM.
+</dd>
+<dd><br />
+<code>-agentlib:jdwp=transport=dt_shmem,server=y,suspend=n</code>
+</dd>
+<dd>Choose an available shared memory transport address and print it to stdout. Listen for a shared memory connection at that address. Allow the VM to begin executing before the debugger application attaches.
+</dd>
+<dd><br />
+<code>-agentlib:jdwp=transport=dt_socket,address=myhost:8000</code>
+</dd>
+<dd>Attach to a running debugger application via socket on host myhost at port 8000. Suspend this VM before the main class loads.
+</dd>
+<dd><br />
+<code>-agentlib:jdwp=transport=dt_shmem,address=mysharedmemory</code>
+</dd>
+<dd>Attach to a running debugger application via shared memory at transport address &quot;<code>mysharedmemory</code>&quot;. Suspend this VM before the main class loads.
+</dd>
+<dd><br />
+
+</dd>
+<dt><code>-agentlib:jdwp=transport=dt_socket,server=y,address=8000,onthrow=java.io.IOException,launch=/usr/local/bin/debugstub</code></dt>
+<dd>Wait for an instance of java.io.IOException to be thrown in this VM. Suspend the VM (suspend=y by default). Listen for a socket connection on port 8000. Execute the following: &quot;<code>/usr/local/bin/debugstub dt_socket myhost:8000&quot;.</code>This program can launch a debugger process in a separate window which will attach to this VM and begin debugging it.
+</dd>
+<dd><br />
+
+</dd>
+<dt><code>-agentlib:jdwp=transport=dt_shmem,server=y,onuncaught=y,launch=d:\bin\debugstub.exe</code></dt>
+<dd>Wait for an uncaught exception to be thrown in this VM. Suspend the VM. Select a shared memory transport address and listen for a connection at that address. Execute the following: &quot;<code>d:\bin\debugstub.exe dt_shmem &lt;address&gt;&quot;</code>, where <code>&lt;address&gt;</code> is the selected shared memory address. This program can launch a debugger process in a separate window which will attach to this VM and begin debugging it.
+</dd>
+<dd><br />
+
+</dd>
+</dl>
+<h3 id="debugging-plug-in-applets">Debugging Plug-in Applets</h3>
+<p>Applets running under Java Plug-in can be debugged. The required VM options described <a href="#oracle-vm-invocation-options">above</a> can be specified in the Plug-In control panel, under the &quot;Basic&quot; tab, in the &quot;Java Run-Time Parameters&quot;. The debug options under the &quot;Advanced&quot; tab should not be used as they will enable the old <code>sun.tools.debug</code> debug support. In future versions of Java Plug-in, these debug options will be changed to use JPDA.</p>
+<p>JDI launching <a href="#connectors">connectors</a> cannot be used to debug Plug-in applets.</p>
+<h3 id="connecting-with-jdb">Connecting with JDB</h3>
+<p>The example implementation of JDB provided with the JPDA, provides an illustration of the usage of JDI connectors. There are &quot;shortcut&quot; options to JDB which assume the use of connectors known to it (that is, connectors present in the reference implementation). It also provides a way to establish a general connection using any connector. While JDB is hardly an example of a good debugger interface, it does provide a simple example of connectors in use.</p>
+<p>In JDB, the -attach option provides access to one of the attaching connectors in the reference implementation (shared memory on Microsoft Windows, sockets on the Solaris and Linux platforms). The -listen option provides access to one of the listening connectors in the reference implementation (shared memory on Microsoft Windows, sockets on the Solaris and Linux platforms). A class name and arguments specified directly on the command line provide access to the command line launching connector.</p>
+<p>For example:</p>
+<p><code>jdb -attach myhost:8000</code></p>
+<p>is an easy way to attach to a target VM with the Socket Attaching Connector (on the Solaris operating environment), and</p>
+<p><code>jdb Hello 1 2 3</code></p>
+<p>is an easy way to launch a target VM with the Command Line Launching Connector.</p>
+<p>However, the -connect option is also provided by JDB to handle any connector by taking an connector name and a set of arbitrary name/value argument pairs. For example the command lines above have the following equivalents.</p>
+<p><code>jdb -connect com.sun.jdi.SocketAttach:hostname=myhost,port=8000</code><br />
+<code>jdb -connect &quot;com.sun.jdi.CommandLineLaunch:main=Hello 1 2 3&quot;</code></p>
+<p>These command lines are more cumbersome than the ones above, but the -connect option can be used with any connector. This kind of operation is a primitive example of how a JDI debugger can deal with any kind of connector while providing a simplified interface for dealing with common, well-known connectors.</p>
+<hr />
+<h3 id="service-provider-interfaces">Service Provider Interfaces</h3>
+<p>JPDA includes service provider interfaces to allow the development and deployment of connector and transport implementations. These service provider interfaces allow debugger and other tool vendors develop new connector implementations and provide addition transport mechanisms over and beyond the socket and shared memory transport provided by Oracle. The service provider interfaces in JDI are specified in the <a href="../../api/jdk.jdi/com/sun/jdi/connect/spi/package-summary.html">com.sun.jdi.connect.spi</a> package.</p>
+<p>In addition to the service provider interfaces in JDI the Oracle implementation also includes a transport library interface called the <a href="../jdwp/jdwp-transport.html">Java Debug Wire Protocol Transport Interface</a>. A transport library is loaded by the JDWP agent in the target VM and is used to establish a connection to the debugger and to transport JDWP packets between the debugger and the VM.</p>
+<p>Further information on the service provider interfaces can be in the document <a href="jpda_spis.html">Java Platform Debugger Architecture - Service Provider Interfaces</a>.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2018, Oracle and/or its affiliates. All rights reserved.</em></p>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Debug Wire Protocol Transport Interface (jdwpTransport)</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Java Debug Wire Protocol Transport Interface (jdwpTransport)</h1>
+</header>
+<p>A transport is implemented as a series of functions in a dynamic library (sometimes called a <em>DLL</em>, or <em>shared library</em>). The library exports an <em>onload</em> function that is invoked by the JDWP (or other) agent at startup-time.</p>
+<p>Like JVMTI, jdwpTransport functions are accessed through an interface pointer called the <em>environment pointer</em>. An environment pointer is a pointer to an environment and has type <code>jdwpTransportEnv*</code>. The environment pointer is returned to the JDWP (or other) agent from the <em>onload</em> function.</p>
+<p>A transport may support a single environment or it may support multiple environments. In other words, a transport may be used by only one, or multiple agents at the same time. If a transport supports multiple environments then each call to the <em>onload</em> function will return a new environment pointer. If a transport only supports a single environment then second, and subsequent calls to the <em>onload</em> function will return an error.</p>
+<p>A transport is thread-safe and jdwpTransport functions can be used by multiple concurrent threads. For example, one thread may be blocked in the jdwpTransport <code>ReadPacket</code> function waiting for a packet while another thread invokes <code>WritePacket</code> function to write a packet.</p>
+<p>In most cases jdwpTransport functions return a <code>jdwpTransportError</code> value indicating return status. Some functions return additional values through pointers provided by the calling function. In cases where the return values are allocated by a jdwpTransport function then the function will use the memory allocation routine specified by the agent. The memory allocation routines are specified to the transport, at start-up, via the <em>onload</em> function.</p>
+<p>In the event of an error (that is, one of the jdwpTransport functions returns a value other than <code>JDWPTRANSPORT_ERROR_NONE</code>) then a string representing the error can be subsequently obtained through a call to the jdwpTransport function <code>GetLastError</code>. Errors are recorded on a per-thread basis. The <code>GetLastError</code> function will return a string represetning the last error that was encountered by the current thread only.</p>
+<h2 id="developing-a-transport-implementation">Developing a Transport implementation</h2>
+<p>A transport library can be developed in any native language that supports C language calling conventions and C or C++ definitions.</p>
+<p>The function, data type, and constant definitions needed for using the jdwpTransport interface are defined in the include file jdwpTransport.h. To use these definitions add the Java SE include directory to your include path:</p>
+<pre><code>#include &quot;jdwpTransport.h&quot;</code></pre>
+<h2 id="transport-start-up">Transport Start-Up</h2>
+<p>The transport library must export an <em>onload</em> function with the following prototype:</p>
+<pre><code>JNIEXPORT jint JNICALL
+jdwpTransport_OnLoad(JavaVM *jvm,
+                     jdwpTransportCallback *callback,
+                     jint version,
+                     jdwpTransportEnv** env);</code></pre>
+<p>This function will be called by the JDWP (or other agent) when the library is loaded.</p>
+<p>The <code>jvm</code> argument is the <em>JNI invocation interface</em> obtained by agent by invoking JNI's <code>GetJavaVM</code> function.</p>
+<p>The <code>callback</code> argument is a pointer to a function table of memory management routines that the transport must use to allocate the memory for return values that are allocated by the transport implementation:</p>
+<pre><code>typedef struct jdwpTransportCallback {
+    void* (*alloc)(jint numBytes);
+    void (*free)(void *buffer);
+} jdwpTransportCallback;</code></pre>
+<p>The lifespan of the <code>callback</code> argument is the <em>onload</em> function and therefore the transport must take a copy of the function table in the <code>jdwpTransport_OnLoad</code> function.</p>
+<p>The function table has two entries. The <code>alloc</code> function allocates an area of memory. It has a single argument to specify the number of bytes to allocate. It returns a pointer to the begining of the allocated memory, or NULL if the memory request cannot be honored. If the number of bytes requested is zero then NULL is returned. The <code>free</code> function deallocates an area of memory that was previously allocated using the <code>alloc</code> function.</p>
+<p>The memory management functions provided by the agent are thread safe and the transport implementation is not required to synchronize calls to the these functions. The implementation of the memory management functions are guaranteed not to call any jdwpTransport function.</p>
+<p><code>version</code> is the version of the transport interface that the agent expects. This must be specified as <code>JDWPTRANSPORT_VERSION_1_0</code>.</p>
+<p><code>env</code> is a pointer to the environment pointer returned by the function.</p>
+<p>The <code>jdwpTransport_OnLoad</code> function returns <code>JNI_OK</code> if the transport initializes successfully. If initialization fails then one of the following errors is returned:</p>
+<pre><code>JNI_ENOMEM
+JNI_EVERSION
+JNI_EEXIST</code></pre>
+<p><code>JNI_ENOMEM</code> is returned if there is insufficient memory to complete initialization.</p>
+<p><code>JNI_EVERSION</code> is returned if the version in the <code>version</code> argument is not <code>JDWPTRANSPORT_VERSION_1_0</code>.</p>
+<p><code>JNI_EEXIST</code> is returned if the transport only supports a single environment, and the environment pointer was previously returned by the first call to the <em>onload</em> function.</p>
+<h2 id="functions">Functions</h2>
+<p>The jdwpTransport functions fall into these categories:</p>
+<ul>
+<li><a href="#connection-management"><strong>Connection Management</strong></a>
+<ul>
+<li><a href="#attach">Attach</a></li>
+<li><a href="#startlistening">StartListening</a></li>
+<li><a href="#stoplistening">StopListening</a></li>
+<li><a href="#accept">Accept</a></li>
+<li><a href="#isopen">IsOpen</a></li>
+<li><a href="#close">Close</a></li>
+</ul></li>
+<li><a href="#io-functions"><strong>I/O Functions</strong></a>
+<ul>
+<li><a href="#readpacket">ReadPacket</a></li>
+<li><a href="#writepacket">WritePacket</a></li>
+</ul></li>
+<li><a href="#miscellaneous-functions"><strong>Miscellaneous Functions</strong></a>
+<ul>
+<li><a href="#getlasterror">GetLastError</a></li>
+<li><a href="#getcapabilities">GetCapabilities</a></li>
+</ul></li>
+</ul>
+<h2 id="connection-management">Connection Management</h2>
+<p>The connection management functions are used to establish and close the connection to the debugger. A connection provides a reliable flow of JDWP packets to and from the debugger. Packets written to a connection are read, by the debugger, in exactly the order in which they were written. Similarly, any packets written to the connection by the debugger are read in the order in which they were written.</p>
+<p>Connections are established either <em>actively</em> or <em>passively</em>. Establishing the connection <em>actively</em> means that the jdwpTransport's <code>Attach</code> function is called to initiate the connection the debugger. Establishing the connection <em>passively</em> means that the jdwpTransport's <code>StartListening</code> function is used to put the transport into <em>listen mode</em> so that it listens for a connection from a debugger. Once in listen mode the <code>Accept</code> function is used to accept the connection. Irrespective of how the connection is established the <code>Close</code> function is used to close the connection, and <code>IsOpen</code> is used to test if a connection is open to the debugger.</p>
+<h3 id="attach">Attach</h3>
+<pre><code>jdwpTransportError
+Attach(jdwpTransportEnv* env, const char* address,
+       jlong attachTimeout, jlong handshakeTimeout)</code></pre>
+<p>Attaches to the debugger. Attaching to the debugger involves two steps. First, a connection is established to the specified <code>address</code>. Once a connection is established a <em>handshake</em> is performed to ensure that the connection is indeed established to a debugger. Handshaking involves the exchange of ASCII string <em>JDWP-Handshake</em> as specified in the <a href="jdwp-spec.html">Java Debug Wire Protocol</a> specification.</p>
+<p>The <code>address</code> argument is a pointer to a string representing the address of the debugger. The exact format is specific to the transport (In the case of a TCP/IP based transport the address may include the hostname and port number of the debugger. In the case of a transport that supports connections through a serial port it might be the device name of the serial port).</p>
+<p>The <code>attachTimeout</code> argument specifies a timeout to use when attaching. If the transport supports an attach timeout (see <a href="#getcapabilities">GetCapabilities</a>) and if the <code>attachTimeout</code> is positive then it specifies the timeout, in milliseconds (more or less), to use when attaching to the debugger. If the transport does not support an attach timeout, or if <code>attachTimeout</code> is specified as zero then a timeout is not used when attaching.</p>
+<p>The <code>handshakeTimeout</code> argument specifies a timeout to use when handshaking with the debugger. If the transport supports a handshake timeout (see <a href="#getcapabilities">GetCapabilities</a>) and if the <code>handshakeTimeout</code> is positive then it specifies the timeout, in milliseconds (more or less), to use when handshaking with the debugger. The exact usage of the handshake timeout is specific to the transport - for example one implementation may use the timeout as an inter-character timeout while waiting for the <em>JDWP-Handshake</em> message from the debugger. Another implementation may use the timeout to indicate the total duration allowed for the handshake exchange. In general the purpose of the handshake timeout is to allow for error handling in the event that the transport connects to something other than a valid debugger. If the transport does not support a handshake timeout, or if the <code>handshakeTimeout</code> is specified as zero then a timeout is not used when handshaking.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT
+JDWPTRANSPORT_ERROR_ILLEGAL_STATE
+JDWPTRANSPORT_ERROR_IO_ERROR
+JDWPTRANSPORT_ERROR_TIMEOUT</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code> is returned if <code>address</code> is invalid or <code>timeout</code> is negative.</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code> is returned if the transport is currently in <em>listen mode</em> (see <a href="#startlistening">StartListening</a>), or there is already an open connection to the debugger (see <a href="#isopen">IsOpen</a>).</p>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if there is an error (other than an attach timeout) attaching to the debugger. Note that errors during the start-up handshake (including a handshake timeout) are considered I/O errors. I/O errors are specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representation of the error.</p>
+<p><code>JDWPTRANSPORT_ERROR_TIMEOUT</code> is returned if the transport supports an attach timeout, and if the <code>attachTimeout</code> value is positive, and if the connection to the debugger cannot be established within that attachTimeout period.</p>
+<h3 id="startlistening">StartListening</h3>
+<pre><code>jdwpTransportError
+StartListening(jdwpTransportEnv* env, const char* address, char** actualAddress);</code></pre>
+<p>Puts the transport into <em>listen mode</em> to listen for a connection from a debugger.</p>
+<p>The <code>address</code> argument is a pointer to a string representing the local address that the transport should listen on. The exact format is specific to the transport (In the case of a TCP/IP based transport the address might a local TCP port number. In the case of a transport that supports connections through a serial port it might be the device name of a serial port). The <code>address</code> argument can be specified as <code>NULL</code> or as an empty string (first character is <code>\0</code>). In that case the transport listens on a default address that is specific to the transport.</p>
+<p>If <code>actualAddress</code> is not <code>NULL</code> then it is set to the address of a string returned by the <code>StartListening</code> function. The returned string will contain the string representation of the address that the transport is listening on. This may, or may not, differ from the address provided in the <code>address</code> argument. The string is allocated using the allocation callback provided to the transport when the <code>jdwpTransport_OnLoad</code> function was called. The caller is responsible for freeing the returned string.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT
+JDWPTRANSPORT_ERROR_ILLEGAL_STATE
+JDWPTRANSPORT_ERROR_IO_ERROR</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code> is returned if <code>address</code> is invalid.</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code> is returned if there is already an open connection to a debugger (see <a href="#isopen">IsOpen</a>), or the transport is already in listen mode.</p>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if there is an error putting the transport into listen mode. The nature of the error is specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<h3 id="stoplistening">StopListening</h3>
+<pre><code>jdwpTransportError
+StopListening(jdwpTransportEnv* env)</code></pre>
+<p>Takes the transport out of <em>listen mode</em> so that it's no longer listening for connections from a debugger.</p>
+<p>If the transport is in <em>listen mode</em> then it will be taken out of this mode. If there is an open (see <a href="#isopen">IsOpen</a>) connection to a debugger then it is unaffected by this function. In other words, <code>StopListening</code> does not close a connection to the debugger. If the transport is not in listen mode then this function does nothing and no error is returned.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_IO_ERROR</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if there is an error taking the transport out of listen mode. The nature of the error is specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<h3 id="accept">Accept</h3>
+<pre><code>jdwpTransportError
+Accept(jdwpTransportEnv* env, jlong acceptTimeout, jlong handshakeTimeout)</code></pre>
+<p>Accepts a connection from a debugger. Accepting a connection from a debugger involves two steps. Firstly, a connection is established by the debugger. Once a connection is established a <em>handshake</em> is performed to ensure that the connection was indeed established by a debugger. Handshaking involves the exchange of ASCII string <em>JDWP-Handshake</em> as specified in the <a href="jdwp-spec.html">Java Debug Wire Protocol</a> specification.</p>
+<p>The <code>acceptTimeout</code> argument specifies the timeout to use while waiting for the debugger to connect. If the transport supports an accept timeout (see <a href="#getcapabilities">GetCapabilities</a>) and if the <code>acceptTimeout</code> is positive then it specifies the timeout, in milliseconds (more or less), to use when waiting for a connection from a debugger. If the transport does not support an accept timeout, or if <code>timeout</code> is specified as zero then block indefinitely waiting for a connection.</p>
+<p>The <code>handshakeTimeout</code> argument specifies a timeout to use when handshaking with the debugger. If the transport supports a handshake timeout (see <a href="#getcapabilities">GetCapabilities</a>) and if the <code>handshakeTimeout</code> is positive then it specifies the timeout, in milliseconds (more or less), to use when handshaking with the debugger. The exact usage of the handshake timeout is specific to the transport - for example one implementation may use the timeout as an inter-character timeout while waiting for the <em>JDWP-Handshake</em> message from the debugger. Another implementation may use the timeout to indicate the total duration allowed for the handshake exchange. In general the purpose of the handshake timeout is to allow for error handling in the event that something other than a debugger establishes a connection to the debuggee. If the transport does not support a handshake timeout, or if the <code>handshakeTimeout</code> is specified as zero then a timeout is not used when handshaking.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT
+JDWPTRANSPORT_ERROR_ILLEGAL_STATE
+JDWPTRANSPORT_ERROR_IO_ERROR
+JDWPTRANSPORT_ERROR_TIMEOUT</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code> is returned if <code>attachTimeout</code> or <code>handshakeTimeout</code> is negative.</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code> is returned if there is already an open connection to a debugger (see <a href="#isopen">IsOpen</a>), or if the transport is not in listen mode (see <a href="#startlistening">StartListening</a>).</p>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if there is an error (other than an accept timeout) while accepting a connection from a debugger. Note that errors during the start-up handshake (including a handshake timeout) are considered I/O errors. The nature of the error is specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<p><code>JDWPTRANSPORT_ERROR_TIMEOUT</code> is returned if the transport supports an accept timeout, and if the <code>acceptTimeout</code> value is positive, and if the connection to the debugger cannot be established within that timeout period.</p>
+<p><strong>Note:</strong> A thread that is blocked in <code>Accept</code> waiting for a connection from a debugger can be interrupted by another thread calling <code>StopListening</code>. In that case the thread that called <code>Accept</code> will return <code>JDWPTRANSPORT_ERROR_IO_ERROR</code> indicating an I/O error has occurred. If a thread blocked in <code>Accept</code> has accepted a connection and is in the process of handshaking with the debugger then <code>StopListening</code> will not interrupt the connection.</p>
+<h3 id="isopen">IsOpen</h3>
+<pre><code>jboolean
+isOpen(jdwpTransportEnv* env)</code></pre>
+<p>Tells whether or not there is a connection open to a debugger.</p>
+<p>Returns <code>JNI_TRUE</code> if, and only if, there is an open connection to a debugger. Otherwise it returns <code>JNI_FALSE</code>.</p>
+<h3 id="close">Close</h3>
+<pre><code>jdwpTransportError
+Close(jdwpTransportEnv* env)</code></pre>
+<p>Closes an open connection to a debugger.</p>
+<p>If there isn't an open connection to a debugger (see <a href="#isopen">IsOpen</a>) then this function does nothing and no error is returned.</p>
+<p>If there are threads blocked in any I/O functions (namely, <a href="#readpacket">ReadPacket</a> and <a href="#writepacket">WritePacket</a>), then these I/O functions will be interrupted by the close and will return an <code>JDWPTRANSPORT_ERROR_IO_ERROR</code> indicating an I/O error has occurred.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_IO_ERROR</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if there is an error closing the connection. The nature of the error is specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<h2 id="io-functions">I/O Functions</h2>
+<p>The I/O functions are used for reading and writing JDWP packets from and to the debugger.</p>
+<h3 id="readpacket">ReadPacket</h3>
+<pre><code>typedef struct {
+    jint len;
+    jint id;
+    jbyte flags;
+    jbyte cmdSet;
+    jbyte cmd;
+    jbyte *data;
+} jdwpCmdPacket;
+
+typedef struct {
+    jint len;
+    jint id;
+    jbyte flags;
+    jshort errorCode;
+    jbyte *data;
+} jdwpReplyPacket;
+
+typedef struct jdwpPacket {
+    union {
+        jdwpCmdPacket cmd;
+        jdwpReplyPacket reply;
+    } type;
+} jdwpPacket;
+
+jdwpTransportError
+ReadPacket(jdwpTransportEnv* env, jdwpPacket* packet)</code></pre>
+<p>Reads a JDWP packet from an open connection to a debugger.</p>
+<p>This function does a <em>blocking read</em> on an open connection. It blocks indefinitely until a complete JDWP packet can be returned, or in the case of a transport based on a stream-oriented protocol, end-of-stream is encountered.</p>
+<p>The <code>packet</code> argument is the address of a <code>jdwpPacket</code> structure that is populated by this function. The <code>packet.type.cmd.len</code> or <code>packet.type.reply.len</code> field (depending on if the packet is a command or reply packet) is populated with the length of the packet. If end of stream is encountered the length field will be set to <code>0</code> and all other fields in the packet will be undefined. If end of stream is encountered after reading some, but not all, bytes of a packet it is considered an I/O error and <code>JDWPTRANSPORT_ERROR_IO_ERROR</code> will be returned. In that case the length field will not be populated. When an entire packet is read then all fields in the packet are populated with values in host order. This may, or may not, differ from the big endian order require when transmitting JDWP packets.</p>
+<p>The <code>packet.type.cmd.data</code> or <code>packet.type.reply.data</code> field (depending on if the packet is a command or reply packet) will be populated with <code>NULL</code> or a pointer to the packet data allocated by this function. Packet data is allocated using the allocation callback provided to the transport when the <code>jdwpTransport_OnLoad</code> function was called. The caller is responsible to free it. The layout of the packet data (that is the data following the header, if any) is returned to the caller in the byte ordering in which it was received.</p>
+<p>The <code>ReadPacket</code> function does not do any integrity checking on the returned packet except checking that the length of the packet (as indicated by the first 4 bytes) is <code>&gt;=</code> 11 bytes. If the <code>length</code> field is less than 11 bytes then <code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_IO_ERROR
+JDWPTRANSPORT_ERROR_ILLEGAL_STATE
+JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if an I/O error occurs when reading, the connection is closed asynchronously by another thread calling the <a href="#close">Close</a> function, or a badly formed packet (<code>length</code> field less than 11 bytes) is received. I/O errors are specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code> is returned if there isn't an open connection to a debugger (see <a href="#isopen">IsOpen</a>).</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code> is returned if <code>packet</code> is <code>NULL</code></p>
+<h3 id="writepacket">WritePacket</h3>
+<pre><code>jdwpTransportError
+WritePacket(jdwpTransportEnv* env, const jdwpPacket* packet)</code></pre>
+<p>Writes a JDWP packet to an open connection.</p>
+<p>The <code>packet</code> argument is a pointer to a <code>jdwpPacket</code> structure. All fields in the packet header must be stored in host order. The packet data field (<code>packet.type.cmd.data</code> or <code>packet.type.reply.data</code>) must be <code>NULL</code>, or a pointer to a location containing packet data that immediately follows the header. The packet data is must be in network order (big endian) ready for transmission.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT
+JDWPTRANSPORT_ERROR_IO_ERROR
+JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_ARGUMENT</code> if <code>packet</code> is <code>NULL</code>, or if the packet length field (<code>packet.type.cmd.len</code> or <code>packet.type.reply.len</code>) is less than 11, or it is greater than 11 but the packet data field (<code>packet.type.cmd.data</code> or <code>packet.type.reply.data</code>) is <code>NULL</code>.</p>
+<p><code>JDWPTRANSPORT_ERROR_IO_ERROR</code> is returned if an I/O error occurs when writing, or the connection is closed asynchronously by another thread calling the <a href="#close">Close</a> function. I/O errors are specific to the transport. <a href="#getlasterror">GetLastError</a> can be used to obtain a string representing the error.</p>
+<p><code>JDWPTRANSPORT_ERROR_ILLEGAL_STATE</code> is returned if there isn't an open connection to a debugger (see <a href="#isopen">IsOpen</a>).</p>
+<h2 id="miscellaneous-functions">Miscellaneous Functions</h2>
+<h3 id="getlasterror">GetLastError</h3>
+<pre><code>jdwpTransportError
+GetLastError(jdwpTransportEnv* env, char** msg);</code></pre>
+<p>Returns the string representation of the last error.</p>
+<p>When an error occurs it is recorded on a per-thread basis. A subsequent call to <code>GetLastError</code> returns the string representation of the last I/O error.</p>
+<p>The <code>msg</code> argument is a pointer to a null-terminated string returned by this function. The string is allocated using the allocation callback provided to the transport when the <code>jdwpTransport_OnLoad</code> function was called. The caller is responsible to free the returned string.</p>
+<p>This function returns a <a href="#universal-errors">universal error</a> or one of the following errors:</p>
+<pre><code>JDWPTRANSPORT_ERROR_MSG_NOT_AVAILABLE</code></pre>
+<p><code>JDWPTRANSPORT_ERROR_MSG_NOT_AVAILABLE</code> is returned if this thread has not encountered an I/O error or there isn't a string representation of the last error available.</p>
+<h3 id="getcapabilities">GetCapabilities</h3>
+<pre><code>typedef struct {
+    unsigned int can_timeout_attach     :1;
+    unsigned int can_timeout_accept     :1;
+    unsigned int can_timeout_handshake  :1;
+    unsigned int reserved3              :1;
+    unsigned int reserved4              :1;
+    unsigned int reserved5              :1;
+    unsigned int reserved6              :1;
+    unsigned int reserved7              :1;
+    unsigned int reserved8              :1;
+    unsigned int reserved9              :1;
+    unsigned int reserved10             :1;
+    unsigned int reserved11             :1;
+    unsigned int reserved12             :1;
+    unsigned int reserved13             :1;
+    unsigned int reserved14             :1;
+    unsigned int reserved15             :1;
+} JDWPTransportCapabilities;
+
+jdwpTransportError
+GetCapabilities(jdwpTransportEnv* env, JDWPTransportCapabilities* capabilitiesPtr)</code></pre>
+<p>Returns via <code>capabilitiesPtr</code> the optional jdwpTransport features supported by this transport. The capabilities structure contains a number of boolean flags indicating whether the named feature is supported. The current set of flags is:</p>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Boolean Flag</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>can_timeout_attach</code></td>
+<td style="text-align: left;">Indicates if the transport supports attaching with a timeout</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>can_timeout_accept</code></td>
+<td style="text-align: left;">Indicates if the transport supports an accept timeout</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>can_timeout_handshake</code></td>
+<td style="text-align: left;">Indicates if the transport supports a timeout when performing the initial handshake with the debugger when the connection is established</td>
+</tr>
+</tbody>
+</table>
+<p>This function does not return any errors.</p>
+<h2 id="universal-errors">Universal Errors</h2>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Error</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>JDWPTRANSPORT_ERROR_NONE</code></td>
+<td style="text-align: left;">No error has occurred. This is the error code that is returned on successful completion of the function.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>JDWPTRANSPORT_ERROR_OUT_OF_MEMORY</code></td>
+<td style="text-align: left;">The function needed to allocate memory and no more memory was available for allocation.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>JDWPTRANSPORT_ERROR_INTERNAL</code></td>
+<td style="text-align: left;">An unexpected internal error has occurred.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+</body>
+</html>

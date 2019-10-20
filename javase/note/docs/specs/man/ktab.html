@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The ktab Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The ktab Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>ktab - manage the principal names and service keys stored in a local key table</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>ktab</code> [<em>commands</em>] [<em>options</em>]</p>
+<dl>
+<dt>[<em>commands</em>] [<em>options</em>]</dt>
+<dd>Lists the keytab name and entries, adds new key entries to the keytab, deletes existing key entries, and displays instructions. See <a href="#commands-and-options">Commands and Options</a>.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>ktab</code> enables the user to manage the principal names and service keys stored in a local key table. Principal and key pairs listed in the keytab enable services running on a host to authenticate themselves to the Key Distribution Center (KDC).</p>
+<p>Before configuring a server to use Kerberos, you must set up a keytab on the host running the server. Note that any updates made to the keytab using the <code>ktab</code> tool don't affect the Kerberos database.</p>
+<p>A <em>keytab</em> is a host's copy of its own keylist, which is analogous to a user's password. An application server that needs to authenticate itself to the Key Distribution Center (KDC) must have a keytab which contains its own principal and key. If you change the keys in the keytab, you must also make the corresponding changes to the Kerberos database. The <code>ktab</code> tool enables you to list, add, update or delete principal names and key pairs in the key table. None of these operations affect the Kerberos database.</p>
+<h2 id="security-alert">Security Alert</h2>
+<p>Don't specify your password on the command line. Doing so can be a security risk. For example, an attacker could discover your password while running the UNIX <code>ps</code> command.</p>
+<p>Just as it is important for users to protect their passwords, it is equally important for hosts to protect their keytabs. You should always store keytab files on the local disk and make them readable only by root. You should never send a keytab file over a network in the clear.</p>
+<h2 id="commands-and-options">Commands and Options</h2>
+<dl>
+<dt><code>-l</code> [<code>-e</code>] [<code>-t</code>]</dt>
+<dd>Lists the keytab name and entries. When <code>-e</code> is specified, the encryption type for each entry is displayed. When <code>-t</code> is specified, the timestamp for each entry is displayed.
+</dd>
+<dt><code>-a</code> <em>principal_name</em> [<em>password</em>] [<code>-n</code> <em>kvno</em>] [<code>-append</code>]</dt>
+<dd><p>Adds new key entries to the keytab for the given principal name with an optional <em>password</em>. If a <em>kvno</em> is specified, new keys' Key Version Numbers equal to the value, otherwise, automatically incrementing the Key Version Numbers. If <code>-append</code> is specified, new keys are appended to the keytab, otherwise, old keys for the same principal are removed.</p>
+<p>No changes are made to the Kerberos database. <strong>Don't specify the password on the command line or in a script.</strong> This tool will prompt for a password if it isn't specified.</p>
+</dd>
+<dt><code>-d</code> <em>principal_name</em> [<code>-f</code>] [<code>-e</code> <em>etype</em>] [<em>kvno</em> | <code>all</code>| <code>old</code>]</dt>
+<dd><p>Deletes key entries from the keytab for the specified principal. No changes are made to the Kerberos database.</p>
+<ul>
+<li><p>If <em>kvno</em> is specified, the tool deletes keys whose Key Version Numbers match kvno. If <code>all</code> is specified, delete all keys.</p></li>
+<li><p>If <code>old</code> is specified, the tool deletes all keys except those with the highest <em>kvno</em>. The default action is <code>all</code>.</p></li>
+<li><p>If <em>etype</em> is specified, the tool only deletes keys of this encryption type. <em>etype</em> should be specified as the numberic value <em>etype</em> defined in RFC 3961, section 8. A prompt to confirm the deletion is displayed unless <code>-f</code> is specified.</p></li>
+</ul>
+<p>When <em>etype</em> is provided, only the entry matching this encryption type is deleted. Otherwise, all entries are deleted.</p>
+</dd>
+<dt><code>-help</code></dt>
+<dd>Displays instructions.
+</dd>
+</dl>
+<h2 id="common-options">Common Options</h2>
+<p>This option can be used with the <code>-l</code>, <code>-a</code> or <code>-d</code> commands.</p>
+<dl>
+<dt><code>-k</code> <em>keytab name</em></dt>
+<dd>Specifies the keytab name and path with the <code>FILE:</code> prefix.
+</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<ul>
+<li><p>Lists all the entries in the default keytable</p>
+<blockquote>
+<p><code>ktab -l</code></p>
+</blockquote></li>
+<li><p>Adds a new principal to the key table (note that you will be prompted for your password)</p>
+<blockquote>
+<p><code>ktab -a duke@example.com</code></p>
+</blockquote></li>
+<li><p>Deletes a principal from the key table</p>
+<blockquote>
+<p><code>ktab -d duke@example.com</code></p>
+</blockquote></li>
+</ul>
+</body>
+</html>

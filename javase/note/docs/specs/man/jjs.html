@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jjs Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jjs Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jjs - command-line tool to invoke the Nashorn engine</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> The <code>jjs</code> tool and the Nashorn engine are deprecated in JDK 11 in preparation for removal in a future release.</p>
+<p><code>jjs</code> [<em>options</em>] <em>script-files</em> [<code>--</code> <em>arguments</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents one or more options of the <code>jjs</code> command, separated by spaces. See <a href="#options-for-the-jjs-command">Options for the jjs Command</a>.
+</dd>
+<dt><em>script-files</em></dt>
+<dd>This represents one or more script files that you want to interpret using the Nashorn engine, separated by spaces. If no files are specified, then an interactive shell is started.
+</dd>
+<dt><em>arguments</em></dt>
+<dd>All values after the double hyphen marker (<code>--</code>) are passed through to the script or the interactive shell as arguments. These values can be accessed by using the <code>arguments</code> property.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jjs</code> command-line tool is used to invoke the Nashorn engine. You can use it to interpret one or several script files, or to run an interactive shell.</p>
+<h2 id="options-for-the-jjs-command">Options for the jjs Command</h2>
+<p>The options of the <code>jjs</code> command control the conditions under which scripts are interpreted by Nashorn engine.</p>
+<dl>
+<dt><code>-D</code><em>name</em><code>=</code><em>value</em></dt>
+<dd><p>Sets a system property to be passed to the script by assigning a value to a property name. The following example shows how to invoke Nashorn engine in interactive mode and assign <code>myValue</code> to the property named <code>myKey</code>:</p>
+<pre><code>&gt;&gt; jjs -DmyKey=myValue
+jjs&gt; java.lang.System.getProperty(&quot;myKey&quot;)
+myValue
+jjs&gt;</code></pre>
+<p>This option can be repeated to set multiple properties.</p>
+</dd>
+<dt><code>--add-modules</code> <em>modules</em></dt>
+<dd>Specifies the root user Java modules.
+</dd>
+<dt><code>-cp</code> <em>path</em> or <code>-classpath</code> <em>path</em></dt>
+<dd><p>Specifies the path to the supporting class files. To set multiple paths, the option can be repeated, or you can separate each path with the following character:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> Colon (<code>:</code>)</p></li>
+<li><p><strong>Windows:</strong> Semicolon (<code>;</code>)</p></li>
+</ul>
+</dd>
+<dt><code>-doe=</code>[<code>true</code>|<code>false</code>] or <code>-dump-on-error=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Provides a full stack trace when an error occurs. By default, only a brief error message is printed. The default parameter is <code>false</code>.
+</dd>
+<dt><code>-fv=</code>[<code>true</code>|<code>false</code>] or <code>-fullversion=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Prints the full Nashorn version string. The default parameter is <code>false</code>.
+</dd>
+<dt><code>-fx=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd><p>Launches the script as a JavaFX application. The default parameter is <code>false</code>.</p>
+<p><strong>Note:</strong></p>
+<p>You must explicitly add the JavaFX modules to launch the script as a JavaFX application. The following example specifies the location of the JavaFX modules and adds them with the <code>--module-path</code> and <code>--add-modules</code> options:</p>
+<pre><code>jjs -fx --module-path /SOMEDIR/javafx-sdk-11/lib --add-modules javafx.controls HelloWorld.js</code></pre>
+<p>The following example uses the <code>jlink</code> command to create a custom runtime image that contains the JavaFX modules. The example then launches a script as a JavaFX application without specifying the JavaFX modules in the <code>jjs</code> command:</p>
+<pre><code>jlink --module-path /SOMEDIR/javafx-jmods-11 --add-modules jdk.scripting.nashorn,jdk.scripting.nashorn.shell,javafx.controls --output /SOMEDIR/myjdk
+
+/SOMEDIR/myjdk/bin/jjs -fx HelloWorld.js</code></pre>
+<p>If you don't explicitly specify the JavaFX modules, then the <code>jjs</code> command prints a message and exits:</p>
+<pre><code>jjs -fx HelloWorld.js
+
+JavaFX is not available.</code></pre>
+</dd>
+<dt><code>-h</code> or <code>-help</code></dt>
+<dd>Prints the list of options and their descriptions.
+</dd>
+<dt><code>--language=</code>[<code>es5</code>|<code>es6</code>]</dt>
+<dd>Specifies the ECMAScript language version. The default version is ES5.
+</dd>
+<dt><code>--module-path</code> <em>path</em></dt>
+<dd>Specifies where to find user Java modules.
+</dd>
+<dt><code>-ot=</code>[<code>true</code>|<code>false</code>] or <code>-optimistic-types=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Enables or disables optimistic type assumptions with deoptimizing recompilation. This makes the compiler try, for any program symbol whose type can't be proven at compile time, to type it as narrowly and primitively as possible. If the runtime encounters an error because the symbol type is too narrow, then a wider method is generated until a steady stage is reached. While this produces as optimal Java bytecode as possible, erroneous type guesses will lead to longer warmup. Optimistic typing is currently enabled by default, but it can be disabled for faster startup performance. The default parameter is <code>true</code>.
+</dd>
+<dt><code>-scripting=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Enables a shell scripting features. The default parameter is <code>true</code>.
+</dd>
+<dt><code>-strict=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Enables a strict mode, which enforces stronger adherence to the standard (ECMAScript Edition 5.1), making it easier to detect common coding errors. The default parameter is <code>false</code>.
+</dd>
+<dt><code>-t=</code><em>zone</em> or <code>-timezone=</code><em>zone</em></dt>
+<dd>Sets the specified time zone for script execution. It overrides the time zone set in the OS and used by the <code>Date</code> object. The default <em>zone</em> is <code>America/Los_Angeles</code>.
+</dd>
+<dt><code>-v=</code>[<code>true</code>|<code>false</code>] or<code>-version=</code>[<code>true</code>|<code>false</code>]</dt>
+<dd>Prints the Nashorn version string. The default parameter is <code>false</code>.
+</dd>
+</dl>
+<h2 id="example-of-running-a-script-with-nashorn">Example of Running a Script with Nashorn</h2>
+<pre><code>jjs script.js</code></pre>
+<h2 id="example-of-running-nashorn-in-interactive-mode">Example of Running Nashorn in Interactive Mode</h2>
+<pre><code>&gt;&gt; jjs
+jjs&gt; println(&quot;Hello, World!&quot;)
+Hello, World!
+jjs&gt; quit()
+&gt;&gt;</code></pre>
+<h2 id="example-of-passing-arguments-to-nashorn">Example of Passing Arguments to Nashorn</h2>
+<pre><code>&gt;&gt; jjs -- a b c
+jjs&gt; arguments.join(&quot;, &quot;)
+a, b, c
+jjs&gt;</code></pre>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>JAR File Specification</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">JAR File Specification</h1>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#modular-jar-files">Modular JAR files</a></li>
+<li><a href="#multi-release-jar-files">Multi-release JAR files</a><ul>
+<li><a href="#modular-multi-release-jar-files">Modular multi-release JAR files</a></li>
+</ul></li>
+<li><a href="#the-meta-inf-directory">The META-INF directory</a></li>
+<li><a href="#name-value-pairs-and-sections">Name-Value pairs and Sections</a><ul>
+<li><a href="#specification">Specification:</a></li>
+</ul></li>
+<li><a href="#jar-manifest">JAR Manifest</a><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#manifest-specification">Manifest Specification:</a></li>
+<li><a href="#main-attributes">Main Attributes</a></li>
+<li><a href="#per-entry-attributes">Per-Entry Attributes</a></li>
+</ul></li>
+<li><a href="#signed-jar-file">Signed JAR File</a><ul>
+<li><a href="#overview-1">Overview</a></li>
+<li><a href="#signature-file">Signature File</a></li>
+<li><a href="#signature-validation">Signature Validation</a></li>
+<li><a href="#the-magic-attribute">The Magic Attribute</a></li>
+</ul></li>
+<li><a href="#digital-signatures">Digital Signatures</a></li>
+<li><a href="#notes-on-manifest-and-signature-files">Notes on Manifest and Signature Files</a></li>
+<li><a href="#jar-index">JAR Index</a><ul>
+<li><a href="#overview-2">Overview</a></li>
+<li><a href="#index-file-specification">Index File Specification</a></li>
+<li><a href="#backward-compatibility">Backward Compatibility</a></li>
+</ul></li>
+<li><a href="#class-path-attribute">Class-Path Attribute</a></li>
+<li><a href="#package-sealing">Package Sealing</a></li>
+<li><a href="#api-details">API Details</a></li>
+<li><a href="#see-also">See Also</a></li>
+</ul>
+</nav>
+<h2 id="introduction">Introduction</h2>
+<p>JAR file is a file format based on the popular ZIP file format and is used for aggregating many files into one. A JAR file is essentially a zip file that contains an optional META-INF directory. A JAR file can be created by the command-line jar tool, or by using the <a href="../../api/java.base/java/util/jar/package-summary.html"><code>java.util.jar</code></a> API in the Java platform. There is no restriction on the name of a JAR file, it can be any legal file name on a particular platform.</p>
+<h2 id="modular-jar-files">Modular JAR files</h2>
+<p>A modular JAR file is a JAR file that has a module descriptor, <code>module-info.class</code>, in the top-level directory (or root) directory. The module descriptor is the binary form of a module declaration. (Note the section on <a href="#multi-release-jar-files">multi-release JAR files</a> further refines the definition of modular JAR files.)</p>
+<p>A modular JAR file deployed on the module path, as opposed to the class path, is an <em>explicit</em> module. Dependences and service providers are declared in the module descriptor. If the modular JAR file is deployed on the class path then it behaves as if a non-modular JAR file.</p>
+<p>A non-modular JAR file deployed on the module path is an <em>automatic module</em>. If the JAR file has a main attribute <code>Automatic-Module-Name</code> (see <a href="#main-attributes">Main Attributes</a>) then the attribute's value is the module name, otherwise the module name is derived from the name of the JAR file as specified in <a href="../../api/java.base/java/lang/module/ModuleFinder.html#automatic-modules"><code>ModuleFinder.of(Path...)</code></a>.</p>
+<h2 id="multi-release-jar-files">Multi-release JAR files</h2>
+<p>A multi-release JAR file allows for a single JAR file to support multiple major versions of Java platform releases. For example, a multi-release JAR file can depend on both the Java 8 and Java 9 major platform releases, where some class files depend on APIs in Java 8 and other class files depend on APIs in Java 9. This enables library and framework developers to decouple the use of APIs in a specific major version of a Java platform release from the requirement that all their users migrate to that major version. Library and framework developers can gradually migrate to and support new Java features while still supporting the old features.</p>
+<p>A multi-release JAR file is identified by the main attribute:</p>
+<pre><code>Multi-Release: true</code></pre>
+<p>declared in the main section of the <a href="#jar-manifest">JAR Manifest</a>.</p>
+<p>Classes and resource files dependent on a major version, 9 or greater, of a Java platform release may be located under a <em>versioned directory</em> instead of under the top-level (or root) directory. The versioned directory is located under the <a href="#the-meta-inf-directory">the META-INF directory</a> and is of the form:</p>
+<pre><code>META-INF/versions/N</code></pre>
+<p>where N is the string representation of the major version number of a Java platform release. Specifically <code>N</code> must conform to the specification:</p>
+<table>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>N:</em></td>
+<td style="text-align: left;"><em><code>{1-9}</code> <code>{0-9}</code>*</em></td>
+</tr>
+</tbody>
+</table>
+<p>Any versioned directory whose value of <code>N</code> is less than <code>9</code> is ignored as is a string representation of <code>N</code> that does not conform to the above specification.</p>
+<p>A class file under a versioned directory, of version <code>N</code> say, in a multi-release JAR must have a class file version less than or equal to the class file version associated with <code>N</code>th major version of a Java platform release. If the class of the class file is public or protected then that class must <em>preside over</em> a class of the same fully qualified name and access modifier whose class file is present under the top-level directory. By logical extension this applies to a class of a class file, if present, under a versioned directory whose version is less than <code>N</code>.</p>
+<p>If a multi-release JAR file is deployed on the class path or module path (as an automatic module or an explicit <a href="#modular-multi-release-jar-files">multi-release module</a>) of major version <code>N</code> of a Java platform release runtime, then a class loader loading classes from that JAR file will first search for class files under the <code>N</code>th versioned directory, then prior versioned directories in descending order (if present), down to a lower major version bound of <code>9</code>, and finally under the top-level directory.</p>
+<p>The public API exported by the classes in a multi-release JAR file must be <em>exactly</em> the same across versions, hence at a minimum why versioned public or protected classes for class files under a versioned directory must preside over classes for class files under the top-level directory. It is difficult and costly to perform extensive API verification checks as such tooling, such as the <code>jar</code> tool, is not required to perform extensive verification and a Java runtime is not required to perform any verification. A future release of this specification may relax the exact same API constraint to support careful evolution.</p>
+<p>Resources under the <code>META-INF</code> directory cannot be versioned (such as for service configuration).</p>
+<p>A multi-release JAR file can be signed.</p>
+<p>Multi-release JAR files are not supported by the boot class loader of a Java runtime. If a multi-release JAR file is appended to the boot class path (with the <code>-Xbootclasspath/a</code> option) then the JAR is treated as if it is an ordinary JAR file.</p>
+<h3 id="modular-multi-release-jar-files">Modular multi-release JAR files</h3>
+<p>A modular multi-release JAR file is a multi-release JAR file that has a module descriptor, <code>module-info.class</code>, in the top-level directory (as for a <a href="#modular-jar-files">modular</a> JAR file), or directly in a versioned directory.</p>
+<p>A public or protected class in a non-exported package (that is not declared as exported in the module descriptor) need not preside over a class of the same fully qualified name and access modifier whose class file is present under the top-level directory.</p>
+<p>A module descriptor is generally treated no differently to any other class or resource file. A module descriptor may be present under a versioned area but not present under the top-level directory. This ensures, for example, only Java 8 versioned classes can be present under the top-level directory while Java 9 versioned classes (including, or perhaps only, the module descriptor) can be present under the <code>9</code> versioned directory.</p>
+<p>Any versioned module descriptor that presides over a lesser versioned module descriptor or that at the top-level, <code>M</code> say, must be identical to <code>M</code>, with two exceptions:</p>
+<ol type="1">
+<li>the presiding versioned descriptor can have different non-<code>transitive</code> <code>requires</code> clauses of <code>java.*</code> and <code>jdk.*</code> modules; and</li>
+<li>the presiding versioned descriptor can have different <code>uses</code> clauses, even of service types defined outside of <code>java.*</code> and <code>jdk.*</code> modules.</li>
+</ol>
+<p>Tooling, such as the <code>jar</code> tool, should perform such verification of versioned module descriptors but a Java runtime is not required to perform any verification.</p>
+<h2 id="the-meta-inf-directory">The META-INF directory</h2>
+<p>The following files/directories in the META-INF directory are recognized and interpreted by the Java 2 Platform to configure applications, class loaders and services:</p>
+<ul>
+<li><code>MANIFEST.MF</code></li>
+</ul>
+<p>The manifest file that is used to define package related data.</p>
+<ul>
+<li><code>INDEX.LIST</code></li>
+</ul>
+<p>This file is generated by the new &quot;<code>-i&quot;</code> option of the jar tool, which contains location information for packages defined in an application. It is part of the JarIndex implementation and used by class loaders to speed up their class loading process.</p>
+<ul>
+<li><code>x.SF</code></li>
+</ul>
+<p>The signature file for the JAR file. 'x' stands for the base file name.</p>
+<ul>
+<li><code>x.DSA</code></li>
+</ul>
+<p>The signature block file associated with the signature file with the same base file name. This file stores the digital signature of the corresponding signature file.</p>
+<ul>
+<li><code>services/</code></li>
+</ul>
+<p>This directory stores all the service provider configuration files for JAR files deployed on the class path or JAR files deployed as automatic modules on the module path. See the specification of <a href="../../api/java.base/java/util/ServiceLoader.html#developing-service-providers">service provider development</a> for more details.</p>
+<ul>
+<li><code>versions/</code></li>
+</ul>
+<p>This directory contains underneath it versioned class and resource files for a <a href="#multi-release-jar-files">multi-release</a> JAR file.</p>
+<h2 id="name-value-pairs-and-sections">Name-Value pairs and Sections</h2>
+<p>Before we go to the details of the contents of the individual configuration files, some format convention needs to be defined. In most cases, information contained within the manifest file and signature files is represented as so-called &quot;name: value&quot; pairs inspired by the RFC822 standard. We also call these pairs headers or attributes.</p>
+<p>Groups of name-value pairs are known as a &quot;section&quot;. Sections are separated from other sections by empty lines.</p>
+<p>Binary data of any form is represented as base64. Continuations are required for binary data which causes line length to exceed 72 bytes. Examples of binary data are digests and signatures.</p>
+<p>Implementations shall support header values of up to 65535 bytes.</p>
+<p>All the specifications in this document use the same grammar in which terminal symbols are shown in fixed width font and non-terminal symbols are shown in italic type face.</p>
+<h3 id="specification">Specification:</h3>
+<table>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>section:</em></td>
+<td style="text-align: left;"><em>*header +newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>nonempty-section:</em></td>
+<td style="text-align: left;"><em>+header +newline</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>newline:</em></td>
+<td style="text-align: left;"><code>CR LF | LF | CR</code> (<em>not followed by</em> <code>LF</code>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>header:</em></td>
+<td style="text-align: left;"><em>name</em> <code>:</code> <em>value</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>name:</em></td>
+<td style="text-align: left;"><em>alphanum *headerchar</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>value:</em></td>
+<td style="text-align: left;">SPACE *<em>otherchar newline *continuation</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>continuation:</em></td>
+<td style="text-align: left;">SPACE <em>*otherchar newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>alphanum:</em></td>
+<td style="text-align: left;">{<code>A-Z</code>} | {<code>a-z</code>} | {<code>0-9</code>}</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>headerchar:</em></td>
+<td style="text-align: left;"><em>alphanum</em> | <code>-</code> | <code>_</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>otherchar:</em></td>
+<td style="text-align: left;"><em>any UTF-8 character except</em> <code>NUL, CR</code> <em>and</em> <code>LF</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Note: To prevent mangling of files sent via straight e-mail, no header will start with the four letters &quot;From&quot;.</li>
+</ul>
+<p>Non-terminal symbols defined in the above specification will be referenced in the following specifications.</p>
+<h2 id="jar-manifest">JAR Manifest</h2>
+<h3 id="overview">Overview</h3>
+<p>A JAR file manifest consists of a main section followed by a list of sections for individual JAR file entries, each separated by a newline. Both the main section and individual sections follow the section syntax specified above. They each have their own specific restrictions and rules.</p>
+<ul>
+<li><p>The main section contains security and configuration information about the JAR file itself, as well as the application. It also defines main attributes that apply to every individual manifest entry. No attribute in this section can have its name equal to &quot;<code>Name</code>&quot;. This section is terminated by an empty line.</p></li>
+<li><p>The individual sections define various attributes for packages or files contained in this JAR file. Not all files in the JAR file need to be listed in the manifest as entries, but all files which are to be signed must be listed. The manifest file itself must not be listed. Each section must start with an attribute with the name as &quot;<code>Name</code>&quot;, and the value must be a relative path to the file, or an absolute URL referencing data outside the archive.</p></li>
+<li><p>If there are multiple individual sections for the same file entry, the attributes in these sections are merged. If a certain attribute have different values in different sections, the last one is recognized.</p></li>
+<li><p>Attributes which are not understood are ignored. Such attributes may include implementation specific information used by applications.</p></li>
+</ul>
+<h3 id="manifest-specification">Manifest Specification:</h3>
+<table>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>manifest-file:</em></td>
+<td style="text-align: left;"><em>main-section newline *individual-section</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>main-section:</em></td>
+<td style="text-align: left;"><em>version-info newline *main-attribute</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>version-info:</em></td>
+<td style="text-align: left;"><code>Manifest-Version :</code> <em>version-number</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>version-number:</em></td>
+<td style="text-align: left;"><em>digit+{</em><code>.</code><em>digit+}*</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>main-attribute:</em></td>
+<td style="text-align: left;"><em>(any legitimate main attribute) newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>individual-section:</em></td>
+<td style="text-align: left;"><code>Name :</code> <em>value</em> <em>newline *perentry-attribute</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>perentry-attribute:</em></td>
+<td style="text-align: left;"><em>(any legitimate perentry attribute) newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>newline:</em></td>
+<td style="text-align: left;"><code>CR LF | LF | CR</code> (<em>not followed by</em> <code>LF</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>digit:</em></td>
+<td style="text-align: left;"><code>{0-9}</code></td>
+</tr>
+</tbody>
+</table>
+<p>In the above specification, attributes that can appear in the main section are referred to as main attributes, whereas attributes that can appear in individual sections are referred to as per-entry attributes. Certain attributes can appear both in the main section and the individual sections, in which case the per-entry attribute value overrides the main attribute value for the specified entry. The two types of attributes are defined as follows.</p>
+<h3 id="main-attributes">Main Attributes</h3>
+<p>Main attributes are the attributes that are present in the main section of the manifest. They fall into the following different groups:</p>
+<ul>
+<li>general main attributes
+<ul>
+<li>Manifest-Version: Defines the manifest file version. The value is a legitimate version number, as described in the above spec.</li>
+<li>Created-By: Defines the version and the vendor of the java implementation on top of which this manifest file is generated. This attribute is generated by the <code>jar</code> tool.</li>
+<li>Signature-Version: Defines the signature version of the jar file. The value should be a valid <em>version-number</em> string.</li>
+<li>Class-Path: The value of this attribute specifies the relative URLs of the libraries that this application needs. URLs are separated by one or more spaces. The application class loader uses the value of this attribute to construct its internal search path. See <a href="#class-path-attribute">Class-Path Attribute</a> section for details.</li>
+<li>Automatic-Module-Name: Defines the module name if this JAR file is deployed as an automatic module on the module path. For further details see the specification of <a href="../../api/java.base/java/lang/module/ModuleFinder.html#automatic-modules"><code>automatic modules</code></a>.</li>
+<li>Multi-Release: This attribute defines whether this JAR file is a <a href="#modular-multi-release-jar-files">multi-release</a> JAR file. If the value is &quot;true&quot; , case is ignored, then the JAR file will be processed by the Java runtime and tooling as a multi-release JAR file. Otherwise, if the value is anything other than &quot;true&quot; then this attribute is ignored.</li>
+</ul></li>
+<li>attribute defined for stand-alone applications: This attribute is used by stand-alone applications that are bundled into executable jar files which can be invoked by the java runtime directly by running &quot;<code>java -jar x.jar</code>&quot;.
+<ul>
+<li>Main-Class: The value of this attribute is the class name of the main application class which the launcher will load at startup time. The value must <em>not</em> have the <code>.class</code> extension appended to the class name.</li>
+<li>Launcher-Agent-Class: If this attribute is present then its value is the class name of a <em>java agent</em> that is started before the application main method is invoked. This attribute can be used for cases where a java agent is packaged in the same executable JAR file as the application. The agent class defines a public static method name <code>agentmain</code> in one of the two forms specified in the <a href="../../api/java.instrument/java/lang/instrument/package-summary.html"><code>java.lang.instrument</code></a> package summary. Additional attributes (such as <code>Can-Retransform-Classes</code>) can be used to indicate capabilities needed by the agent.</li>
+</ul></li>
+<li>attributes defined for <a href="../../api/java.base/java/lang/Package.html">package versioning and sealing</a> information: The value of these attributes apply to all the packages in the JAR file, but can be overridden by per-entry attributes.
+<ul>
+<li>Implementation-Title: The value is a string that defines the title of the extension implementation.</li>
+<li>Implementation-Version: The value is a string that defines the version of the extension implementation.</li>
+<li>Implementation-Vendor: The value is a string that defines the organization that maintains the extension implementation.</li>
+<li>Specification-Title: The value is a string that defines the title of the extension specification.</li>
+<li>Specification-Version: The value is a string that defines the version of the extension specification.</li>
+<li>Specification-Vendor: The value is a string that defines the organization that maintains the extension specification.</li>
+<li>Sealed: This attribute defines whether this JAR file is sealed or not. The value can be either &quot;true&quot; or &quot;false&quot;, case is ignored. If it is set to &quot;true&quot;, then all the packages in the JAR file are defaulted to be sealed, unless they are defined otherwise individually. See also the <a href="#package-sealing">Package Sealing</a> section.</li>
+</ul></li>
+</ul>
+<h3 id="per-entry-attributes">Per-Entry Attributes</h3>
+<p>Per-entry attributes apply only to the individual JAR file entry to which the manifest entry is associated with. If the same attribute also appeared in the main section, then the value of the per-entry attribute overwrites the main attribute's value. For example, if JAR file a.jar has the following manifest content:</p>
+<pre><code>    Manifest-Version: 1.0
+    Created-By: 1.8 (Oracle Inc.)
+    Sealed: true
+    Name: foo/bar/
+    Sealed: false</code></pre>
+<p>It means that all the packages archived in a.jar are sealed, except that package foo.bar is not.</p>
+<p>The per-entry attributes fall into the following groups:</p>
+<ul>
+<li>attributes defined for file contents:
+<ul>
+<li>Content-Type: This attribute can be used to specify the MIME type and subtype of data for a specific file entry in the JAR file. The value should be a string in the form of <em>type/subtype.</em> For example &quot;image/bmp&quot; is an image type with a subtype of bmp (representing bitmap). This would indicate the file entry as an image with the data stored as a bitmap. RFC <a href="http://www.ietf.org/rfc/rfc1521.txt">1521</a> and <a href="http://www.ietf.org/rfc/rfc1522.txt">1522</a> discuss and define the MIME types definition.</li>
+</ul></li>
+<li>attributes defined for package versioning and sealing information: These are the same set of attributes defined above as main attributes that defines the extension package versioning and sealing information. When used as per-entry attributes, these attributes overwrites the main attributes but only apply to the individual file specified by the manifest entry.</li>
+<li>attribute defined for beans objects:
+<ul>
+<li>Java-Bean: Defines whether the specific jar file entry is a Java Beans object or not. The value should be either &quot;true&quot; or &quot;false&quot;, case is ignored.</li>
+</ul></li>
+<li>attributes defined for signing: These attributes are used for signing and verifying purposes. More details here.
+<ul>
+<li>x-Digest-y: The name of this attribute specifies the name of the digest algorithm used to compute the digest value for the corresponding jar file entry. The value of this attribute stores the actual digest value. The prefix 'x' specifies the algorithm name and the optional suffix 'y' indicates to which language the digest value should be verified against.</li>
+<li>Magic: This is an optional attribute that can be used by applications to indicate how verifier should compute the digest value contained in the manifest entry. The value of this attribute is a set of comma separated context specific strings. Detailed description is here.</li>
+</ul></li>
+</ul>
+<h2 id="signed-jar-file">Signed JAR File</h2>
+<h3 id="overview-1">Overview</h3>
+<p>A JAR file can be signed by using the command line jarsigner tool or directly through the <code>java.security</code> API. Every file entry, including non-signature related files in the <code>META-INF</code> directory, will be signed if the JAR file is signed by the jarsigner tool. The signature related files are:</p>
+<ul>
+<li><code>META-INF/MANIFEST.MF</code></li>
+<li><code>META-INF/*.SF</code></li>
+<li><code>META-INF/*.DSA</code></li>
+<li><code>META-INF/*.RSA</code></li>
+<li><code>META-INF/SIG-*</code></li>
+</ul>
+<p>Note that if such files are located in <code>META-INF</code> subdirectories, they are not considered signature-related. Case-insensitive versions of these filenames are reserved and will also not be signed.</p>
+<p>Subsets of a JAR file can be signed by using the <code>java.security</code> API. A signed JAR file is exactly the same as the original JAR file, except that its manifest is updated and two additional files are added to the <code>META-INF</code> directory: a signature file and a signature block file. When jarsigner is not used, the signing program has to construct both the signature file and the signature block file.</p>
+<p>For every file entry signed in the signed JAR file, an individual manifest entry is created for it as long as it does not already exist in the manifest. Each manifest entry lists one or more digest attributes and an optional <a href="#the-magic-attribute">Magic attribute</a>.</p>
+<h3 id="signature-file">Signature File</h3>
+<p>Each signer is represented by a signature file with extension <code>.SF</code>. The major part of the file is similar to the manifest file. It consists of a main section which includes information supplied by the signer but not specific to any particular jar file entry. In addition to the <code>Signature-Version</code> and <code>Created-By</code> attributes (see <a href="#main-attributes">Main Attributes</a>), the main section can also include the following security attributes:</p>
+<ul>
+<li>x-Digest-Manifest-Main-Attributes (where x is the standard name of a <code>java.security.MessageDigest</code> algorithm): The value of this attribute is the digest value of the main attributes of the manifest.</li>
+<li>x-Digest-Manifest (where x is the standard name of a <code>java.security.MessageDigest</code> algorithm): The value of this attribute is the digest value of the entire manifest.</li>
+</ul>
+<p>The main section is followed by a list of individual entries whose names must also be present in the manifest file. Each individual entry must contain at least the digest of its corresponding entry in the manifest file.</p>
+<p>Paths or URLs appearing in the manifest file but not in the signature file are not used in the calculation.</p>
+<h3 id="signature-validation">Signature Validation</h3>
+<p>A successful JAR file verification occurs if the signature(s) are valid, and none of the files that were in the JAR file when the signatures were generated have been changed since then. JAR file verification involves the following steps:</p>
+<ol type="1">
+<li><p>Verify the signature over the signature file when the manifest is first parsed. For efficiency, this verification can be remembered. Note that this verification only validates the signature directions themselves, not the actual archive files.</p></li>
+<li><p>If an <code>x-Digest-Manifest</code> attribute exists in the signature file, verify the value against a digest calculated over the entire manifest. If more than one <code>x-Digest-Manifest</code> attribute exists in the signature file, verify that at least one of them matches the calculated digest value.</p></li>
+<li><p>If an <code>x-Digest-Manifest</code> attribute does not exist in the signature file or none of the digest values calculated in the previous step match, then a less optimized verification is performed:</p>
+<ol type="1">
+<li><p>If an <code>x-Digest-Manifest-Main-Attributes</code> entry exists in the signature file, verify the value against a digest calculated over the main attributes in the manifest file. If this calculation fails, then JAR file verification fails. This decision can be remembered for efficiency. If an <code>x-Digest-Manifest-Main-Attributes</code> entry does not exist in the signature file, its nonexistence does not affect JAR file verification and the manifest main attributes are not verified.</p></li>
+<li><p>Verify the digest value in each source file information section in the signature file against a digest value calculated against the corresponding entry in the manifest file. If any of the digest values don't match, then JAR file verification fails.</p></li>
+</ol>
+<p>One reason the digest value of the manifest file that is stored in the <code>x-Digest-Manifest</code> attribute may not equal the digest value of the current manifest file is that one or more files were added to the JAR file (using the jar tool) after the signature (and thus the signature file) was generated. When the jar tool is used to add files, the manifest file is changed (sections are added to it for the new files), but the signature file is not. A verification is still considered successful if none of the files that were in the JAR file when the signature was generated have been changed since then, which is the case if the digest values in the non-header sections of the signature file equal the digest values of the corresponding sections in the manifest file.</p></li>
+<li><p>For each entry in the manifest, verify the digest value in the manifest file against a digest calculated over the actual data referenced in the &quot;Name:&quot; attribute, which specifies either a relative file path or URL. If any of the digest values don't match, then JAR file verification fails.</p></li>
+</ol>
+<p>Example manifest file:</p>
+<pre><code>    Manifest-Version: 1.0
+    Created-By: 1.8.0 (Oracle Inc.)
+
+    Name: common/class1.class
+    SHA-256-Digest: (base64 representation of SHA-256 digest)
+
+    Name: common/class2.class
+    SHA1-Digest: (base64 representation of SHA1 digest)
+    SHA-256-Digest: (base64 representation of SHA-256 digest)</code></pre>
+<p>The corresponding signature file would be:</p>
+<pre><code>    Signature-Version: 1.0
+    SHA-256-Digest-Manifest: (base64 representation of SHA-256 digest)
+    SHA-256-Digest-Manifest-Main-Attributes: (base64 representation of SHA-256 digest)
+
+    Name: common/class1.class
+    SHA-256-Digest: (base64 representation of SHA-256 digest)
+
+    Name: common/class2.class
+    SHA-256-Digest: (base64 representation of SHA-256 digest)</code></pre>
+<h3 id="the-magic-attribute">The Magic Attribute</h3>
+<p>Another requirement to validate the signature on a given manifest entry is that the verifier understand the value or values of the Magic key-pair value in that entry's manifest entry.</p>
+<p>The Magic attribute is optional but it is required that a parser understand the value of an entry's Magic key if it is verifying that entry's signature.</p>
+<p>The value or values of the Magic attribute are a set of comma-separated context-specific strings. The spaces before and after the commas are ignored. Case is ignored. The exact meaning of the magic attributes is application specific. These values indicate how to compute the hash value contained in the manifest entry, and are therefore crucial to the proper verification of the signature. The keywords may be used for dynamic or embedded content, multiple hashes for multilingual documents, etc.</p>
+<p>Here are two examples of the potential use of Magic attribute in the manifest file:</p>
+<pre><code>        Name: http://www.example-scripts.com/index#script1
+        SHA-256-Digest: (base64 representation of SHA-256 hash)
+        Magic: JavaScript, Dynamic
+
+        Name: http://www.example-tourist.com/guide.html
+        SHA-256-Digest: (base64 representation of SHA-256 hash)
+        SHA-256-Digest-French: (base64 representation of SHA-256 hash)
+        SHA-256-Digest-German: (base64 representation of SHA-256 hash)
+        Magic: Multilingual</code></pre>
+<p>In the first example, these Magic values may indicate that the result of an http query is the script embedded in the document, as opposed to the document itself, and also that the script is generated dynamically. These two pieces of information indicate how to compute the hash value against which to compare the manifest's digest value, thus comparing a valid signature.</p>
+<p>In the second example, the Magic value indicates that the document retrieved may have been content-negotiated for a specific language, and that the digest to verify against is dependent on which language the document retrieved is written in.</p>
+<h2 id="digital-signatures">Digital Signatures</h2>
+<p>A digital signature is a signed version of the <code>.SF</code> signature file. These are binary files not intended to be interpreted by humans.</p>
+<p>Digital signature files have the same filenames as the .SF files but different extensions. The extension varies depending on the type of digital signature.</p>
+<ul>
+<li><code>.RSA</code> (PKCS7 signature, SHA-256 + RSA)</li>
+<li><code>.DSA</code> (PKCS7 signature, DSA)</li>
+</ul>
+<p>Digital signature files for signature algorithms not listed above must reside in the <code>META-INF</code> directory and have the prefix &quot;<code>SIG-</code>&quot;. The corresonding signature file (<code>.SF</code> file) must also have the same prefix.</p>
+<p>For those formats that do not support external signed data, the file shall consist of a signed copy of the <code>.SF</code> file. Thus some data may be duplicated and a verifier should compare the two files.</p>
+<p>Formats that support external data either reference the <code>.SF</code> file, or perform calculations on it with implicit reference.</p>
+<p>Each <code>.SF</code> file may have multiple digital signatures, but those signatures should be generated by the same legal entity.</p>
+<p>File name extensions may be 1 to 3 <em>alphanum</em> characters. Unrecognized extensions are ignored.</p>
+<h2 id="notes-on-manifest-and-signature-files">Notes on Manifest and Signature Files</h2>
+<p>Following is a list of additional restrictions and rules that apply to manifest and signature files.</p>
+<ul>
+<li>Before parsing:
+<ul>
+<li>If the last character of the file is an EOF character (code 26), the EOF is treated as whitespace. Two newlines are appended (one for editors that don't put a newline at the end of the last line, and one so that the grammar doesn't have to special-case the last entry, which may not have a blank line after it).</li>
+</ul></li>
+<li>Attributes:
+<ul>
+<li>In all cases for all sections, attributes which are not understood are ignored.</li>
+<li>Attribute names are case insensitive. Programs which generate manifest and signature files should use the cases shown in this specification however.</li>
+<li>Attribute names cannot be repeated within a section.</li>
+</ul></li>
+<li>Versions:
+<ul>
+<li>Manifest-Version and Signature-Version must be first, and in exactly that case (so that they can be recognized easily as magic strings). Other than that, the order of attributes within a main section is not significant.</li>
+</ul></li>
+<li>Ordering:
+<ul>
+<li>The order of individual manifest entries is not significant.</li>
+<li>The order of individual signature entries is not significant, except that the digests that get signed are in that order.</li>
+</ul></li>
+<li>Line length:
+<ul>
+<li>No line may be longer than 72 bytes (not characters), in its UTF8-encoded form. If a value would make the initial line longer than this, it should be continued on extra lines (each starting with a single SPACE).</li>
+</ul></li>
+<li>Errors:
+<ul>
+<li>If a file cannot be parsed according to this spec, a warning should be output, and none of the signatures should be trusted.</li>
+</ul></li>
+<li>Limitations:
+<ul>
+<li>Because header names cannot be continued, the maximum length of a header name is 70 bytes (there must be a colon and a SPACE after the name).</li>
+<li>NUL, CR, and LF can't be embedded in header values, and NUL, CR, LF and &quot;:&quot; can't be embedded in header names.</li>
+<li>Implementations should support 65535-byte (not character) header values, and 65535 headers per file. They might run out of memory, but there should not be hard-coded limits below these values.</li>
+</ul></li>
+<li>Signers:
+<ul>
+<li>It is technically possible that different entities may use different signing algorithms to share a single signature file. This violates the standard, and the extra signature may be ignored.</li>
+</ul></li>
+<li>Algorithms:
+<ul>
+<li>No digest algorithm or signature algorithm is mandated by this standard. However, at least one of SHA-256 and SHA1 digest algorithm must be supported.</li>
+</ul></li>
+</ul>
+<h2 id="jar-index">JAR Index</h2>
+<h3 id="overview-2">Overview</h3>
+<p>Since 1.3, JarIndex is introduced to optimize the class searching process of class loaders for network applications, especially applets. Originally, an applet class loader uses a simple linear search algorithm to search each element on its internal search path, which is constructed from the &quot;ARCHIVE&quot; tag or the &quot;Class-Path&quot; main attribute. The class loader downloads and opens each element in its search path, until the class or resource is found. If the class loader tries to find a nonexistent resource, then all the jar files within the application or applet will have to be downloaded. For large network applications and applets this could result in slow startup, sluggish response and wasted network bandwidth. The JarIndex mechanism collects the contents of all the jar files defined in an applet and stores the information in an index file in the first jar file on the applet's class path. After the first jar file is downloaded, the applet class loader will use the collected content information for efficient downloading of jar files.</p>
+<p>The existing <code>jar</code> tool is enhanced to be able to examine a list of jar files and generate directory information as to which classes and resources reside in which jar file. This directory information is stored in a simple text file named <code>INDEX.LIST</code> in the <code>META-INF</code> directory of the root jar file. When the classloader loads the root jar file, it reads the <code>INDEX.LIST</code> file and uses it to construct a hash table of mappings from file and package names to lists of jar file names. In order to find a class or a resource, the class loader queries the hashtable to find the proper jar file and then downloads it if necessary.</p>
+<p>Once the class loader finds a <code>INDEX.LIST</code> file in a particular jar file, it always trusts the information listed in it. If a mapping is found for a particular class, but the class loader fails to find it by following the link, an unspecified Error or RuntimeException is thrown. When this occurs, the application developer should rerun the <code>jar</code> tool on the extension to get the right information into the index file.</p>
+<p>To prevent adding too much space overhead to the application and to speed up the construction of the in-memory hash table, the INDEX.LIST file is kept as small as possible. For classes with non-null package names, mappings are recorded at the package level. Normally one package name is mapped to one jar file, but if a particular package spans more than one jar file, then the mapped value of this package will be a list of jar files. For resource files with non-empty directory prefixes, mappings are also recorded at the directory level. Only for classes with null package name, and resource files which reside in the root directory, will the mapping be recorded at the individual file level.</p>
+<h3 id="index-file-specification">Index File Specification</h3>
+<p>The <code>INDEX.LIST</code> file contains one or more sections each separated by a single blank line. Each section defines the content of a particular jar file, with a header defining the jar file path name, followed by a list of package or file names, one per line. All the jar file paths are relative to the code base of the root jar file. These path names are resolved in the same way as the current extension mechanism does for bundled extensions.</p>
+<p>The UTF-8 encoding is used to support non ASCII characters in file or package names in the index file.</p>
+<h4 id="specification-1">Specification</h4>
+<table>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>index file:</em></td>
+<td style="text-align: left;"><em>version-info blankline section*</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>version-info:</em></td>
+<td style="text-align: left;"><code>JarIndex-Version:</code> <em>version-number</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>version-number:</em></td>
+<td style="text-align: left;"><em>digit+{.digit+}*</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>section:</em></td>
+<td style="text-align: left;"><em>body blankline</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>body:</em></td>
+<td style="text-align: left;"><em>header name*</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>header:</em></td>
+<td style="text-align: left;"><em>char+</em><code>.jar</code> <em>newline</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>name:</em></td>
+<td style="text-align: left;"><em>char+ newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>char:</em></td>
+<td style="text-align: left;"><em>any valid Unicode character except</em> <code>NULL, CR</code> <em>and</em><code>LF</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>blankline:</em></td>
+<td style="text-align: left;"><em>newline newline</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>newline:</em></td>
+<td style="text-align: left;"><code>CR LF | LF | CR</code> (<em>not followed by</em> <code>LF</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>digit:</em></td>
+<td style="text-align: left;">{<code>0-9</code>}</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>INDEX.LIST</code> file is generated by running <code>jar -i.</code> See the jar man page for more details.</p>
+<h3 id="backward-compatibility">Backward Compatibility</h3>
+<p>The new class loading scheme is totally backward compatible with applications developed on top of the current extension mechanism. When the class loader loads the first jar file and an <code>INDEX.LIST</code> file is found in the <code>META-INF</code> directory, it would construct the index hash table and use the new loading scheme for the extension. Otherwise, the class loader will simply use the original linear search algorithm.</p>
+<h2 id="class-path-attribute">Class-Path Attribute</h2>
+<p>The manifest for an application can specify one or more relative URLs referring to the JAR files and directories for other libraries that it needs. These relative URLs will be treated relative to the code base that the containing application was loaded from.</p>
+<p>An application (or, more generally, JAR file) specifies the relative URLs of the libraries that it needs via the manifest attribute <code>Class-Path</code>. This attribute lists the URLs to search for implementations of other libraries if they cannot be found on the host Java Virtual Machine. These relative URLs may include JAR files and directories for any libraries or resources needed by the application. Relative URLs not ending with '/' are assumed to refer to JAR files. For example,</p>
+<pre style="MARGIN-LEFT: 40px"><code>Class-Path: servlet.jar infobus.jar acme/beans.jar images/</code></pre>
+<p>At most one <code>Class-Path</code> header may be specified in a JAR file's manifest..</p>
+<p>Currently, the URLs must be <em>relative</em> to the code base of the JAR file for security reasons. Thus, remote optional packages will originate from the same code base as the application.</p>
+<p>Each relative URL is resolved against the code base that the containing application or library was loaded from. If the resulting URL is invalid or refers to a resource that cannot be found then it is ignored.</p>
+<p>The resulting URLs are used to extend the class path for the application, applet, or servlet by inserting the URLs in the class path immediately following the URL of the containing JAR file. Any duplicate URLs are omitted. For example, given the following class path:</p>
+<pre style="MARGIN-LEFT: 40px"><code>a.jar b.jar</code></pre>
+<p>If <code>b.jar</code> contained the following <code>Class-Path</code> manifest attribute:</p>
+<pre style="MARGIN-LEFT: 40px"><code>Class-Path: x.jar a.jar</code></pre>
+<p>Then the resulting application class path would be the following:</p>
+<pre style="MARGIN-LEFT: 40px"><code>a.jar b.jar x.jar</code></pre>
+<p>Of course, if <code>x.jar</code> had dependencies of its own then these would be added according to the same rules and so on for each subsequent URL. In the actual implementation, JAR file dependencies are processed lazily so that the JAR files are not actually opened until needed.</p>
+<h2 id="package-sealing">Package Sealing</h2>
+<p>JAR files and packages can be optionally <em>sealed</em>, so that an package can enforce consistency within a version.</p>
+<p>A package sealed within a JAR specifies that all classes defined in that package must originate from the same JAR. Otherwise, a <code>SecurityException</code> is thrown.</p>
+<p>A sealed JAR specifies that all packages defined by that JAR are sealed unless overridden specifically for a package.</p>
+<p>A sealed package is specified via the manifest attribute, <code>Sealed</code>, whose value is <code>true</code> or <code>false</code> (case irrelevant). For example,</p>
+<pre><code>    Name: javax/servlet/internal/
+    Sealed: true</code></pre>
+<p>specifies that the <code>javax.servlet.internal</code> package is sealed, and that all classes in that package must be loaded from the same JAR file.</p>
+<p>If this attribute is missing, the package sealing attribute is that of the containing JAR file.</p>
+<p>A sealed JAR is specified via the same manifest header, <code>Sealed</code>, with the value again of either <code>true</code> or <code>false</code>. For example,</p>
+<pre><code>    Sealed: true</code></pre>
+<p>specifies that all packages in this archive are sealed unless explicitly overridden for a particular package with the <code>Sealed</code> attribute in a manifest entry.</p>
+<p>If this attribute is missing, the JAR file is assumed to <em>not</em> be sealed, for backwards compatibility. The system then defaults to examining package headers for sealing information.</p>
+<p>Package sealing is also important for security, because it restricts access to package-protected members to only those classes defined in the package that originated from the same JAR file.</p>
+<p>The unnamed package is not sealable, so classes that are to be sealed must be placed in their own packages.</p>
+<h2 id="api-details">API Details</h2>
+<p>Package <a href="../../api/java.base/java/util/jar/package-summary.html">java.util.jar</a></p>
+<h2 id="see-also">See Also</h2>
+<p>Package <a href="../../api/java.base/java/security/package-summary.html">java.security</a><br />
+Package <a href="../../api/java.base/java/util/zip/package-summary.html">java.util.zip</a></p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2018, Oracle and/or its affiliates. All rights reserved.</em></p>
+</body>
+</html>

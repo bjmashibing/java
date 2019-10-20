@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation Specification</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | PREV | <a href="intro.html">NEXT</a>
+<h1 id="javatm-remote-method-invocation-specification">Java<sup>TM</sup> Remote Method Invocation Specification</h1>
+<p>Java Remote Method Invocation (Java RMI) is a distributed object model for the Java programming language that retains the semantics of the Java platform's object model, making distributed objects easy to implement and to use. The system combines aspects of the Modula-3 Network Objects system and Spring's subcontract and includes some novel features made possible by the Java SE platform.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<h3 id="introduction">1 <a href="intro.html">Introduction</a></h3>
+<ul>
+<li>1.1 <a href="intro.html#background">Background</a></li>
+<li>1.2 <a href="intro.html#system-goals">System Goals</a></li>
+</ul>
+<h3 id="java-distributed-object-model">2 <a href="objmodel.html">Java Distributed Object Model</a></h3>
+<ul>
+<li>2.1 <a href="objmodel.html#distributed-object-applications">Distributed Object Applications</a></li>
+<li>2.2 <a href="objmodel.html#definition-of-terms">Definition of Terms</a></li>
+<li>2.3 <a href="objmodel.html#the-distributed-and-nondistributed-models-contrasted">The Distributed and Nondistributed Models Contrasted</a></li>
+<li>2.4 <a href="objmodel.html#overview-of-rmi-interfaces-and-classes">Overview of RMI Interfaces and Classes</a></li>
+<li>2.5 <a href="objmodel.html#implementing-a-remote-interface">Implementing a Remote Interface</a></li>
+<li>2.6 <a href="objmodel.html#parameter-passing-in-remote-method-invocation">Parameter Passing in Remote Method Invocation</a></li>
+<li>2.7 <a href="objmodel.html#locating-remote-objects">Locating Remote Objects</a></li>
+</ul>
+<h3 id="rmi-system-overview">3 <a href="arch.html">RMI System Overview</a></h3>
+<ul>
+<li>3.1 <a href="arch.html#stubs-and-skeletons">Stubs and Skeletons</a></li>
+<li>3.2 <a href="arch.html#thread-usage-in-remote-method-invocations">Thread Usage in Remote Method Invocations</a></li>
+<li>3.3 <a href="arch.html#garbage-collection-of-remote-objects">Garbage Collection of Remote Objects</a></li>
+<li>3.4 <a href="arch.html#dynamic-class-loading">Dynamic Class Loading</a></li>
+<li>3.5 <a href="arch.html#rmi-through-firewalls-via-proxies">RMI Through Firewalls Via Proxies</a></li>
+</ul>
+<h3 id="client-interfaces">4 <a href="client.html">Client Interfaces</a></h3>
+<ul>
+<li>4.1 <a href="client.html#the-remote-interface">The <code>Remote</code> Interface</a></li>
+<li>4.2 <a href="client.html#the-remoteexception-class">The <code>RemoteException</code> Class</a></li>
+<li>4.3 <a href="client.html#the-naming-class">The <code>Naming</code> Class</a></li>
+</ul>
+<h3 id="server-interfaces">5 <a href="server.html">Server Interfaces</a></h3>
+<ul>
+<li>5.1 <a href="server.html#the-remoteobject-class">The <code>RemoteObject</code> Class</a></li>
+<li>5.2 <a href="server.html#the-remoteserver-class">The <code>RemoteServer</code> Class</a></li>
+<li>5.3 <a href="server.html#the-unicastremoteobject-class">The <code>UnicastRemoteObject</code> Class</a></li>
+<li>5.4 <a href="server.html#the-unreferenced-interface">The <code>Unreferenced</code> Interface</a></li>
+<li>5.5 <a href="server.html#the-rmisecuritymanager-class">The <code>RMISecurityManager</code> Class</a></li>
+<li>5.6 <a href="server.html#the-rmiclassloader-class">The <code>RMIClassLoader</code> Class</a></li>
+<li>5.7 <a href="server.html#the-loaderhandler-interface">The <code>LoaderHandler</code> Interface</a></li>
+<li>5.8 <a href="server.html#rmi-socket-factories">RMI Socket Factories</a></li>
+<li>5.9 <a href="server.html#the-rmifailurehandler-interface">The <code>RMIFailureHandler</code> Interface</a></li>
+<li>5.10 <a href="server.html#the-logstream-class">The <code>LogStream</code> Class</a></li>
+<li>5.11 <a href="server.html#stub-and-skeleton-compiler">Stub and Skeleton Compiler</a></li>
+</ul>
+<h3 id="registry-interfaces">6 <a href="registry.html">Registry Interfaces</a></h3>
+<ul>
+<li>6.1 <a href="registry.html#the-registry-interface">The <code>Registry</code> Interface</a></li>
+<li>6.2 <a href="registry.html#the-locateregistry-class">The <code>LocateRegistry</code> Class</a></li>
+<li>6.3 <a href="registry.html#the-registryhandler-interface">The <code>RegistryHandler</code> Interface</a></li>
+</ul>
+<h3 id="remote-object-activation">7 <a href="activation.html">Remote Object Activation</a></h3>
+<ul>
+<li>7.1 <a href="activation.html#overview">Overview</a></li>
+<li>7.2 <a href="activation.html#activation-protocol">Activation Protocol</a></li>
+<li>7.3 <a href="activation.html#implementation-model-for-an-activatable-remote-object">Implementation Model for an &quot;Activatable&quot; Remote Object</a></li>
+<li>7.4 <a href="activation.html#activation-interfaces">Activation Interfaces</a></li>
+</ul>
+<h3 id="stubskeleton-interfaces">8 <a href="stubs.html">Stub/Skeleton Interfaces</a></h3>
+<ul>
+<li>8.1 <a href="stubs.html#the-remotestub-class">The <code>RemoteStub</code> Class</a></li>
+<li>8.2 <a href="stubs.html#the-remotecall-interface">The <code>RemoteCall</code> Interface</a></li>
+<li>8.3 <a href="stubs.html#the-remoteref-interface">The <code>RemoteRef</code> Interface</a></li>
+<li>8.4 <a href="stubs.html#the-serverref-interface">The <code>ServerRef</code> Interface</a></li>
+<li>8.5 <a href="stubs.html#the-skeleton-interface">The <code>Skeleton</code> Interface</a></li>
+<li>8.6 <a href="stubs.html#the-operation-class">The <code>Operation</code> Class</a></li>
+</ul>
+<h3 id="garbage-collector-interfaces">9 <a href="dgc.html">Garbage Collector Interfaces</a></h3>
+<ul>
+<li>9.1 <a href="dgc.html#the-dgc-interface">The <code>DGC</code> Interface</a></li>
+<li>9.2 <a href="dgc.html#the-lease-class">The <code>Lease</code> Class</a></li>
+<li>9.3 <a href="dgc.html#the-objid-class">The <code>ObjID</code> Class</a></li>
+<li>9.4 <a href="dgc.html#the-uid-class">The <code>UID</code> Class</a></li>
+<li>9.5 <a href="dgc.html#the-vmid-class">The <code>VMID</code> Class</a></li>
+</ul>
+<h3 id="rmi-wire-protocol">10 <a href="protocol.html">RMI Wire Protocol</a></h3>
+<ul>
+<li>10.1 <a href="protocol.html#overview">Overview</a></li>
+<li>10.2 <a href="protocol.html#rmi-transport-protocol">RMI Transport Protocol</a></li>
+<li>10.3 <a href="protocol.html#rmis-use-of-object-serialization">RMI's Use of Object Serialization Protocol</a></li>
+<li>10.4 <a href="protocol.html#rmis-use-of-http-post-protocol">RMI's Use of HTTP POST Protocol</a></li>
+<li>10.5 <a href="protocol.html#application-specific-values-for-rmi">Application-Specific Values for RMI</a></li>
+<li>10.6 <a href="protocol.html#rmis-multiplexing-protocol">RMI's Multiplexing Protocol</a></li>
+</ul>
+<h3 id="a-exceptions-in-rmi">A <a href="exceptions.html">Exceptions In RMI</a></h3>
+<ul>
+<li>A.1 <a href="exceptions.html#a.1-exceptions-during-remote-object-export">Exceptions During Remote Object Export</a></li>
+<li>A.2 <a href="exceptions.html#a.2-exceptions-during-rmi-call">Exceptions During RMI Call</a></li>
+<li>A.3 <a href="exceptions.html#a.3-exceptions-or-errors-during-return">Exceptions or Errors During Return</a></li>
+<li>A.4 <a href="exceptions.html#a.4-naming-exceptions">Naming Exceptions</a></li>
+<li>A.5 <a href="exceptions.html#a.5-activation-exceptions">Activation Exceptions</a></li>
+<li>A.6 <a href="exceptions.html#a.6-other-exceptions">Other Exceptions</a></li>
+</ul>
+<h3 id="b-properties-in-rmi">B <a href="properties.html">Properties In RMI</a></h3>
+<ul>
+<li>B.1 <a href="properties.html#b.1-server-properties">Server Properties</a></li>
+<li>B.2 <a href="properties.html#b.2-activation-properties">Activation Properties</a></li>
+<li>B.3 <a href="properties.html#b.3-other-properties">Other Properties</a></li>
+</ul>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | PREV | <a href="intro.html">NEXT</a>
+</body>
+</html>

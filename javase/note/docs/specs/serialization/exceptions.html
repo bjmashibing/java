@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Object Serialization Specification: B - Exceptions In Object Serialization</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="security.html">PREV</a> | <a href="examples.html">NEXT</a>
+<header id="title-block-header">
+<h1 class="title">Java Object Serialization Specification: B - Exceptions In Object Serialization</h1>
+</header>
+<hr />
+<p>All exceptions thrown by serialization classes are subclasses of <code>ObjectStreamException</code> which is a subclass of <code>IOException</code>.</p>
+<h3 id="objectstreamexception"><code>ObjectStreamException</code></h3>
+<p>Superclass of all serialization exceptions.</p>
+<h3 id="invalidclassexception"><code>InvalidClassException</code></h3>
+<p>Thrown when a class cannot be used to restore objects for any of these reasons:</p>
+<ul>
+<li>The class does not match the serial version of the class in the stream.</li>
+<li>The class contains fields with invalid primitive data types.</li>
+<li>The <code>Externalizable</code> class does not have a public no-arg constructor.</li>
+<li>The <code>Serializable</code> class can not access the no-arg constructor of its closest non-Serializable superclass.</li>
+</ul>
+<h3 id="notserializableexception"><code>NotSerializableException</code></h3>
+<p>Thrown by a <code>readObject</code> or <code>writeObject</code> method to terminate serialization or deserialization.</p>
+<h3 id="streamcorruptedexception"><code>StreamCorruptedException</code></h3>
+<p>Thrown:</p>
+<ul>
+<li>If the stream header is invalid.</li>
+<li>If control information not found.</li>
+<li>If control information is invalid.</li>
+<li>JDK 1.1.5 or less attempts to call <code>readExternal</code> on a <code>PROTOCOL_VERSION_2</code> stream.</li>
+</ul>
+<h3 id="notactiveexception"><code>NotActiveException</code></h3>
+<p>Thrown if <code>writeObject</code> state is invalid within the following <code>ObjectOutputStream</code> methods:</p>
+<ul>
+<li><code>defaultWriteObject</code></li>
+<li><code>putFields</code></li>
+<li><code>writeFields</code></li>
+</ul>
+<p>Thrown if <code>readObject</code> state is invalid within the following <code>ObjectInputStream</code> methods:</p>
+<ul>
+<li><code>defaultReadObject</code></li>
+<li><code>readFields</code></li>
+<li><code>registerValidation</code></li>
+</ul>
+<h3 id="invalidobjectexception"><code>InvalidObjectException</code></h3>
+<p>Thrown when a restored object cannot be made valid.</p>
+<h3 id="optionaldataexception"><code>OptionalDataException</code></h3>
+<p>Thrown by <code>readObject</code> when there is primitive data in the stream and an object is expected. The length field of the exception indicates the number of bytes that are available in the current block.</p>
+<h3 id="writeabortedexception"><code>WriteAbortedException</code></h3>
+<p>Thrown when reading a stream terminated by an exception that occurred while the stream was being written.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 2005, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="security.html">PREV</a> | <a href="examples.html">NEXT</a>
+</body>
+</html>

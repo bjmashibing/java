@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: 6 - Registry Interfaces</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="server.html">PREV</a> | <a href="activation.html">NEXT</a>
+<h1 id="registry-interfaces">6 Registry Interfaces</h1>
+<ul>
+<li><a href="#the-registry-interface">The <code>Registry</code> Interface</a></li>
+<li><a href="#the-locateregistry-class">The <code>LocateRegistry</code> Class</a></li>
+<li><a href="#the-registryhandler-interface">The <code>RegistryHandler</code> Interface</a></li>
+</ul>
+<hr />
+<p>The RMI system uses the <code>java.rmi.registry.Registry</code> interface and the <code>java.rmi.registry.LocateRegistry</code> class to provide a well-known bootstrap service for retrieving and registering objects by simple names.</p>
+<p>A <em>registry</em> is a remote object that maps names to remote objects. Any server process can support its own registry or a single registry can be used for a host.</p>
+<p>The methods of <code>LocateRegistry</code> are used to get a registry operating on a particular host or host and port. The methods of the <code>java.rmi.Naming</code> class makes calls to a remote object that implements the Registry interface using the appropriate LocateRegistry.getRegistry method.</p>
+<h2 id="the-registry-interface">6.1 The <code>Registry</code> Interface</h2>
+<p>See the <code>Registry</code> API documentation.</p>
+<h2 id="the-locateregistry-class">6.2 The <code>LocateRegistry</code> Class</h2>
+<p>The class <code>java.rmi.registry.LocateRegistry</code> is used to obtain a reference (construct a stub) to a bootstrap remote object registry on a particular host (including the local host), or to create a remote object registry that accepts calls on a specific port.</p>
+<p>The registry implements a simple flat naming syntax that associates the name of a remote object (a string) with a remote object reference. The name and remote object bindings are not remembered across server restarts.</p>
+<p>Note that a <code>getRegistry</code> call does not actually make a connection to the remote host. It simply creates a local reference to the remote registry and will succeed even if no registry is running on the remote host. Therefore, a subsequent method invocation to a remote registry returned as a result of this method may fail.</p>
+<pre><code>package java.rmi.registry;
+
+public final class LocateRegistry {
+
+        public static Registry getRegistry()
+                throws java.rmi.RemoteException {...}
+        public static Registry getRegistry(int port)
+                throws java.rmi.RemoteException {...}
+        public static Registry getRegistry(String host)
+                throws java.rmi.RemoteException {...}
+        public static Registry getRegistry(String host, int port)
+                throws java.rmi.RemoteException {...}
+        public static Registry getRegistry(String host, int port,
+                                           RMIClientSocketFactory csf)
+                throws RemoteException {...}
+        public static Registry createRegistry(int port)
+                throws java.rmi.RemoteException {...}
+        public static Registry createRegistry(int port,
+                                              RMIClientSocketFactory csf,
+                                              RMIServerSocketFactory ssf)
+                throws RemoteException {...}
+}</code></pre>
+<p>The first four <code>getRegistry</code> methods return a reference to a registry on the current host, current host at a specified <em>port</em>, a specified <em>host,</em> or at a particular <em>port</em> on a specified <em>host</em>. What is returned is the remote stub for the registry with the specified host and port information.</p>
+<p>The fifth <code>getRegistry</code> method (that takes an <code>RMIClientSocketFactory</code> as one of its arguments), returns a locally created remote stub to the remote object <code>Registry</code> on the specified <em>host</em> and <em>port</em>. Communication with the remote registry whose stub is constructed with this method will use the supplied <code>RMIClientSocketFactory</code>, <em>csf</em>, to create <code>Socket</code> connections to the registry on the remote host and port.</p>
+<p><strong>Note:</strong> A registry returned from the <code>getRegistry</code> method is a specially constructed stub that contains a well-known object identifier. Passing a registry stub from one JVM to another is not supported (it may or may not work depending on the implementation). Use the <code>LocateRegistry.getRegistry</code> methods to obtain the appropriate registry for a host.</p>
+<p>The <code>createRegistry</code> method creates and exports a registry on the local host on the specified <em>port</em>.</p>
+<p>The second <code>createRegistry</code> method allows more flexibility in communicating with the registry. This call creates and exports a <code>Registry</code> on the local host that uses custom socket factories for communication with that registry. The registry that is created listens for incoming requests on the given <em>port</em> using a <code>ServerSocket</code> created from the supplied <code>RMIServerSocketFactory</code>. A client that receives a reference to this registry will use a <code>Socket</code> created from the supplied <code>RMIClientSocketFactory</code>.</p>
+<p><strong>Note:</strong> Starting a registry with the <code>createRegistry</code> method does not keep the server process alive.</p>
+<h2 id="the-registryhandler-interface">6.3 The <code>RegistryHandler</code> Interface</h2>
+<p>See the <code>RegistryHandler</code> API documentation.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="server.html">PREV</a> | <a href="activation.html">NEXT</a>
+</body>
+</html>

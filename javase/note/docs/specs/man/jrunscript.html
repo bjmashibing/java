@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jrunscript Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jrunscript Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jrunscript - run a command-line script shell that supports interactive and batch modes</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong></p>
+<p>This tool is <strong>experimental</strong>??and unsupported.</p>
+<p><code>jrunscript</code> [<em>options</em>] [<em>arguments</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents the <code>jrunscript</code> command-line options that can be used. See <a href="#options-for-the-jrunscript-command">Options for the jrunscript Command</a>.
+</dd>
+<dt><em>arguments</em></dt>
+<dd>Arguments, when used, follow immediately after options or the command name. See <a href="#arguments">Arguments</a>.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jrunscript</code> command is a language-independent command-line script shell. The <code>jrunscript</code> command supports both an interactive (read-eval-print) mode and a batch (<code>-f</code> option) mode of script execution. By default, JavaScript is the language used, but the <code>-l</code> option can be used to specify a different language. By using Java to scripting language communication, the <code>jrunscript</code> command supports an exploratory programming style.</p>
+<p>If JavaScript is used, then before it evaluates a user defined script, the <code>jrunscript</code> command initializes certain built-in functions and objects, which are documented in the API Specification for <code>jrunscript</code> JavaScript built-in functions.</p>
+<h2 id="options-for-the-jrunscript-command">Options for the jrunscript Command</h2>
+<dl>
+<dt><code>-cp</code> <em>path</em> or <code>-classpath</code> <em>path</em></dt>
+<dd>Indicates where any class files are that the script needs to access.
+</dd>
+<dt><code>-D</code><em>name</em><code>=</code><em>value</em></dt>
+<dd>Sets a Java system property.
+</dd>
+<dt><code>-J</code><em>flag</em></dt>
+<dd>Passes <em>flag</em> directly to the Java Virtual Machine where the <code>jrunscript</code> command is running.
+</dd>
+<dt><code>-l</code> <em>language</em></dt>
+<dd>Uses the specified scripting language. By default, JavaScript is used. To use other scripting languages, you must specify the corresponding script engine's JAR file with the <code>-cp</code> or <code>-classpath</code> option.
+</dd>
+<dt><code>-e</code> <em>script</em></dt>
+<dd>Evaluates the specified script. This option can be used to run one-line scripts that are specified completely on the command line.
+</dd>
+<dt><code>-encoding</code> <em>encoding</em></dt>
+<dd>Specifies the character encoding used to read script files.
+</dd>
+<dt><code>-f</code> <em>script-file</em></dt>
+<dd>Evaluates the specified script file (batch mode).
+</dd>
+<dt><code>-f -</code></dt>
+<dd>Enters interactive mode to read and evaluate a script from standard input.
+</dd>
+<dt><code>-help</code> or <code>-?</code></dt>
+<dd>Displays a help message and exits.
+</dd>
+<dt><code>-q</code></dt>
+<dd>Lists all script engines available and exits.
+</dd>
+</dl>
+<h2 id="arguments">Arguments</h2>
+<p>If arguments are present and if no <code>-e</code> or <code>-f</code> option is used, then the first argument is the script file and the rest of the arguments, if any, are passed as script arguments. If arguments and the <code>-e</code> or the <code>-f</code> option are used, then all arguments are passed as script arguments. If arguments <code>-e</code> and <code>-f</code> are missing, then the interactive mode is used.</p>
+<h2 id="example-of-executing-inline-scripts">Example of Executing Inline Scripts</h2>
+<blockquote>
+<p><code>jrunscript -e &quot;print('hello world')&quot;</code></p>
+</blockquote>
+<blockquote>
+<p><code>jrunscript -e &quot;cat('http://www.example.com')&quot;</code></p>
+</blockquote>
+<h2 id="example-of-using-specified-language-and-evaluate-the-script-file">Example of Using Specified Language and Evaluate the Script File</h2>
+<blockquote>
+<p><code>jrunscript -l js -f test.js</code></p>
+</blockquote>
+<h2 id="example-of-interactive-mode">Example of Interactive Mode</h2>
+<pre><code>jrunscript
+js&gt; print(&#39;Hello World\n&#39;);
+Hello World
+js&gt; 34 + 55
+89.0
+js&gt; t = new java.lang.Thread(function() { print(&#39;Hello World\n&#39;); })
+Thread[Thread-0,5,main]
+js&gt; t.start()
+js&gt; Hello World
+
+js&gt;</code></pre>
+<h2 id="run-script-file-with-script-arguments">Run Script File with Script Arguments</h2>
+<p>In this example, the <code>test.js</code> file is the script file. The <code>arg1</code>, <code>arg2</code>, and <code>arg3</code> arguments are passed to the script. The script can access these arguments with an arguments array.</p>
+<blockquote>
+<p><code>jrunscript test.js arg1 arg2 arg3</code></p>
+</blockquote>
+</body>
+</html>

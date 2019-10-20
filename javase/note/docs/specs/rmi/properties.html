@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: B - Properties In RMI</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="exceptions.html">PREV</a> | NEXT
+<h1 id="b-properties-in-rmi">B Properties In RMI</h1>
+<ul>
+<li><a href="#b.1-server-properties">Server Properties</a></li>
+<li><a href="#b.2-activation-properties">Activation Properties</a></li>
+<li><a href="#b.3-other-properties">Other Properties</a></li>
+</ul>
+<hr />
+<h2 id="b.1-server-properties">B.1 Server Properties</h2>
+<p>The following table contains a list of properties typically used by servers for configuration. Note that properties are typically restricted from being set from applets.</p>
+<h3 id="java.rmi.server.codebase"><code>java.rmi.server.codebase</code></h3>
+<p>Indicates the codebase URL of classes originating from the JVM. The codebase property is used to annotate class descriptors of classes <em>originating</em> from a JVM so that the class for an object sent as a parameter or return value in a remote method call can be loaded at the receiver.</p>
+<h3 id="java.rmi.server.disablehttp"><code>java.rmi.server.disableHttp</code></h3>
+<p>The implementation of RMI calls through firewalls via proxies has been removed as of JDK 9.</p>
+<h3 id="java.rmi.server.hostname"><code>java.rmi.server.hostname</code></h3>
+<p>RMI uses IP addresses to indicate the location of a server (embedded in a remote reference). If the use of a hostname is desired, this property is used to specify the fully-qualified hostname for RMI to use for remote objects exported to the local JVM. The property can also be set to an IP address. Not set by default.</p>
+<h3 id="java.rmi.dgc.leasevalue"><code>java.rmi.dgc.leaseValue</code></h3>
+<p>Sets the lease duration that the RMI runtime grants to clients referencing remote objects in the JVM. Defaults to 10 minutes.</p>
+<h3 id="java.rmi.server.logcalls"><code>java.rmi.server.logCalls</code></h3>
+<p>If set to <code>true</code>, server call logging is turned on and prints to stderr. Defaults to <code>false</code>.</p>
+<h3 id="java.rmi.server.usecodebaseonly"><code>java.rmi.server.useCodebaseOnly</code></h3>
+<p>If set to <code>true</code>, when RMI loads classes (if not available via <code>CLASSPATH</code>) they are only loaded using the URL specified by the property <code>java.rmi.server.codebase</code>.</p>
+<h3 id="java.rmi.server.uselocalhostname"><code>java.rmi.server.useLocalHostname</code></h3>
+<p>If the <code>java.rmi.server.hostname</code> property is not set and this property is set, then RMI will not use an IP address to denote the location (embedded in remote references) of remote objects that are exported into the JVM. Instead, RMI will use the value of the call to the method <code>java.net.InetAddress.getLocalHost</code>.</p>
+<h2 id="b.2-activation-properties">B.2 Activation Properties</h2>
+<p>The following table contains a list of properties used in activation.</p>
+<h3 id="java.rmi.activation.port"><code>java.rmi.activation.port</code></h3>
+<p>The port number on which the <code>ActivationSystem</code> is exported. This port number should be specified in a JVM if the activation daemon <code>rmid</code> uses a port other than the default.</p>
+<h3 id="java.rmi.activation.activator.class"><code>java.rmi.activation.activator.class</code></h3>
+<p>The class that implements the interface <code>java.rmi.activation.Activator</code>. This property is used internally to locate the resident implementation of the <code>Activator</code> from which the stub class name can be found.</p>
+<h2 id="b.3-other-properties">B.3 Other Properties</h2>
+<p>These properties are used to locate specific implementation classes within implementation packages. Note: all these properties have been deprecated as of Java 2 SDK, Standard Edition, v1.2.</p>
+<h3 id="java.rmi.loader.packageprefix"><code>java.rmi.loader.packagePrefix</code></h3>
+<p><em>Note: this property is deprecated as of Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>The package prefix for the class that implements the interface <code>java.rmi.server.LoaderHandler</code>. Defaults to <code>sun.rmi.server</code>.</p>
+<h3 id="java.rmi.registry.packageprefix"><code>java.rmi.registry.packagePrefix</code></h3>
+<p><em>Note: this property is deprecated as of Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>The package prefix for the class that implements the interface <code>java.rmi.registry.RegistryHandler</code>. Defaults to <code>sun.rmi.registry</code>.</p>
+<h3 id="java.rmi.server.packageprefix"><code>java.rmi.server.packagePrefix</code></h3>
+<p><em>Note: this property is deprecated as of Java 2 SDK, Standard Edition, v1.2</em></p>
+<p>The server package prefix. Assumes that the implementation of the server reference classes (such as <code>UnicastRef</code> and <code>UnicastServerRef</code>) are located in the package defined by the prefix. Defaults to <code>sun.rmi.server</code>.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="exceptions.html">PREV</a> | NEXT
+</body>
+</html>

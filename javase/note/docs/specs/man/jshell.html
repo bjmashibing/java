@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jshell Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jshell Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jshell - interactively evaluate declarations, statements, and expressions of the Java programming language in a read-eval-print loop (REPL)</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jshell</code> [<em>options</em>] [<em>load-files</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>Command-line options, separated by spaces. See <a href="#options-for-jshell">Options for jshell</a>.
+</dd>
+<dt><em>load-files</em></dt>
+<dd><p>One or more scripts to run when the tool is started. Scripts can contain any valid code snippets or JShell commands.</p>
+<p>The script can be a local file or one of following predefined scripts:</p>
+<dl>
+<dt><code>DEFAULT</code></dt>
+<dd>Loads the default entries, which are commonly used as imports.
+</dd>
+<dt><code>JAVASE</code></dt>
+<dd>Imports all Java SE packages.
+</dd>
+<dt><code>PRINTING</code></dt>
+<dd>Defines <code>print</code>, <code>println</code>, and <code>printf</code> as <code>jshell</code> methods for use within the tool.
+</dd>
+</dl>
+<p>For more than one script, use a space to separate the names. Scripts are run in the order in which they're entered on the command line. Command-line scripts are run after startup scripts. To run a script after JShell is started, use the <code>/open</code> command.</p>
+<p>To accept input from standard input and suppress the interactive I/O, enter a hyphen (-) for <em>load-files</em>. This option enables the use of the <code>jshell</code> tool in pipe chains.</p>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>JShell provides a way to interactively evaluate declarations, statements, and expressions of the Java programming language, making it easier to learn the language, explore unfamiliar code and APIs, and prototype complex code. Java statements, variable definitions, method definitions, class definitions, import statements, and expressions are accepted. The bits of code entered are called snippets.</p>
+<p>As snippets are entered, they're evaluated, and feedback is provided. Feedback varies from the results and explanations of actions to nothing, depending on the snippet entered and the feedback mode chosen. Errors are described regardless of the feedback mode. Start with the verbose mode to get the most feedback while learning the tool.</p>
+<p>Command-line options are available for configuring the initial environment when JShell is started. Within JShell, commands are available for modifying the environment as needed.</p>
+<p>Existing snippets can be loaded from a file to initialize a JShell session, or at any time within a session. Snippets can be modified within the session to try out different variations and make corrections. To keep snippets for later use, save them to a file.</p>
+<h2 id="options-for-jshell">Options for jshell</h2>
+<dl>
+<dt><code>--add-modules</code> <em>module</em>[<code>,</code><em>module</em>...]</dt>
+<dd>Specifies the root modules to resolve in addition to the initial module.
+</dd>
+<dt><code>-C</code><em>flag</em></dt>
+<dd>Provides a flag to pass to the compiler. To pass more than one flag, provide an instance of this option for each flag or flag argument needed.
+</dd>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd>Specifies the directories and archives that are searched to locate class files. This option overrides the path in the <code>CLASSPATH</code> environment variable. If the environment variable isn't set and this option isn't used, then the current directory is searched. For Oracle Solaris, Linux, and macOS, use a colon (:) to separate items in the path. For Windows, use a semicolon (;) to separate items.
+</dd>
+<dt><code>--feedback</code> <em>mode</em></dt>
+<dd><p>Sets the initial level of feedback provided in response to what's entered. The initial level can be overridden within a session by using the <code>/set feedback</code> <em>mode</em> command. The default is <code>normal</code>.</p>
+<p>The following values are valid for <em>mode</em>:</p>
+<dl>
+<dt><code>verbose</code></dt>
+<dd>Provides detailed feedback for entries. Additional information about the action performed is displayed after the result of the action. The next prompt is separated from the feedback by a blank line.
+</dd>
+<dt><code>normal</code></dt>
+<dd>Provides an average amount of feedback. The next prompt is separated from the feedback by a blank line.
+</dd>
+<dt><code>concise</code></dt>
+<dd>Provides minimal feedback. The next prompt immediately follows the code snippet or feedback.
+</dd>
+<dt><code>silent</code></dt>
+<dd>Provides no feedback. The next prompt immediately follows the code snippet.
+</dd>
+<dt><em>custom</em></dt>
+<dd>Provides custom feedback based on how the mode is defined. Custom feedback modes are created within JShell by using the <code>/set mode</code> command.
+</dd>
+</dl>
+</dd>
+<dt><code>--help</code> or <code>-h</code> or <code>-?</code></dt>
+<dd>Prints a summary of standard options and exits the tool.
+</dd>
+<dt><code>--help-extra</code> or <code>-X</code></dt>
+<dd>Prints a summary of nonstandard options and exits the tool. Nonstandard options are subject to change without notice.
+</dd>
+<dt><code>-J</code><em>flag</em></dt>
+<dd>Provides a flag to pass to the runtime system. To pass more than one flag, provide an instance of this option for each flag or flag argument needed.
+</dd>
+<dt><code>--module-path</code> <em>modulepath</em></dt>
+<dd>Specifies where to find application modules. For Oracle Solaris, Linux, and macOS, use a colon (:) to separate items in the path. For Windows, use a semicolon (;) to separate items.
+</dd>
+<dt><code>--no-startup</code></dt>
+<dd>Prevents startup scripts from running when JShell starts. Use this option to run only the scripts entered on the command line when JShell is started, or to start JShell without any preloaded information if no scripts are entered. This option can't be used if the <code>--startup</code> option is used.
+</dd>
+<dt><code>-q</code></dt>
+<dd>Sets the feedback mode to <code>concise</code>, which is the same as entering <code>--feedback concise</code>.
+</dd>
+<dt><code>-R</code><em>flag</em></dt>
+<dd>Provides a flag to pass to the remote runtime system. To pass more than one flag, provide an instance of this option for each flag or flag argument to pass.
+</dd>
+<dt><code>-s</code></dt>
+<dd>Sets the feedback mode to <code>silent</code>, which is the same as entering <code>--feedback silent</code>.
+</dd>
+<dt><code>--show-version</code></dt>
+<dd>Prints version information and enters the tool.
+</dd>
+<dt><code>--startup</code> <em>file</em></dt>
+<dd><p>Overrides the default startup script for this session. The script can contain any valid code snippets or commands.</p>
+<p>The script can be a local file or one of the following predefined scripts:</p>
+<dl>
+<dt><code>DEFAULT</code></dt>
+<dd>Loads the default entries, which are commonly used as imports.
+</dd>
+<dt><code>JAVASE</code></dt>
+<dd>Imports all Java SE packages.
+</dd>
+<dt><code>PRINTING</code></dt>
+<dd>Defines <code>print</code>, <code>println</code>, and <code>printf</code> as <code>jshell</code> methods for use within the tool.
+</dd>
+</dl>
+<p>For more than one script, provide a separate instance of this option for each script. Startup scripts are run when JShell is first started and when the session is restarted with the <code>/reset</code>, <code>/reload</code>, or <code>/env</code> command. Startup scripts are run in the order in which they're entered on the command line.</p>
+<p>This option can't be used if the <code>--no-startup</code> option is used.</p>
+</dd>
+<dt><code>-v</code></dt>
+<dd>Sets the feedback mode to <code>verbose</code>, which is the same as entering <code>--feedback verbose</code>.
+</dd>
+<dt><code>--version</code></dt>
+<dd>Prints version information and exits the tool.
+</dd>
+</dl>
+<h2 id="jshell-commands">jshell Commands</h2>
+<p>Within the <code>jshell</code> tool, commands are used to modify the environment and manage code snippets.</p>
+<dl>
+<dt><code>/drop</code> {<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Drops snippets identified by name, ID, or ID range, making them inactive. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of code snippets.
+</dd>
+<dt><code>/edit</code> [<em>option</em>]</dt>
+<dd><p>Opens an editor. If no option is entered, then the editor opens with the active snippets.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Opens the editor with the snippets identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of code snippets.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Opens the editor with all snippets, including startup snippets and snippets that failed, were overwritten, or were dropped.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Opens the editor with startup snippets that were evaluated when JShell was started.
+</dd>
+</dl>
+<p>To exit edit mode, close the editor window, or respond to the prompt provided if the <code>-wait</code> option was used when the editor was set.</p>
+<p>Use the <code>/set editor</code> command to specify the editor to use. If no editor is set, then the following environment variables are checked in order: <code>JSHELLEDITOR</code>, <code>VISUAL</code>, and <code>EDITOR</code>. If no editor is set in JShell and none of the editor environment variables is set, then a simple default editor is used.</p>
+</dd>
+<dt><code>/env</code> [<em>options</em>]</dt>
+<dd><p>Displays the environment settings, or updates the environment settings and restarts the session. If no option is entered, then the current environment settings are displayed. If one or more options are entered, then the session is restarted as follows:</p>
+<ul>
+<li><p>Updates the environment settings with the provided options.</p></li>
+<li><p>Resets the execution state.</p></li>
+<li><p>Runs the startup scripts.</p></li>
+<li><p>Silently replays the history in the order entered. The history includes all valid snippets or <code>/drop</code> commands entered at the <code>jshell</code> prompt, in scripts entered on the command line, or scripts entered with the <code>/open</code> command.</p></li>
+</ul>
+<p>Environment settings entered on the command line or provided with a previous <code>/reset</code>, <code>/env</code>, or <code>/reload</code> command are maintained unless an <em>option</em> is entered that overwrites the setting.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>--add-modules</code> <em>module</em>[<code>,</code><em>module</em>...]</dt>
+<dd>Specifies the root modules to resolve in addition to the initial module.
+</dd>
+<dt><code>--add-exports</code> <em>source-module</em><code>/</code><em>package</em><code>=</code><em>target-module</em>[<code>,</code><em>target-module</em>]*</dt>
+<dd>Adds an export of <em>package</em> from <em>source-module</em> to <em>target-module</em>.
+</dd>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd>Specifies the directories and archives that are searched to locate class files. This option overrides the path in the <code>CLASSPATH</code> environment variable. If the environment variable isn't set and this option isn't used, then the current directory is searched. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+<dt><code>--module-path</code> <em>modulepath</em></dt>
+<dd>Specifies where to find application modules. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+</dl>
+</dd>
+<dt><code>/exit</code> [<em>integer-expression-snippet</em>]</dt>
+<dd>Exits the tool. If no snippet is entered, the exit status is zero. If a snippet is entered and the result of the snippet is an integer, the result is used as the exit status. If an error occurs, or the result of the snippet is not an integer, an error is displayed and the tool remains active.
+</dd>
+<dt><code>/history</code></dt>
+<dd>Displays what was entered in this session.
+</dd>
+<dt><code>/help</code> [<em>command</em>|<em>subject</em>]</dt>
+<dd><p>Displays information about commands and subjects. If no options are entered, then a summary of information for all commands and a list of available subjects are displayed. If a valid command is provided, then expanded information for that command is displayed. If a valid subject is entered, then information about that subject is displayed.</p>
+<p>The following values for <em>subject</em> are valid:</p>
+<dl>
+<dt><code>context</code></dt>
+<dd>Describes the options that are available for configuring the environment.
+</dd>
+<dt><code>intro</code></dt>
+<dd>Provides an introduction to the tool.
+</dd>
+<dt><code>shortcuts</code></dt>
+<dd>Describes keystrokes for completing commands and snippets. See <a href="#input-shortcuts">Input Shortcuts</a>.
+</dd>
+</dl>
+</dd>
+<dt><code>/imports</code></dt>
+<dd>Displays the current active imports, including those from the startup scripts and scripts that were entered on the command line when JShell was started.
+</dd>
+<dt><code>/list</code> [<em>option</em>]</dt>
+<dd><p>Displays a list of snippets and their IDs. If no option is entered, then all active snippets are displayed, but startup snippets aren't.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Displays the snippets identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Displays all snippets, including startup snippets and snippets that failed, were overwritten, or were dropped. IDs that begin with <code>s</code> are startup snippets. IDs that begin with <code>e</code> are snippets that failed.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Displays startup snippets that were evaluated when JShell was started.
+</dd>
+</dl>
+</dd>
+<dt><code>/methods</code> [<em>option</em>]</dt>
+<dd><p>Displays information about the methods that were entered. If no option is entered, then the name, parameter types, and return type of all active methods are displayed.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Displays information for methods identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of code snippets.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Displays information for all methods, including those added when JShell was started, and methods that failed, were overwritten, or were dropped.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Displays information for startup methods that were added when JShell was started.
+</dd>
+</dl>
+</dd>
+<dt><code>/open</code> <em>file</em></dt>
+<dd><p>Opens the script specified and reads the snippets into the tool. The script can be a local file or one of the following predefined scripts:</p>
+<dl>
+<dt><code>DEFAULT</code></dt>
+<dd>Loads the default entries, which are commonly used as imports.
+</dd>
+<dt><code>JAVASE</code></dt>
+<dd>Imports all Java SE packages.
+</dd>
+<dt><code>PRINTING</code></dt>
+<dd>Defines <code>print</code>, <code>println</code>, and <code>printf</code> as <code>jshell</code> methods for use within the tool.
+</dd>
+</dl>
+</dd>
+<dt><code>/reload</code> [<em>options</em>]</dt>
+<dd><p>Restarts the session as follows:</p>
+<ul>
+<li><p>Updates the environment settings with the provided options, if any.</p></li>
+<li><p>Resets the execution state.</p></li>
+<li><p>Runs the startup scripts.</p></li>
+<li><p>Replays the history in the order entered. The history includes all valid snippets or <code>/drop</code> commands entered at the <code>jshell</code> prompt, in scripts entered on the command line, or scripts entered with the <code>/open</code> command.</p></li>
+</ul>
+<p>Environment settings entered on the command line or provided with a previous <code>/reset</code>, <code>/env</code>, or <code>/reload</code> command are maintained unless an <em>option</em> is entered that overwrites the setting.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>--add-modules</code> <em>module</em>[<code>,</code><em>module</em>...]</dt>
+<dd>Specifies the root modules to resolve in addition to the initial module.
+</dd>
+<dt><code>--add-exports</code> <em>source-module</em><code>/</code><em>package</em><code>=</code><em>target-module</em>[<code>,</code><em>target-module</em>]*</dt>
+<dd>Adds an export of <em>package</em> from <em>source-module</em> to <em>target-module</em>.
+</dd>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd>Specifies the directories and archives that are searched to locate class files. This option overrides the path in the <code>CLASSPATH</code> environment variable. If the environment variable isn't set and this option isn't used, then the current directory is searched. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+<dt><code>--module-path</code> <em>modulepath</em></dt>
+<dd>Specifies where to find application modules. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+<dt><code>-quiet</code></dt>
+<dd>Replays the valid history without displaying it. Errors are displayed.
+</dd>
+<dt><code>-restore</code></dt>
+<dd>Resets the environment to the state at the start of the previous run of the tool or to the last time a <code>/reset</code>, <code>/reload</code>, or <code>/env</code> command was executed in the previous run. The valid history since that point is replayed. Use this option to restore a previous JShell session.
+</dd>
+</dl>
+</dd>
+<dt><code>/reset</code> [<em>options</em>]</dt>
+<dd><p>Discards all entered snippets and restarts the session as follows:</p>
+<ul>
+<li><p>Updates the environment settings with the provided options, if any.</p></li>
+<li><p>Resets the execution state.</p></li>
+<li><p>Runs the startup scripts.</p></li>
+</ul>
+<p>History is not replayed. All code that was entered is lost.</p>
+<p>Environment settings entered on the command line or provided with a previous <code>/reset</code>, <code>/env</code>, or <code>/reload</code> command are maintained unless an <em>option</em> is entered that overwrites the setting.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>--add-modules</code> <em>module</em>[<code>,</code><em>module</em>...]</dt>
+<dd>Specifies the root modules to resolve in addition to the initial module.
+</dd>
+<dt><code>--add-exports</code> <em>source-module</em><code>/</code><em>package</em><code>=</code><em>target-module</em>[<code>,</code><em>target-module</em>]*</dt>
+<dd>Adds an export of <em>package</em> from <em>source-module</em> to <em>target-module</em>.
+</dd>
+<dt><code>--class-path</code> <em>path</em></dt>
+<dd>Specifies the directories and archives that are searched to locate class files. This option overrides the path in the <code>CLASSPATH</code> environment variable. If the environment variable isn't set and this option isn't used, then the current directory is searched. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+<dt><code>--module-path</code> <em>modulepath</em></dt>
+<dd>Specifies where to find application modules. For Oracle Solaris, Linux, and macOS, use a colon (<code>:</code>) to separate items in the path. For Windows, use a semicolon (<code>;</code>) to separate items.
+</dd>
+</dl>
+</dd>
+<dt><code>/save</code> [<em>options</em>] <em>file</em></dt>
+<dd><p>Saves snippets and commands to the file specified. If no options are entered, then active snippets are saved.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Saves the snippets and commands identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of the code snippets.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Saves all snippets, including startup snippets and snippets that were overwritten or failed.
+</dd>
+<dt><code>-history</code></dt>
+<dd>Saves the sequential history of all commands and snippets entered in the current session.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Saves the current startup settings. If no startup scripts were provided, then an empty file is saved.
+</dd>
+</dl>
+</dd>
+<dt><code>/set</code> [<em>setting</em>]</dt>
+<dd><p>Sets configuration information, including the external editor, startup settings, and feedback mode. This command is also used to create a custom feedback mode with customized prompt, format, and truncation values. If no setting is entered, then the current setting for the editor, startup settings, and feedback mode are displayed.</p>
+<p>The following values are valid for <code>setting</code>:</p>
+<dl>
+<dt><code>editor</code> [<em>options</em>] [<em>command</em>]</dt>
+<dd><p>Sets the command used to start an external editor when the <code>/edit</code> command is entered. The command can include command arguments separated by spaces. If no command or options are entered, then the current setting is displayed.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>-default</code></dt>
+<dd>Sets the editor to the default editor provided with JShell. This option can't be used if a command for starting an editor is entered.
+</dd>
+<dt><code>-delete</code></dt>
+<dd><p>Sets the editor to the one in effect when the session started. If used with the <code>-retain</code> option, then the retained editor setting is deleted and the editor is set to the first of the following environment variables found: <code>JSHELLEDITOR</code>, <code>VISUAL</code>, or <code>EDITOR</code>. If none of the editor environment variables are set, then this option sets the editor to the default editor.</p>
+<p>This option can't be used if a command for starting an editor is entered.</p>
+</dd>
+<dt><code>-retain</code></dt>
+<dd>Saves the editor setting across sessions. If no other option or a command is entered, then the current setting is saved.
+</dd>
+<dt><code>-wait</code></dt>
+<dd>Prompts the user to indicate when editing is complete. Otherwise control returns to JShell when the editor exits. Use this option if the editor being used exits immediately, for example, when an edit window already exists. This option is valid only when a command for starting an editor is entered.
+</dd>
+</dl>
+</dd>
+<dt><code>feedback</code> [<em>mode</em>]</dt>
+<dd><p>Sets the feedback mode used to respond to input. If no mode is entered, then the current mode is displayed.</p>
+<p>The following modes are valid: <code>concise</code>, <code>normal</code>, <code>silent</code>, <code>verbose</code>, and any custom mode created with the <code>/set mode</code> command.</p>
+</dd>
+<dt><code>format</code> <em>mode</em> <em>field</em> <code>&quot;</code><em>format-string</em><code>&quot;</code> <em>selector</em></dt>
+<dd><p>Sets the format of the feedback provided in response to input. If no mode is entered, then the current formats for all fields for all feedback modes are displayed. If only a mode is entered, then the current formats for that mode are displayed. If only a mode and field are entered, then the current formats for that field are displayed.</p>
+<p>To define a format, the following arguments are required:</p>
+<dl>
+<dt><em>mode</em></dt>
+<dd>Specifies a feedback mode to which the response format is applied. Only custom modes created with the <code>/set mode</code> command can be modified.
+</dd>
+<dt><em>field</em></dt>
+<dd>Specifies a context-specific field to which the response format is applied. The fields are described in the online help, which is accessed from JShell using the <code>/help /set format</code> command.
+</dd>
+<dt><code>&quot;</code><em>format-string</em><code>&quot;</code></dt>
+<dd>Specifies the string to use as the response format for the specified field and selector. The structure of the format string is described in the online help, which is accessed from JShell using the <code>/help /set format</code> command.
+</dd>
+<dt><em>selector</em></dt>
+<dd>Specifies the context in which the response format is applied. The selectors are described in the online help, which is accessed from JShell using the <code>/help /set format</code> command.
+</dd>
+</dl>
+</dd>
+<dt><code>mode</code> [<em>mode-name</em>] [<em>existing-mode</em>] [<em>options</em>]</dt>
+<dd><p>Creates a custom feedback mode with the mode name provided. If no mode name is entered, then the settings for all modes are displayed, which includes the mode, prompt, format, and truncation settings. If the name of an existing mode is provided, then the settings from the existing mode are copied to the mode being created.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>-command</code>|<code>-quiet</code></dt>
+<dd>Specifies the level of feedback displayed for commands when using the mode. This option is required when creating a feedback mode. Use <code>-command</code> to show information and verification feedback for commands. Use <code>-quiet</code> to show only essential feedback for commands, such as error messages.
+</dd>
+<dt><code>-delete</code></dt>
+<dd>Deletes the named feedback mode for this session. The name of the mode to delete is required. To permanently delete a retained mode, use the <code>-retain</code> option with this option. Predefined modes can't be deleted.
+</dd>
+<dt><code>-retain</code></dt>
+<dd>Saves the named feedback mode across sessions. The name of the mode to retain is required.
+</dd>
+</dl>
+<p>Configure the new feedback mode using the <code>/set prompt</code>, <code>/set format</code>, and <code>/set truncation</code> commands.</p>
+<p>To start using the new mode, use the <code>/set feedback</code> command.</p>
+</dd>
+<dt><code>prompt</code> <em>mode</em> <code>&quot;</code><em>prompt-string</em><code>&quot;</code> <code>&quot;</code><em>continuation-prompt-string</em><code>&quot;</code></dt>
+<dd><p>Sets the prompts for input within JShell. If no mode is entered, then the current prompts for all feedback modes are displayed. If only a mode is entered, then the current prompts for that mode are displayed.</p>
+<p>To define a prompt, the following arguments are required:</p>
+<dl>
+<dt><em>mode</em></dt>
+<dd>Specifies the feedback mode to which the prompts are applied. Only custom modes created with the <code>/set mode</code> command can be modified.
+</dd>
+<dt><code>&quot;</code><em>prompt-string</em><code>&quot;</code></dt>
+<dd>Specifies the string to use as the prompt for the first line of input.
+</dd>
+<dt><code>&quot;</code><em>continuation-prompt-string</em><code>&quot;</code></dt>
+<dd>Specifies the string to use as the prompt for the additional input lines needed to complete a snippet.
+</dd>
+</dl>
+</dd>
+<dt><code>start</code> [<code>-retain</code>] [<em>file</em> [<em>file</em>...]|<em>option</em>]</dt>
+<dd><p>Sets the names of the startup scripts used when the next <code>/reset</code>, <code>/reload</code>, or <code>/env</code> command is entered. If more than one script is entered, then the scripts are run in the order entered. If no scripts or options are entered, then the current startup settings are displayed.</p>
+<p>The scripts can be local files or one of the following predefined scripts:</p>
+<dl>
+<dt><code>DEFAULT</code></dt>
+<dd>Loads the default entries, which are commonly used as imports.
+</dd>
+<dt><code>JAVASE</code></dt>
+<dd>Imports all Java SE packages.
+</dd>
+<dt><code>PRINTING</code></dt>
+<dd>Defines <code>print</code>, <code>println</code>, and <code>printf</code> as <code>jshell</code> methods for use within the tool.
+</dd>
+</dl>
+<p>The following options are valid:</p>
+<dl>
+<dt><code>-default</code></dt>
+<dd>Sets the startup settings to the default settings.
+</dd>
+<dt><code>-none</code></dt>
+<dd>Specifies that no startup settings are used.
+</dd>
+</dl>
+<p>Use the <code>-retain</code> option to save the start setting across sessions.</p>
+</dd>
+<dt><code>truncation</code> <em>mode</em> <em>length</em> <em>selector</em></dt>
+<dd><p>Sets the maximum length of a displayed value. If no mode is entered, then the current truncation values for all feedback modes are displayed. If only a mode is entered, then the current truncation values for that mode are displayed.</p>
+<p>To define truncation values, the following arguments are required:</p>
+<dl>
+<dt><em>mode</em></dt>
+<dd>Specifies the feedback mode to which the truncation value is applied. Only custom modes created with the <code>/set mode</code> command can be modified.
+</dd>
+<dt><em>length</em></dt>
+<dd>Specifies the unsigned integer to use as the maximum length for the specified selector.
+</dd>
+<dt><em>selector</em></dt>
+<dd>Specifies the context in which the truncation value is applied. The selectors are described in the online help, which is accessed from JShell using the <code>/help /set truncation</code> command.
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt><code>/types</code> [<em>option</em>]</dt>
+<dd><p>Displays classes, interfaces, and enums that were entered. If no option is entered, then all current active classes, interfaces, and enums are displayed.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Displays information for classes, interfaces, and enums identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of the code snippets.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Displays information for all classes, interfaces, and enums, including those added when JShell was started, and classes, interfaces, and enums that failed, were overwritten, or were dropped.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Displays information for startup classes, interfaces, and enums that were added when JShell was started.
+</dd>
+</dl>
+</dd>
+<dt><code>/vars</code> [<em>option</em>]</dt>
+<dd><p>Displays the name, type, and value of variables that were entered. If no option is entered, then all current active variables are displayed.</p>
+<p>The following options are valid:</p>
+<dl>
+<dt>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Displays information for variables identified by name, ID, or ID range. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. Use the <code>/list</code> command to see the IDs of the code snippets.
+</dd>
+<dt><code>-all</code></dt>
+<dd>Displays information for all variables, including those added when JShell was started, and variables that failed, were overwritten, or were dropped.
+</dd>
+<dt><code>-start</code></dt>
+<dd>Displays information for startup variables that were added when JShell was started.
+</dd>
+</dl>
+</dd>
+<dt><code>/?</code></dt>
+<dd>Same as the <code>/help</code> command.
+</dd>
+<dt><code>/!</code></dt>
+<dd>Reruns the last snippet.
+</dd>
+<dt><code>/</code>{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>} [{<em>name</em>|<em>id</em>|<em>startID</em><code>-</code><em>endID</em>}...]</dt>
+<dd>Reruns the snippets identified by ID, range of IDs, or name. For a range of IDs, provide the starting ID and ending ID separated with a hyphen. To provide a list, separate the items in the list with a space. The first item in the list must be an ID or ID range. Use the <code>/list</code> command to see the IDs of the code snippets.
+</dd>
+<dt><code>/-</code><em>n</em></dt>
+<dd>Reruns the -<em>n</em>th previous snippet. For example, if 15 code snippets were entered, then <code>/-4</code> runs the 11th snippet. Commands aren't included in the count.
+</dd>
+</dl>
+<h2 id="input-shortcuts">Input Shortcuts</h2>
+<p>The following shortcuts are available for entering commands and snippets in JShell.</p>
+<h3 id="tab-completion">Tab completion</h3>
+<dl>
+<dt><strong>&lt;tab&gt;</strong></dt>
+<dd><p>When entering snippets, commands, subcommands, command arguments, or command options, use the Tab key to automatically complete the item. If the item can't be determined from what was entered, then possible options are provided.</p>
+<p>When entering a method call, use the Tab key after the method call's opening parenthesis to see the parameters for the method. If the method has more than one signature, then all signatures are displayed. Pressing the Tab key a second time displays the description of the method and the parameters for the first signature. Continue pressing the Tab key for a description of any additional signatures.</p>
+</dd>
+<dt><strong>Shift+&lt;Tab&gt; V</strong></dt>
+<dd>After entering a complete expression, use this key sequence to convert the expression to a variable declaration of a type determined by the type of the expression.
+</dd>
+<dt><strong>Shift+&lt;Tab&gt; M</strong></dt>
+<dd>After entering a complete expression or statement, use this key sequence to convert the expression or statement to a method declaration. If an expression is entered, the return type is based on the type of the expression.
+</dd>
+<dt><strong>Shift+&lt;Tab&gt; I</strong></dt>
+<dd>When an identifier is entered that can't be resolved, use this key sequence to show possible imports that resolve the identifier based on the content of the specified class path.
+</dd>
+</dl>
+<h3 id="command-abbreviations">Command abbreviations</h3>
+<p>An abbreviation of a command is accepted if the abbreviation uniquely identifies a command. For example, <code>/l</code> is recognized as the <code>/list</code> command. However, <code>/s</code> isn't a valid abbreviation because it can't be determined if the <code>/set</code> or <code>/save</code> command is meant. Use <code>/se</code> for the <code>/set</code> command or <code>/sa</code> for the <code>/save</code> command.</p>
+<p>Abbreviations are also accepted for subcommands, command arguments, and command options. For example, use <code>/m -a</code> to display all methods.</p>
+<h3 id="history-navigation">History navigation</h3>
+<p>A history of what was entered is maintained across sessions. Use the up and down arrows to scroll through commands and snippets from the current and past sessions. Use the Ctrl key with the up and down arrows to skip all but the first line of multiline snippets.</p>
+<h3 id="history-search">History search</h3>
+<p>Use the Ctrl+R key combination to search the history for the string entered. The prompt changes to show the string and the match. Ctrl+R searches backwards from the current location in the history through earlier entries. Ctrl+S searches forward from the current location in the history though later entries.</p>
+<h2 id="input-editing">Input Editing</h2>
+<p>The editing capabilities of JShell are similar to that of other common shells. Keyboard keys and key combinations provide line editing shortcuts. The Ctrl key and Meta key are used in key combinations. If your keyboard doesn't have a Meta key, then the Alt key is often mapped to provide Meta key functionality.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Key or Key Combination</th>
+<th style="text-align: left;">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Return</td>
+<td style="text-align: left;">Enter the current line.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Left arrow</td>
+<td style="text-align: left;">Move the cursor to the left one character.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Right arrow</td>
+<td style="text-align: left;">Move the cursor to the right one character.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ctrl+A</td>
+<td style="text-align: left;">Move the cursor to the beginning of the line.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ctrl+E</td>
+<td style="text-align: left;">Move the cursor to the end of the line.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Meta+B</td>
+<td style="text-align: left;">Move the cursor to the left one word.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Meta+F</td>
+<td style="text-align: left;">Move the cursor to the right one word.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;">Delete the character under the cursor.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Backspace</td>
+<td style="text-align: left;">Delete the character before the cursor.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ctrl+K</td>
+<td style="text-align: left;">Delete the text from the cursor to the end of the line.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Meta+D</td>
+<td style="text-align: left;">Delete the text from the cursor to the end of the word.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ctrl+W</td>
+<td style="text-align: left;">Delete the text from the cursor to the previous white space.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ctrl+Y</td>
+<td style="text-align: left;">Paste the most recently deleted text into the line.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Meta+Y</td>
+<td style="text-align: left;">After Ctrl+Y, press to cycle through the previously deleted text.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-of-starting-and-stopping-a-jshell-session">Example of Starting and Stopping a JShell Session</h2>
+<p>JShell is provided with the JDK. To start a session, enter <code>jshell</code> on the command line. A welcome message is printed, and a prompt for entering commands and snippets is provided.</p>
+<pre><code>% jshell
+|  Welcome to JShell -- Version 9
+|  For an introduction type: /help intro
+
+jshell&gt;</code></pre>
+<p>To see which snippets were automatically loaded when JShell started, use the <code>/list -start</code> command. The default startup snippets are import statements for common packages. The ID for each snippet begins with the letter <em>s</em>, which indicates it's a startup snippet.</p>
+<pre><code>jshell&gt; /list -start
+
+  s1 : import java.io.*;
+  s2 : import java.math.*;
+  s3 : import java.net.*;
+  s4 : import java.nio.file.*;
+  s5 : import java.util.*;
+  s6 : import java.util.concurrent.*;
+  s7 : import java.util.function.*;
+  s8 : import java.util.prefs.*;
+  s9 : import java.util.regex.*;
+ s10 : import java.util.stream.*;
+
+jshell&gt;</code></pre>
+<p>To end the session, use the <code>/exit</code> command.</p>
+<pre><code>jshell&gt; /exit
+|  Goodbye
+
+%</code></pre>
+<h2 id="example-of-entering-snippets">Example of Entering Snippets</h2>
+<p>Snippets are Java statements, variable definitions, method definitions, class definitions, import statements, and expressions. Terminating semicolons are automatically added to the end of a completed snippet if they're missing.</p>
+<p>The following example shows two variables and a method being defined, and the method being run. Note that a scratch variable is automatically created to hold the result because no variable was provided.</p>
+<pre><code>jshell&gt; int a=4
+a ==&gt; 4
+
+jshell&gt; int b=8
+b ==&gt; 8
+
+jshell&gt; int square(int i1) {
+   ...&gt; return i1 * i1;
+   ...&gt; }
+|  created method square(int)
+
+jshell&gt; square(b)
+$5 ==&gt; 64</code></pre>
+<h2 id="example-of-changing-snippets">Example of Changing Snippets</h2>
+<p>Change the definition of a variable, method, or class by entering it again.</p>
+<p>The following examples shows a method being defined and the method run:</p>
+<pre><code>jshell&gt; String grade(int testScore) {
+   ...&gt;     if (testScore &gt;= 90) {
+   ...&gt;         return &quot;Pass&quot;;
+   ...&gt;     }
+   ...&gt;     return &quot;Fail&quot;;
+   ...&gt; }
+|  created method grade(int)
+
+jshell&gt; grade(88)
+$3 ==&gt; &quot;Fail&quot;</code></pre>
+<p>To change the method <code>grade</code> to allow more students to pass, enter the method definition again and change the pass score to <code>80</code>. Use the up arrow key to retrieve the previous entries to avoid having to reenter them and make the change in the <code>if</code> statement. The following example shows the new definition and reruns the method to show the new result:</p>
+<pre><code>jshell&gt; String grade(int testScore) {
+   ...&gt;     if (testScore &gt;= 80) {
+   ...&gt;         return &quot;Pass&quot;;
+   ...&gt;     }
+   ...&gt;     return &quot;Fail&quot;;
+   ...&gt; }
+|  modified method grade(int)
+
+jshell&gt; grade(88)
+$5 ==&gt; &quot;Pass&quot;</code></pre>
+<p>For snippets that are more than a few lines long, or to make more than a few changes, use the <code>/edit</code> command to open the snippet in an editor. After the changes are complete, close the edit window to return control to the JShell session. The following example shows the command and the feedback provided when the edit window is closed. The <code>/list</code> command is used to show that the pass score was changed to <code>85</code>.</p>
+<pre><code>jshell&gt; /edit grade
+|  modified method grade(int)
+jshell&gt; /list grade
+
+   6 : String grade(int testScore) {
+           if (testScore &gt;= 85) {
+               return &quot;Pass&quot;;
+           }
+           return &quot;Fail&quot;;
+       }</code></pre>
+<h2 id="example-of-creating-a-custom-feedback-mode">Example of Creating a Custom Feedback Mode</h2>
+<p>The feedback mode determines the prompt that's displayed, the feedback messages that are provided as snippets are entered, and the maximum length of a displayed value. Predefined feedback modes are provided. Commands for creating custom feedback modes are also provided.</p>
+<p>Use the <code>/set mode</code> command to create a new feedback mode. In the following example, the new mode <code>mymode</code>, is based on the predefined feedback mode, <code>normal</code>, and verifying command feedback is displayed:</p>
+<pre><code>jshell&gt; /set mode mymode normal -command
+|  Created new feedback mode: mymode</code></pre>
+<p>Because the new mode is based on the <code>normal</code> mode, the prompts are the same. The following example shows how to see what prompts are used and then changes the prompts to custom strings. The first string represents the standard JShell prompt. The second string represents the prompt for additional lines in multiline snippets.</p>
+<pre><code>jshell&gt; /set prompt mymode
+|  /set prompt mymode &quot;\njshell&gt; &quot; &quot;   ...&gt; &quot;
+
+jshell&gt; /set prompt mymode &quot;\nprompt$ &quot; &quot;   continue$ &quot;</code></pre>
+<p>The maximum length of a displayed value is controlled by the truncation setting. Different types of values can have different lengths. The following example sets an overall truncation value of 72, and a truncation value of 500 for variable value expressions:</p>
+<pre><code>jshell&gt; /set truncation mymode 72
+
+jshell&gt; /set truncation mymode 500 varvalue</code></pre>
+<p>The feedback displayed after snippets are entered is controlled by the format setting and is based on the type of snippet entered and the action taken for that snippet. In the predefined mode <code>normal</code>, the string <code>created</code> is displayed when a method is created. The following example shows how to change that string to <code>defined</code>:</p>
+<pre><code>jshell&gt; /set format mymode action &quot;defined&quot; added-primary</code></pre>
+<p>Use the <code>/set feedback</code> command to start using the feedback mode that was just created. The following example shows the custom mode in use:</p>
+<pre><code>jshell&gt; /set feedback mymode
+|  Feedback mode: mymode
+
+prompt$ int square (int num1){
+   continue$ return num1*num1;
+   continue$ }
+|  defined method square(int)
+
+prompt$</code></pre>
+</body>
+</html>

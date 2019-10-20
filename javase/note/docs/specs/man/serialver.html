@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The serialver Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The serialver Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>serialver - return the <code>serialVersionUID</code> for one or more classes in a form suitable for copying into an evolving class</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>serialver</code> [<em>options</em>] [<em>classnames</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents the command-line options for the <code>serialver</code> command. See <a href="#options-for-serialver">Options for serialver</a>.
+</dd>
+<dt><em>classnames</em></dt>
+<dd>The classes for which <code>serialVersionUID</code> is to be returned.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>serialver</code> command returns the <code>serialVersionUID</code> for one or more classes in a form suitable for copying into an evolving class. When called with no arguments, the <code>serialver</code> command prints a usage line.</p>
+<h2 id="options-for-serialver">Options for serialver</h2>
+<dl>
+<dt><code>-classpath</code> <em>path-files</em></dt>
+<dd>Sets the search path for application classes and resources. Separate classes and resources with a colon (:).
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd>Passes the specified <em>option</em> to the Java Virtual Machine, where <em>option</em> is one of the options described on the reference page for the Java application launcher. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB.
+</dd>
+</dl>
+<h2 id="notes">Notes</h2>
+<p>The <code>serialver</code> command loads and initializes the specified classes in its virtual machine, and by default, it doesn't set a security manager. If the <code>serialver</code> command is to be run with untrusted classes, then a security manager can be set with the following option:</p>
+<blockquote>
+<p><code>-J-Djava.security.manager</code></p>
+</blockquote>
+<p>When necessary, a security policy can be specified with the following option:</p>
+<blockquote>
+<p><code>-J-Djava.security.policy=</code><em>policy_file</em></p>
+</blockquote>
+</body>
+</html>

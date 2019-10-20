@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Native Interface Specification: Contents</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | PREV | <a href="intro.html">NEXT</a>
+<h1 id="java-native-interface-specification-contents">Java Native Interface Specification Contents</h1>
+<ul>
+<li><a href="intro.html">1. Introduction</a>
+<ul>
+<li><a href="intro.html#java-native-interface-overview">Java Native Interface Overview</a></li>
+<li><a href="intro.html#historical-background">Historical Background</a>
+<ul>
+<li><a href="intro.html#jdk-1.0-native-method-interface">JDK 1.0 Native Method Interface</a></li>
+<li><a href="intro.html#java-runtime-interface">Java Runtime Interface</a></li>
+<li><a href="intro.html#raw-native-interface-and-javacom-interface">Raw Native Interface and Java/COM Interface</a></li>
+</ul></li>
+<li><a href="intro.html#objectives">Objectives</a></li>
+<li><a href="intro.html#java-native-interface-approach">Java Native Interface Approach</a></li>
+<li><a href="intro.html#programming-to-the-jni">Programming to the JNI</a></li>
+</ul></li>
+<li><a href="design.html">2. Design Overview</a>
+<ul>
+<li><a href="design.html#jni-interface-functions-and-pointers">JNI Interface Functions and Pointers</a></li>
+<li><a href="design.html#compiling-loading-and-linking-native-methods">Compiling, Loading and Linking Native Methods</a>
+<ul>
+<li><a href="design.html#resolving-native-method-names">Resolving Native Method Names</a></li>
+<li><a href="design.html#native-method-arguments">Native Method Arguments</a></li>
+</ul></li>
+<li><a href="design.html#referencing-java-objects">Referencing Java Objects</a>
+<ul>
+<li><a href="design.html#global-and-local-references">Global and Local References</a></li>
+<li><a href="design.html#implementing-local-references">Implementing Local References</a></li>
+</ul></li>
+<li><a href="design.html#accessing-java-objects">Accessing Java Objects</a>
+<ul>
+<li><a href="design.html#accessing-primitive-arrays">Accessing Primitive Arrays</a></li>
+<li><a href="design.html#accessing-fields-and-methods">Accessing Fields and Methods</a></li>
+</ul></li>
+<li><a href="design.html#reporting-programming-errors">Reporting Programming Errors</a></li>
+<li><a href="design.html#java-exceptions">Java Exceptions</a>
+<ul>
+<li><a href="design.html#exceptions-and-error-codes">Exceptions and Error Codes</a></li>
+<li><a href="design.html#asynchronous-exceptions">Asynchronous Exceptions</a></li>
+<li><a href="design.html#exception-handling">Exception Handling</a></li>
+</ul></li>
+</ul></li>
+<li><a href="types.html">3. JNI Types and Data Structures</a>
+<ul>
+<li><a href="types.html#primitive-types">Primitive Types</a></li>
+<li><a href="types.html#reference-types">Reference Types</a></li>
+<li><a href="types.html#field-and-method-ids">Field and Method IDs</a></li>
+<li><a href="types.html#the-value-type">The Value Type</a></li>
+<li><a href="types.html#type-signatures">Type Signatures</a></li>
+<li><a href="types.html#modified-utf-8-strings">Modified UTF-8 Strings</a></li>
+</ul></li>
+<li><a href="functions.html">4. JNI Functions</a>
+<ul>
+<li><a href="functions.html#interface-function-table">Interface Function Table</a></li>
+<li><a href="functions.html#constants">Constants</a>
+<ul>
+<li><a href="functions.html#boolean-values">Boolean values</a></li>
+<li><a href="functions.html#return-codes">Return codes</a></li>
+</ul></li>
+<li><a href="functions.html#version-information">Version Information</a>
+<ul>
+<li><a href="functions.html#getversion">GetVersion</a></li>
+<li><a href="functions.html#version-constants">Version Constants</a></li>
+</ul></li>
+<li><a href="functions.html#class-operations">Class Operations</a>
+<ul>
+<li><a href="functions.html#defineclass">DefineClass</a></li>
+<li><a href="functions.html#findclass">FindClass</a></li>
+<li><a href="functions.html#getsuperclass">GetSuperclass</a></li>
+<li><a href="functions.html#isassignablefrom">IsAssignableFrom</a></li>
+</ul></li>
+<li><a href="functions.html#module-operations">Module Operations</a>
+<ul>
+<li><a href="functions.html#getmodule">GetModule</a></li>
+</ul></li>
+<li><a href="functions.html#exceptions">Exceptions</a>
+<ul>
+<li><a href="functions.html#throw">Throw</a></li>
+<li><a href="functions.html#thrownew">ThrowNew</a></li>
+<li><a href="functions.html#exceptionoccurred">ExceptionOccurred</a></li>
+<li><a href="functions.html#exceptiondescribe">ExceptionDescribe</a></li>
+<li><a href="functions.html#exceptionclear">ExceptionClear</a></li>
+<li><a href="functions.html#fatalerror">FatalError</a></li>
+<li><a href="functions.html#exceptioncheck">ExceptionCheck</a></li>
+</ul></li>
+<li><a href="functions.html#global-and-local-references">Global and Local References</a>
+<ul>
+<li><a href="functions.html#global-references">Global References</a></li>
+<li><a href="functions.html#newglobalref">NewGlobalRef</a></li>
+<li><a href="functions.html#deleteglobalref">DeleteGlobalRef</a></li>
+<li><a href="functions.html#local-references">Local References</a></li>
+<li><a href="functions.html#deletelocalref">DeleteLocalRef</a></li>
+<li><a href="functions.html#ensurelocalcapacity">EnsureLocalCapacity</a></li>
+<li><a href="functions.html#pushlocalframe">PushLocalFrame</a></li>
+<li><a href="functions.html#poplocalframe">PopLocalFrame</a></li>
+<li><a href="functions.html#newlocalref">NewLocalRef</a></li>
+</ul></li>
+<li><a href="functions.html#weak-global-references">Weak Global References</a>
+<ul>
+<li><a href="functions.html#newweakglobalref">NewWeakGlobalRef</a></li>
+<li><a href="functions.html#deleteweakglobalref">DeleteWeakGlobalRef</a></li>
+</ul></li>
+<li><a href="functions.html#object-operations">Object Operations</a>
+<ul>
+<li><a href="functions.html#allocobject">AllocObject</a></li>
+<li><a href="functions.html#newobject-newobjecta-newobjectv">NewObject, NewObjectA, NewObjectV</a></li>
+<li><a href="functions.html#getobjectclass">GetObjectClass</a></li>
+<li><a href="functions.html#getobjectreftype">GetObjectRefType</a></li>
+<li><a href="functions.html#isinstanceof">IsInstanceOf</a></li>
+<li><a href="functions.html#issameobject">IsSameObject</a></li>
+</ul></li>
+<li><a href="functions.html#accessing-fields-of-objects">Accessing Fields of Objects</a>
+<ul>
+<li><a href="functions.html#getfieldid">GetFieldID</a></li>
+<li><a href="functions.html#gettypefield-routines">Get&lt;type&gt;Field Routines</a></li>
+<li><a href="functions.html#settypefield-routines">Set&lt;type&gt;Field Routines</a></li>
+</ul></li>
+<li><a href="functions.html#calling-instance-methods">Calling Instance Methods</a>
+<ul>
+<li><a href="functions.html#getmethodid">GetMethodID</a></li>
+<li><a href="functions.html#calltypemethod-routines-calltypemethoda-routines-calltypemethodv-routines">Call&lt;type&gt;Method Routines, Call&lt;type&gt;MethodA Routines, Call&lt;type&gt;MethodV Routines</a></li>
+<li><a href="functions.html#callnonvirtualtypemethod-routines-callnonvirtualtypemethoda-routines-callnonvirtualtypemethodv-routines">CallNonvirtual&lt;type&gt;Method Routines, CallNonvirtual&lt;type&gt;MethodA Routines, CallNonvirtual&lt;type&gt;MethodV Routines</a></li>
+</ul></li>
+<li><a href="functions.html#accessing-static-fields">Accessing Static Fields</a>
+<ul>
+<li><a href="functions.html#getstaticfieldid">GetStaticFieldID</a></li>
+<li><a href="functions.html#getstatictypefield-routines">GetStatic&lt;type&gt;Field Routines</a></li>
+<li><a href="functions.html#setstatictypefield-routines">SetStatic&lt;type&gt;Field Routines</a></li>
+</ul></li>
+<li><a href="functions.html#calling-static-methods">Calling Static Methods</a>
+<ul>
+<li><a href="functions.html#getstaticmethodid">GetStaticMethodID</a></li>
+<li><a href="functions.html#callstatictypemethod-routines-callstatictypemethoda-routines-callstatictypemethodv-routines">CallStatic&lt;type&gt;Method Routines, CallStatic&lt;type&gt;MethodA Routines, CallStatic&lt;type&gt;MethodV Routines</a></li>
+</ul></li>
+<li><a href="functions.html#string-operations">String Operations</a>
+<ul>
+<li><a href="functions.html#newstring">NewString</a></li>
+<li><a href="functions.html#getstringlength">GetStringLength</a></li>
+<li><a href="functions.html#getstringchars">GetStringChars</a></li>
+<li><a href="functions.html#releasestringchars">ReleaseStringChars</a></li>
+<li><a href="functions.html#newstringutf">NewStringUTF</a></li>
+<li><a href="functions.html#getstringutflength">GetStringUTFLength</a></li>
+<li><a href="functions.html#getstringutfchars">GetStringUTFChars</a></li>
+<li><a href="functions.html#releasestringutfchars">ReleaseStringUTFChars</a></li>
+<li><a href="functions.html#getstringregion">GetStringRegion</a></li>
+<li><a href="functions.html#getstringutfregion">GetStringUTFRegion</a></li>
+<li><a href="functions.html#getstringcritical-releasestringcritical">GetStringCritical, ReleaseStringCritical</a></li>
+</ul></li>
+<li><a href="functions.html#array-operations">Array Operations</a>
+<ul>
+<li><a href="functions.html#getarraylength">GetArrayLength</a></li>
+<li><a href="functions.html#newobjectarray">NewObjectArray</a></li>
+<li><a href="functions.html#getobjectarrayelement">GetObjectArrayElement</a></li>
+<li><a href="functions.html#setobjectarrayelement">SetObjectArrayElement</a></li>
+<li><a href="functions.html#newprimitivetypearray-routines">New&lt;PrimitiveType&gt;Array Routines</a></li>
+<li><a href="functions.html#getprimitivetypearrayelements-routines">Get&lt;PrimitiveType&gt;ArrayElements Routines</a></li>
+<li><a href="functions.html#releaseprimitivetypearrayelements-routines">Release&lt;PrimitiveType&gt;ArrayElements Routines</a></li>
+<li><a href="functions.html#getprimitivetypearrayregion-routines">Get&lt;PrimitiveType&gt;ArrayRegion Routines</a></li>
+<li><a href="functions.html#setprimitivetypearrayregion-routines">Set&lt;PrimitiveType&gt;ArrayRegion Routines</a></li>
+<li><a href="functions.html#getprimitivearraycritical-releaseprimitivearraycritical">GetPrimitiveArrayCritical, ReleasePrimitiveArrayCritical</a></li>
+</ul></li>
+<li><a href="functions.html#registering-native-methods">Registering Native Methods</a>
+<ul>
+<li><a href="functions.html#registernatives">RegisterNatives</a></li>
+<li><a href="functions.html#unregisternatives">UnregisterNatives</a></li>
+</ul></li>
+<li><a href="functions.html#monitor-operations">Monitor Operations</a>
+<ul>
+<li><a href="functions.html#monitorenter">MonitorEnter</a></li>
+<li><a href="functions.html#monitorexit">MonitorExit</a></li>
+</ul></li>
+<li><a href="functions.html#nio-support">NIO Support</a>
+<ul>
+<li><a href="functions.html#newdirectbytebuffer">NewDirectByteBuffer</a></li>
+<li><a href="functions.html#getdirectbufferaddress">GetDirectBufferAddress</a></li>
+<li><a href="functions.html#getdirectbuffercapacity">GetDirectBufferCapacity</a></li>
+</ul></li>
+<li><a href="functions.html#reflection-support">Reflection Support</a>
+<ul>
+<li><a href="functions.html#fromreflectedmethod">FromReflectedMethod</a></li>
+<li><a href="functions.html#fromreflectedfield">FromReflectedField</a></li>
+<li><a href="functions.html#toreflectedmethod">ToReflectedMethod</a></li>
+<li><a href="functions.html#toreflectedfield">ToReflectedField</a></li>
+</ul></li>
+<li><a href="functions.html#java-vm-interface">Java VM Interface</a>
+<ul>
+<li><a href="functions.html#getjavavm">GetJavaVM</a></li>
+</ul></li>
+</ul></li>
+<li><a href="invocation.html">5. The Invocation API</a>
+<ul>
+<li><a href="invocation.html#overview">Overview</a>
+<ul>
+<li><a href="invocation.html#creating-the-vm">Creating the VM</a></li>
+<li><a href="invocation.html#attaching-to-the-vm">Attaching to the VM</a></li>
+<li><a href="invocation.html#detaching-from-the-vm">Detaching from the VM</a></li>
+<li><a href="invocation.html#unloading-the-vm">Unloading the VM</a></li>
+</ul></li>
+<li><a href="invocation.html#library-and-version-management">Library and Version Management</a>
+<ul>
+<li><a href="invocation.html#support-for-statically-linked-libraries">Support for Statically Linked Libraries</a></li>
+<li><a href="invocation.html#library-lifecycle-function-hooks">Library Lifecycle Function Hooks</a></li>
+<li><a href="invocation.html#jni_onload">JNI_OnLoad</a></li>
+<li><a href="invocation.html#jni_onunload">JNI_OnUnload</a></li>
+<li><a href="invocation.html#jni_onload_l">JNI_OnLoad_L</a></li>
+<li><a href="invocation.html#jni_onunload_l">JNI_OnUnload_L</a></li>
+</ul></li>
+<li><a href="invocation.html#invocation-api-functions">Invocation API Functions</a>
+<ul>
+<li><a href="invocation.html#jni_getdefaultjavavminitargs">JNI_GetDefaultJavaVMInitArgs</a></li>
+<li><a href="invocation.html#jni_getcreatedjavavms">JNI_GetCreatedJavaVMs</a></li>
+<li><a href="invocation.html#jni_createjavavm">JNI_CreateJavaVM</a></li>
+<li><a href="invocation.html#destroyjavavm">DestroyJavaVM</a></li>
+<li><a href="invocation.html#attachcurrentthread">AttachCurrentThread</a></li>
+<li><a href="invocation.html#attachcurrentthreadasdaemon">AttachCurrentThreadAsDaemon</a></li>
+<li><a href="invocation.html#detachcurrentthread">DetachCurrentThread</a></li>
+<li><a href="invocation.html#getenv">GetEnv</a></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1993, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | PREV | <a href="intro.html">NEXT</a>
+</body>
+</html>

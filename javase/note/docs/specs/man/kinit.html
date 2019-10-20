@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The kinit Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The kinit Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>kinit - obtain and cache Kerberos ticket-granting tickets</p>
+<h2 id="synopsis">Synopsis</h2>
+<p>Initial ticket request:</p>
+<p><code>kinit</code> [<code>-A</code>] [<code>-f</code>] [<code>-p</code>] [<code>-c</code> <em>cache_name</em>] [<code>-l</code> <em>lifetime</em>] [<code>-r</code> <em>renewable_time</em>] [[<code>-k</code> [<code>-t</code> <em>keytab_file_name</em>]] [<em>principal</em>] [<em>password</em>]</p>
+<p>Renew a ticket:</p>
+<p><code>kinit</code> <code>-R</code> [<code>-c</code> <em>cache_name</em>] [<em>principal</em>]</p>
+<h2 id="description">Description</h2>
+<p>This tool is similar in functionality to the <code>kinit</code> tool that is commonly found in other Kerberos implementations, such as SEAM and MIT Reference implementations. The user must be registered as a principal with the Key Distribution Center (KDC) prior to running <code>kinit</code>.</p>
+<p>By default, on Windows, a cache file named <em>USER_HOME</em><code>\krb5cc_</code><em>USER_NAME</em> is generated.</p>
+<p>The identifier <em>USER_HOME</em> is obtained from the <code>java.lang.System</code> property <code>user.home</code>. <em>USER_NAME</em> is obtained from the <code>java.lang.System</code> property <code>user.name</code>. If <em>USER_HOME</em> is null, the cache file is stored in the current directory from which the program is running. <em>USER_NAME</em> is the operating system's login user name. This user name could be different than the user's principal name. For example, on Windows, the cache file could be <code>C:\Windows\Users\duke\krb5cc_duke</code>, in which <code>duke</code> is the <em>USER_NAME</em> and <code>C:\Windows\Users\duke</code> is the <em>USER_HOME</em>.</p>
+<p>By default, the keytab name is retrieved from the Kerberos configuration file. If the keytab name isn't specified in the Kerberos configuration file, the kinit tool assumes that the name is <em>USER_HOME</em><code>\krb5.keytab</code></p>
+<p>If you don't specify the password using the <em>password</em> option on the command line, the <code>kinit</code> tool prompts you for the password.</p>
+<p><strong>Note:</strong></p>
+<p>The <code>password</code> option is provided only for testing purposes. Don't specify your password in a script or provide your password on the command line. Doing so will compromise your password.</p>
+<h2 id="commands">Commands</h2>
+<p>You can specify one of the following commands. After the command, specify the options for it.</p>
+<dl>
+<dt><code>-A</code></dt>
+<dd>Doesn't include addresses.
+</dd>
+<dt><code>-f</code></dt>
+<dd>Issues a forwardable ticket.
+</dd>
+<dt><code>-p</code></dt>
+<dd>Issues a proxiable ticket.
+</dd>
+<dt><code>-c</code> <em>cache_name</em></dt>
+<dd>The cache name (for example, <code>FILE:D:\temp\mykrb5cc</code>).
+</dd>
+<dt><code>-l</code> <em>lifetime</em></dt>
+<dd>Sets the lifetime of a ticket.
+</dd>
+<dt><code>-r</code> <em>renewable_time</em></dt>
+<dd>Sets the total lifetime that a ticket can be renewed.
+</dd>
+<dt><code>-R</code></dt>
+<dd>Renews a ticket.
+</dd>
+<dt><code>-k</code></dt>
+<dd>Uses keytab
+</dd>
+<dt><code>-t</code> <em>keytab_filename</em></dt>
+<dd>The keytab name (for example, <code>D:\winnt\profiles\duke\krb5.keytab</code>).
+</dd>
+<dt><em>principal</em></dt>
+<dd>The principal name (for example, <code>duke@example.com</code>).
+</dd>
+<dt><em>password</em></dt>
+<dd>The <em>principal</em>'s Kerberos password. <strong>Don't specify this on the command line or in a script.</strong>
+</dd>
+<dt><code>-help</code></dt>
+<dd>Displays instructions.
+</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>Requests credentials valid for authentication from the current client host, for the default services, storing the credentials cache in the default location (<code>C:\Windows\Users\duke\krb5cc_duke</code>):</p>
+<blockquote>
+<p><code>kinit duke@example.com</code></p>
+</blockquote>
+<p>Requests proxiable credentials for a different principal and store these credentials in a specified file cache:</p>
+<blockquote>
+<p><code>kinit -p -c FILE:C:\Windows\Users\duke\credentials\krb5cc_cafebeef cafebeef@example.com</code></p>
+</blockquote>
+<p>Requests proxiable and forwardable credentials for a different principal and stores these credentials in a specified file cache:</p>
+<blockquote>
+<p><code>kinit -f -p -c FILE:C:\Windows\Users\duke\credentials\krb5cc_cafebeef cafebeef@example.com</code></p>
+</blockquote>
+<p>Displays the help menu for the <code>kinit</code> tool:</p>
+<blockquote>
+<p><code>kinit -help</code></p>
+</blockquote>
+</body>
+</html>

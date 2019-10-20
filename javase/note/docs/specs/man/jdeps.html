@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jdeps Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jdeps Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jdeps - launch the Java class dependency analyzer</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>jdeps</code> [<em>options</em>] <em>path</em> ...</p>
+<dl>
+<dt><em>options</em></dt>
+<dd><p>Command-line options. For detailed descriptions of the options that can be used, see</p>
+<ul>
+<li><p><a href="#possible-options">Possible Options</a></p></li>
+<li><p><a href="#module-dependence-analysis-options">Module Dependence Analysis Options</a></p></li>
+<li><p><a href="#options-to-filter-dependences">Options to Filter Dependences</a></p></li>
+<li><p><a href="#options-to-filter-classes-to-be-analyzed">Options to Filter Classes to be Analyzed</a></p></li>
+</ul>
+</dd>
+<dt><em>path</em></dt>
+<dd>A pathname to the <code>.class</code> file, directory, or JAR file to analyze.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jdeps</code> command shows the package-level or class-level dependencies of Java class files. The input class can be a path name to a <code>.class</code> file, a directory, a JAR file, or it can be a fully qualified class name to analyze all class files. The options determine the output. By default, the <code>jdeps</code> command writes the dependencies to the system output. The command can generate the dependencies in DOT language (see the <code>-dotoutput</code> option).</p>
+<h2 id="possible-options">Possible Options</h2>
+<dl>
+<dt><code>-dotoutput</code> <em>dir</em> or <code>--dot-output</code> <em>dir</em></dt>
+<dd>Specifies the destination directory for DOT file output. If this option is specified, then the <code>jdeps</code>command generates one <code>.dot</code> file for each analyzed archive named <code>archive-file-name.dot</code> that lists the dependencies, and also a summary file named <code>summary.dot</code> that lists the dependencies among the archive files.
+</dd>
+<dt><code>-s</code> or <code>-summary</code></dt>
+<dd>Prints a dependency summary only.
+</dd>
+<dt><code>-v</code> or <code>-verbose</code></dt>
+<dd><p>Prints all class-level dependencies. This is equivalent to</p>
+<blockquote>
+<p><code>-verbose:class -filter:none</code></p>
+</blockquote>
+</dd>
+<dt><code>-verbose:package</code></dt>
+<dd>Prints package-level dependencies excluding, by default, dependences within the same package.
+</dd>
+<dt><code>-verbose:class</code></dt>
+<dd>Prints class-level dependencies excluding, by default, dependencies within the same archive.
+</dd>
+<dt><code>-apionly</code> or <code>--api-only</code></dt>
+<dd>Restricts the analysis to APIs, for example, dependences from the signature of <code>public</code> and <code>protected</code> members of public classes including field type, method parameter types, returned type, and checked exception types.
+</dd>
+<dt><code>-jdkinternals</code> or <code>--jdk-internals</code></dt>
+<dd><p>Finds class-level dependences in the JDK internal APIs. By default, this option analyzes all classes specified in the <code>--classpath</code> option and input files unless you specified the <code>-include</code> option. You can't use this option with the <code>-p</code>, <code>-e</code>, and <code>-s</code> options.</p>
+<p><strong>Warning</strong>: The JDK internal APIs are inaccessible.</p>
+</dd>
+<dt><code>-cp</code> <em>path</em>, <code>-classpath</code> <em>path</em>, or <code>--class-path</code> <em>path</em></dt>
+<dd>Specifies where to find class files.
+</dd>
+<dt><code>--module-path</code> <em>module-path</em></dt>
+<dd>Specifies the module path.
+</dd>
+<dt><code>--upgrade-module-path</code> <em>module-path</em></dt>
+<dd>Specifies the upgrade module path.
+</dd>
+<dt><code>--system</code> <em>java-home</em></dt>
+<dd>Specifies an alternate system module path.
+</dd>
+<dt><code>--add-modules</code> <em>module-name</em>[<code>,</code> <em>module-name</em>...]</dt>
+<dd>Adds modules to the root set for analysis.
+</dd>
+<dt><code>--multi-release</code> <em>version</em></dt>
+<dd>Specifies the version when processing multi-release JAR files. <em>version</em> should be an integer &gt;=9 or base.
+</dd>
+<dt><code>-q</code> or <code>-quiet</code></dt>
+<dd>Doesn't show missing dependencies from <code>-generate-module-info</code> output.
+</dd>
+<dt><code>-version</code> or <code>--version</code></dt>
+<dd>Prints version information.
+</dd>
+</dl>
+<h2 id="module-dependence-analysis-options">Module Dependence Analysis Options</h2>
+<dl>
+<dt><code>-m</code> <em>module-name</em> or <code>--module</code> <em>module-name</em></dt>
+<dd>Specifies the root module for analysis.
+</dd>
+<dt><code>--generate-module-info</code> <em>dir</em></dt>
+<dd>Generates <code>module-info.java</code> under the specified directory. The specified JAR files will be analyzed. This option cannot be used with <code>--dot-output</code> or <code>--class-path</code> options. Use the <code>--generate-open-module</code> option for open modules.
+</dd>
+<dt><code>--generate-open-module</code> <em>dir</em></dt>
+<dd>Generates <code>module-info.java</code> for the specified JAR files under the specified directory as open modules. This option cannot be used with the <code>--dot-output</code> or <code>--class-path</code> options.
+</dd>
+<dt><code>--check</code> <em>module-name</em> [<code>,</code> <em>module-name</em>...]</dt>
+<dd>Analyzes the dependence of the specified modules. It prints the module descriptor, the resulting module dependences after analysis and the graph after transition reduction. It also identifies any unused qualified exports.
+</dd>
+<dt><code>--list-deps</code></dt>
+<dd>Lists the module dependences and also the package names of JDK internal APIs (if referenced). This option transitively analyzes libraries on class path and module path if referenced. Use <code>--no-recursive</code> option for non-transitive dependency analysis.
+</dd>
+<dt><code>--list-reduced-deps</code></dt>
+<dd>Same as <code>--list-deps</code> without listing the implied reads edges from the module graph. If module M1 reads M2, and M2 requires transitive on M3, then M1 reading M3 is implied and is not shown in the graph.
+</dd>
+<dt><code>--print-module-deps</code></dt>
+<dd>Same as <code>--list-reduced-deps</code> with printing a comma-separated list of module dependences. The output can be used by <code>jlink --add-modules</code> to create a custom image that contains those modules and their transitive dependences.
+</dd>
+<dt><code>--ignore-missing-deps</code></dt>
+<dd>Ignore missing dependences.
+</dd>
+</dl>
+<h2 id="options-to-filter-dependences">Options to Filter Dependences</h2>
+<dl>
+<dt><code>-p</code> <em>pkg_name</em>, <code>-package</code> <em>pkg_name</em>, or <code>--package</code> <em>pkg_name</em></dt>
+<dd>Finds dependences matching the specified package name. You can specify this option multiple times for different packages. The <code>-p</code> and <code>-e</code> options are mutually exclusive.
+</dd>
+<dt><code>-e</code> <em>regex</em>, <code>-regex</code> <em>regex</em>, or <code>--regex</code> <em>regex</em></dt>
+<dd>Finds dependences matching the specified pattern. The <code>-p</code> and <code>-e</code> options are mutually exclusive.
+</dd>
+<dt><code>--require</code> <em>module-name</em></dt>
+<dd>Finds dependences matching the given module name (may be given multiple times). The <code>--package</code>, <code>--regex</code>, and <code>--require</code> options are mutually exclusive.
+</dd>
+<dt><code>-f</code> <em>regex</em> or <code>-filter</code> <em>regex</em></dt>
+<dd>Filters dependences matching the given pattern. If give multiple times, the last one will be selected.
+</dd>
+<dt><code>-filter:package</code></dt>
+<dd>Filters dependences within the same package. This is the default.
+</dd>
+<dt><code>-filter:archive</code></dt>
+<dd>Filters dependences within the same archive.
+</dd>
+<dt><code>-filter:module</code></dt>
+<dd>Filters dependences within the same module.
+</dd>
+<dt><code>-filter:none</code></dt>
+<dd>No <code>-filter:package</code> and <code>-filter:archive</code> filtering. Filtering specified via the <code>-filter</code> option still applies.
+</dd>
+<dt><code>--missing-deps</code></dt>
+<dd>Finds missing dependences. This option cannot be used with <code>-p</code>, <code>-e</code> and <code>-s</code> options.
+</dd>
+</dl>
+<h2 id="options-to-filter-classes-to-be-analyzed">Options to Filter Classes to be Analyzed</h2>
+<dl>
+<dt><code>-include</code> <em>regex</em></dt>
+<dd>Restricts analysis to the classes matching pattern. This option filters the list of classes to be analyzed. It can be used together with <code>-p</code> and <code>-e</code>, which apply the pattern to the dependencies.
+</dd>
+<dt><code>-P</code> or <code>-profile</code></dt>
+<dd>Shows the profile containing a package.
+</dd>
+<dt><code>-R</code> or <code>-recursive</code></dt>
+<dd>Recursively traverses all run-time dependences. The <code>-R</code> option implies <code>-filter:none</code>. If <code>-p</code>, <code>-e</code>, or <code>-f</code> options are specified, only the matching dependences are analyzed.
+</dd>
+<dt><code>--no-recursive</code></dt>
+<dd>Do not recursively traverse dependences.
+</dd>
+<dt><code>-I</code> or <code>-inverse</code></dt>
+<dd>Analyzes the dependences per other given options and then finds all artifacts that directly and indirectly depend on the matching nodes. This is equivalent to the inverse of the compile-time view analysis and the print dependency summary. This option must be used with the <code>--require</code>, <code>--package</code>, or <code>--regex</code> options.
+</dd>
+<dt><code>--compile-time</code></dt>
+<dd>Analyzes the compile-time view of transitive dependencies, such as the compile-time view of the <code>-R</code> option. Analyzes the dependences per other specified options. If a dependency is found from a directory, a JAR file or a module, all classes in that containing archive are analyzed.
+</dd>
+</dl>
+<h2 id="example-of-analyzing-dependencies">Example of Analyzing Dependencies</h2>
+<p>The following example demonstrates analyzing the dependencies of the <code>Notepad.jar</code> file.</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<pre><code>$ jdeps demo/jfc/Notepad/Notepad.jar
+Notepad.jar -&gt; java.base
+Notepad.jar -&gt; java.desktop
+Notepad.jar -&gt; java.logging
+   &lt;unnamed&gt; (Notepad.jar)
+      -&gt; java.awt
+      -&gt; java.awt.event
+      -&gt; java.beans
+      -&gt; java.io
+      -&gt; java.lang
+      -&gt; java.net
+      -&gt; java.util
+      -&gt; java.util.logging
+      -&gt; javax.swing
+      -&gt; javax.swing.border
+      -&gt; javax.swing.event
+      -&gt; javax.swing.text
+      -&gt; javax.swing.tree
+      -&gt; javax.swing.undo</code></pre>
+<p><strong>Windows:</strong></p>
+<pre><code>C:\Java\jdk1.9.0&gt;jdeps demo\jfc\Notepad\Notepad.jar
+Notepad.jar -&gt; java.base
+Notepad.jar -&gt; java.desktop
+Notepad.jar -&gt; java.logging
+   &lt;unnamed&gt; (Notepad.jar)
+      -&gt; java.awt
+      -&gt; java.awt.event
+      -&gt; java.beans
+      -&gt; java.io
+      -&gt; java.lang
+      -&gt; java.net
+      -&gt; java.util
+      -&gt; java.util.logging
+      -&gt; javax.swing
+      -&gt; javax.swing.border
+      -&gt; javax.swing.event
+      -&gt; javax.swing.text
+      -&gt; javax.swing.tree
+      -&gt; javax.swing.undo</code></pre>
+<h2 id="example-using-the---inverse-option">Example Using the --inverse Option</h2>
+<pre><code> $ jdeps --inverse --require java.xml.bind
+Inverse transitive dependences on [java.xml.bind]
+java.xml.bind &lt;- java.se.ee
+java.xml.bind &lt;- jdk.xml.ws
+java.xml.bind &lt;- java.xml.ws &lt;- java.se.ee
+java.xml.bind &lt;- java.xml.ws &lt;- jdk.xml.ws
+java.xml.bind &lt;- jdk.xml.bind &lt;- jdk.xml.ws</code></pre>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: 10 - RMI Wire Protocol</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="dgc.html">PREV</a> | <a href="exceptions.html">NEXT</a>
+<h1 id="rmi-wire-protocol">10 RMI Wire Protocol</h1>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#rmi-transport-protocol">RMI Transport Protocol</a></li>
+<li><a href="#rmis-use-of-object-serialization">RMI's Use of Object Serialization</a></li>
+<li><a href="#rmis-use-of-http-post-protocol">RMI's Use of HTTP POST Protocol</a></li>
+<li><a href="#application-specific-values-for-rmi">Application-Specific Values for RMI</a></li>
+<li><a href="#rmis-multiplexing-protocol">RMI's Multiplexing Protocol</a></li>
+</ul>
+<hr />
+<h2 id="overview">10.1 Overview</h2>
+<p>The RMI protocol makes use of two other protocols for its on-the-wire format: Java Object Serialization and HTTP. The Object Serialization protocol is used to marshal call and return data. The HTTP protocol is used to &quot;POST&quot; a remote method invocation and obtain return data when circumstances warrant. Each protocol is documented as a separate grammar. Nonterminal symbols in production rules may refer to rules governed by another protocol (either Object Serialization or HTTP). When a protocol boundary is crossed, subsequent productions use that embedded protocol.</p>
+<h3 id="notes-about-grammar-notation">Notes about Grammar Notation</h3>
+<ul>
+<li>We use a similar notation to that used in <em>The Java Language Specification</em>.</li>
+<li>Control codes in the stream are represented by literal values expressed in hexadecimal.</li>
+<li>Some nonterminal symbols in the grammar represent application specific values supplied in a method invocation. The definition of such a nonterminal consists of its Java programming language type. A table mapping each of these nonterminals to its respective type follows the grammar.</li>
+</ul>
+<h2 id="rmi-transport-protocol">10.2 RMI Transport Protocol</h2>
+<p>The wire format for RMI is represented by a <code>Stream</code>. The terminology adopted here reflects a client perspective. <code>Out</code> refers to output messages and <code>In</code> refers to input messages. The contents of the transport header are <em>not</em> formatted using object serialization.</p>
+<pre><code>Stream:
+    Out
+    In</code></pre>
+<p>The input and output streams used by RMI are paired. Each <code>Out</code> stream has a corresponding <code>In</code> stream. An <code>Out</code> stream in the grammar maps to the output stream of a socket (from the client's perspective). An <code>In</code> stream (in the grammar) is paired with the corresponding socket's input stream. Since output and input streams are paired, the only header information needed on an input stream is an acknowledgment as to whether the protocol is understood; other header information (such as the magic number and version number) can be implied by the context of stream pairing.</p>
+<h3 id="format-of-an-output-stream">10.2.1 Format of an Output Stream</h3>
+<p>An output stream in RMI consists of transport <code>Header</code> information followed by a sequence of <code>Messages</code>. Alternatively, an output stream can contain an invocation embedded in the HTTP protocol.</p>
+<pre><code>Out:
+    Header Messages
+    HttpMessage
+
+Header:
+    0x4a 0x52 0x4d 0x49 Version Protocol
+
+Version:
+    0x00 0x01
+
+Protocol:
+    StreamProtocol
+    SingleOpProtocol
+    MultiplexProtocol
+
+StreamProtocol:
+    0x4b
+
+SingleOpProtocol:
+    0x4c
+
+MultiplexProtocol:
+    0x4d
+
+Messages:
+    Message
+    Messages Message</code></pre>
+<p>The <code>Messages</code> are wrapped within a particular protocol as specified by <code>Protocol</code>. For the <code>SingleOpProtocol</code>, there may only be one <code>Message</code> after the <code>Header</code>, and there is no additional data that the <code>Message</code> is wrapped in. The <code>SingleOpProtocol</code> is used for invocation embedded in HTTP requests, where interaction beyond a single request and response is not possible.</p>
+<p>For the <code>StreamProtocol</code> and the <code>MultiplexProtocol</code>, the server must respond with a byte <code>0x4e</code> acknowledging support for the protocol, and an <code>EndpointIdentifier</code> that contains the host name and port number that the server can see is being used by the client. The client can use this information to determine its host name if it is otherwise unable to do that for security reasons. The client must then respond with another <code>EndpointIdentifier</code> that contains the client's default endpoint for accepting connections. This can be used by a server in the <code>MultiplexProtocol</code> case to identify the client.</p>
+<p>For the <code>StreamProtocol</code>, after this endpoint negotiation, the <code>Messages</code> are sent over the output stream without any additional wrapping of the data. For the <code>MultiplexProtocol</code>, the socket connection is used as the concrete connection for a multiplexed connection, as described in <a href="#rmis-multiplexing-protocol">Section 10.6, &quot;RMI's Multiplexing Protocol&quot;</a>. Virtual connections initiated over this multiplexed connection consist of a series of <code>Messages</code> as described below.</p>
+<p>There are three types of output messages: <code>Call</code>, <code>Ping</code> and <code>DgcAck</code>. A <code>Call</code> encodes a method invocation. A <code>Ping</code> is a transport-level message for testing liveness of a remote virtual machine. A <code>DgcAck</code> is an acknowledgment directed to a server's distributed garbage collector that indicates that remote objects in a return value from a server have been received by the client.</p>
+<pre><code>Message:
+    Call
+    Ping
+    DgcAck
+
+Call:
+    0x50 CallData
+
+Ping:
+    0x52
+
+DgcAck:
+    0x54 UniqueIdentifier</code></pre>
+<h3 id="format-of-an-input-stream">10.2.2 Format of an Input Stream</h3>
+<p>There are currently three types of input messages: <code>ReturnData</code>, <code>HttpReturn</code> and <code>PingAck</code>. <code>ReturnData</code> is the result of a &quot;normal&quot; RMI call. An <code>HttpReturn</code> is a return result from an invocation embedded in the HTTP protocol. A <code>PingAck</code> is the acknowledgment for a <code>Ping</code> message.</p>
+<pre><code>In:
+    ProtocolAck Returns
+    ProtocolNotSupported
+    HttpReturn
+
+ProtocolAck:
+    0x4e
+
+ProtocolNotSupported:
+    0x4f
+
+Returns:
+    Return
+    Returns Return
+
+Return:
+    ReturnData
+    PingAck
+
+ReturnData:
+    0x51 ReturnValue
+
+PingAck:
+    0x53</code></pre>
+<h2 id="rmis-use-of-object-serialization">10.3 RMI's Use of Object Serialization</h2>
+<p>Call and return data in RMI calls are formatted using the Java Object Serialization protocol. Each method invocation's <code>CallData</code> is written to a Java object output stream that contains the <code>ObjectIdentifier</code> (the target of the call), an <code>Operation</code> (a number representing the method to be invoked), a <code>Hash</code> (a number that verifies that client stub and remote object skeleton use the same stub protocol), followed by a list of zero or more <code>Arguments</code> for the call.</p>
+<p>In the JDK1.1 stub protocol the <code>Operation</code> represents the method number as assigned by <code>rmic,</code> and the <code>Hash</code> was the stub/skeleton hash which is the stub's interface hash. As of the Java 2 stub protocol (Java 2 stubs are generated using the <code>-v1.2</code> option with <code>rmic</code>), <code>Operation</code> has the value -1 and the <code>Hash</code> is a hash representing the method to call. The hash is described in the section <a href="stubs.html#the-remoteref-interface">&quot;The <code>RemoteRef</code> Interface&quot;</a>.</p>
+<pre><code>CallData:
+    ObjectIdentifier Operation Hash Arguments[opt]
+    ObjectIdentifier:
+    ObjectNumber UniqueIdentifier
+
+UniqueIdentifier:
+    Number Time Count
+
+Arguments:
+    Value
+    Arguments Value
+
+Value:
+    Object
+    Primitive</code></pre>
+<p>A <code>ReturnValue</code> of an RMI call consists of a return code to indicate either a normal or exceptional return, a <code>UniqueIdentifier</code> to tag the return value (used to send a <code>DGCAck</code> if necessary) followed by the return result: either the <code>Value</code> returned or the <code>Exception</code> thrown.</p>
+<pre><code>ReturnValue:
+    0x01 UniqueIdentifier Value[opt]
+    0x02 UniqueIdentifier Exception</code></pre>
+<p><strong>Note:</strong> <code>ObjectIdentifier</code>, <code>UniqueIdentifier,</code> and <code>EndpointIdentifier</code> are not written out using default serialization, but each uses its own special <code>write</code> method (this is not the <code>writeObject</code> method used by object serialization); the <code>write</code> method for each type of identifier adds its component data consecutively to the output stream.</p>
+<h3 id="class-annotation-and-class-loading">10.3.1 Class Annotation and Class Loading</h3>
+<p>RMI overrides the <code>annotateClass</code> and <code>resolveClass</code> methods of <code>ObjectOutputStream</code> and <code>ObjectInputStream</code> respectively. Each class is annotated with the codebase URL (the location from which the class can be loaded). In the <code>annotateClass</code> method, the classloader that loaded the class is queried for its codebase URL. If the classloader is non-<code>null</code> and the classloader has a non-<code>null</code> codebase, then the codebase is written to the stream using the <code>ObjectOutputStream.writeObject</code> method; otherwise a <code>null</code> is written to the stream using the <code>writeObject</code> method. Note: as an optimization, classes in the &quot;<code>java</code>&quot; package are not annotated, since they are always available to the receiver.</p>
+<p>The class annotation is resolved during deserialization using the <code>ObjectInputStream.resolveClass</code> method. The <code>resolveClass</code> method first reads the annotation via the <code>ObjectInputStream.readObject</code> method. If the annotation, a codebase URL, is non-<code>null</code>, then it obtains the classloader for that URL and attempts to load the class. The class is loaded by using a <code>java.net.URLConnection</code> to fetch the class bytes (the same mechanism used by a web browser's applet classloader).</p>
+<h2 id="rmis-use-of-http-post-protocol">10.4 RMI's Use of HTTP POST Protocol</h2>
+<p>The implementation of RMI calls through firewalls via proxies has been removed as of JDK 9.</p>
+<h2 id="application-specific-values-for-rmi">10.5 Application-Specific Values for RMI</h2>
+<p>This table lists the nonterminal symbols that represent application-specific values used by RMI. The table maps each symbol to its respective type. Each is formatted using the protocol in which it is embedded.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>Count</code></td>
+<td style="text-align: left;"><code>short</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Exception</code></td>
+<td style="text-align: left;"><code>java.lang.Exception</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Hash</code></td>
+<td style="text-align: left;"><code>long</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Hostname</code></td>
+<td style="text-align: left;"><code>UTF</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Number</code></td>
+<td style="text-align: left;"><code>int</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Object</code></td>
+<td style="text-align: left;"><code>java.lang.Object</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>ObjectNumber</code></td>
+<td style="text-align: left;"><code>long</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Operation</code></td>
+<td style="text-align: left;"><code>int</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>PortNumber</code></td>
+<td style="text-align: left;"><code>int</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Primitive</code></td>
+<td style="text-align: left;"><code>byte</code>, <code>int</code>, <code>short</code>, <code>long</code> ...</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Time</code></td>
+<td style="text-align: left;"><code>long</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="rmis-multiplexing-protocol">10.6 RMI's Multiplexing Protocol</h2>
+<p>The purpose of multiplexing is to provide a model where two endpoints can each open multiple full duplex connections to the other endpoint in an environment where only one of the endpoints is able to open such a bidirectional connection using some other facility (e.g., a TCP connection). RMI use this simple multiplexing protocol to allow a client to connect to an RMI server object in some situations where that is otherwise not possible. For example, some security managers for applet environments disallow the creation of server sockets to listen for incoming connections, thereby preventing such applets to export RMI objects and service remote calls from direct socket connections. If the applet <em>can</em> open a normal socket connection to its codebase host, however, then it can use the multiplexing protocol over that connection to allow the codebase host to invoke methods on RMI objects exported by the applet. This section describes how the format and rules of the multiplexing protocol.</p>
+<h3 id="definitions">10.6.1 Definitions</h3>
+<p>This sections defines some terms as they are used in the rest of the description of the protocol.</p>
+<p>An <em>endpoint</em> is one of the two users of a connection using the multiplexing protocol.</p>
+<p>The multiplexing protocol must layer on top of one existing bidirectional, reliable byte stream, presumably initiated by one of the endpoints to the other. In current RMI usage, this is always a TCP connection, made with a <code>java.net.Socket</code> object. This connection will be referred to as the <em>concrete connection</em>.</p>
+<p>The multiplexing protocol facilitates the use of <em>virtual connections</em>, which are themselves bidirectional, reliable byte streams, representing a particular session between two endpoints. The set of virtual connections between two endpoints over a single concrete connection comprises a <em>multiplexed connection</em>. Using the multiplexing protocol, virtual connections can be opened and closed by either endpoint. The state of an virtual connection with respect to a given endpoint is defined by the elements of the multiplexing protocol that are sent and received over the concrete connection. Such state involves if the connection is open or closed, the actual data that has been transmitted across, and the related flow control mechanisms. If not otherwise qualified, the term <em>connection</em> used in the remainder of this section means <em>virtual connection</em>.</p>
+<p>A virtual connections within a given multiplexed connection is identified by a 16 bit integer, known as the <em>connection identifier</em>. Thus, there exist 65,536 possible virtual connections in one multiplexed connection. The implementation may limit the number of these virtual connections that may be used simultaneously.</p>
+<h3 id="connection-state-and-flow-control">10.6.2 Connection State and Flow Control</h3>
+<p>Connections are manipulated using the various <em>operations</em> defined by the multiplexing protocol. The following are the names of the operations defined by the protocol: OPEN, CLOSE, CLOSEACK, REQUEST, and TRANSMIT. The exact format and rules for all the operations are detailed in <a href="#protocol-format">Section 10.6.3, &quot;Protocol Format&quot;</a>.</p>
+<p>The OPEN, CLOSE, and CLOSEACK operations control connections becoming opened and closed, while the REQUEST and TRANSMIT operations are used to transmit data across an open connection within the constraints of the flow control mechanism.</p>
+<h4 id="connection-states">Connection States</h4>
+<p>A virtual connection is <em>open</em> with respect to a particular endpoint if the endpoint has sent an OPEN operation for that connection, or it has received an OPEN operation for that connection (and it had not been subsequently closed). The various protocol operations are described below.</p>
+<p>A virtual connection is <em>pending close</em> with respect to a particular endpoint if the endpoint has sent a CLOSE operation for that connection, but it has not yet received a subsequent CLOSE or CLOSEACK operation for that connection.</p>
+<p>A virtual connection is <em>closed</em> with respect to a particular endpoint if it has never been opened, or if it has received a CLOSE or a CLOSEACK operation for that connection (and it has not been subsequently opened).</p>
+<h4 id="flow-control">Flow Control</h4>
+<p>The multiplexing protocol uses a simple packeting flow control mechanism to allow multiple virtual connections to exist in parallel over the same concrete connection. The high level requirement of the flow control mechanism is that the state of all virtual connections is independent; the state of one connection may not affect the behavior of others. For example, if the data buffers handling data coming in from one connection become full, this cannot prevent the transmission and processing of data for any other connection. This is necessary if the continuation of one connection is dependent on the completion of the use of another connection, such as would happen with recursive RMI calls. Therefore, the practical implication is that the implementation must always be able to consume and process all of the multiplexing protocol data ready for input on the concrete connection (assuming that it conforms to this specification).</p>
+<p>Each endpoint has two state values associated with each connection: how many bytes of data the endpoint has requested but not received (<em>input request count</em>) and how many bytes the other endpoint has requested but have not been supplied by this endpoint (<em>output request count</em>).</p>
+<p>An endpoint's output request count is increased when it receives a REQUEST operation from the other endpoint, and it is decreased when it sends a TRANSMIT operation. An endpoint's input request count is increased when it sends a REQUEST operation, and it is decreased when it receives a TRANSMIT operation. It is a protocol violation if either of these values becomes negative.</p>
+<p>It is a protocol violation for an endpoint to send a REQUEST operation that would increase its input request count to more bytes that it can currently handle without blocking. It should, however, make sure that its input request count is greater than zero if the user of the connection is waiting to read data.</p>
+<p>It is a protocol violation for an endpoint to send a TRANSMIT operation containing more bytes that its output request count. It may buffer outgoing data until the user of the connection requests that data written to the connection be explicitly flushed. If data must be sent over the connection, however, by either an explicit flush or because the implementation's output buffers are full, then the user of the connection may be blocked until sufficient TRANSMIT operations can proceed.</p>
+<p>Beyond the rules outlined above, implementations are free to send REQUEST and TRANSMIT operations as deemed appropriate. For example, an endpoint may request more data for a connection even if its input buffer is not empty.</p>
+<h3 id="protocol-format">10.6.3 Protocol Format</h3>
+<p>The byte stream format of the multiplexing protocol consists of a contiguous series of variable length records. The first byte of the record is an operation code that identifies the operation of the record and determines the format of the rest of its content. The following legal operation codes are defined:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">value</th>
+<th style="text-align: left;">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0xE1</td>
+<td style="text-align: left;">OPEN</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0xE2</td>
+<td style="text-align: left;">CLOSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0xE3</td>
+<td style="text-align: left;">CLOSEACK</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0xE4</td>
+<td style="text-align: left;">REQUEST</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0xE5</td>
+<td style="text-align: left;">TRANSMIT</td>
+</tr>
+</tbody>
+</table>
+<p>It is a protocol violation if the first byte of a record is not one of the defined operation codes. The following sections describe the format of the records for each operation code.</p>
+<h4 id="open-operation">OPEN operation</h4>
+<p>This is the format for records of the OPEN operation:</p>
+<table>
+<thead>
+<tr class="header">
+<th>size (bytes)</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: left;"><em>opcode</em></td>
+<td style="text-align: left;">operation code (OPEN)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: left;"><em>ID</em></td>
+<td style="text-align: left;">connection identifier</td>
+</tr>
+</tbody>
+</table>
+<p>An endpoint sends an OPEN operation to open the indicated connection. It is a protocol violation if <em>ID</em> refers to a connection that is currently open or pending close with respect to the sending endpoint. After the connection is opened, both input and request count states for the connection are zero for both endpoints.</p>
+<p>Receipt of an OPEN operation indicates that the other endpoint is opening the indicated connection. After the connection is opened, both input and output request count states for the connection are zero for both endpoints.</p>
+<p>To prevent identifier collisions between the two endpoints, the space of valid connection identifiers is divided in half, depending on the value of the most significant bit. Each endpoint is only allowed to open connections with a particular value for the high bit. The endpoint that initiated the concrete connection must only open connections with the high bit set in the identifier and the other endpoint must only open connections with a zero in the high bit. For example, if an RMI applet that cannot create a server socket initiates a multiplexed connection to its codebase host, the applet may open virtual connections in the identifier range 0x8000-7FFF, and the server may open virtual connection in the identifier range 0-0x7FFF.</p>
+<h4 id="close-operation">CLOSE operation</h4>
+<p>This is the format for records of the CLOSE operation:</p>
+<table>
+<thead>
+<tr class="header">
+<th>size (bytes)</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: left;"><em>opcode</em></td>
+<td style="text-align: left;">operation code (OPEN)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: left;"><em>ID</em></td>
+<td style="text-align: left;">connection identifier</td>
+</tr>
+</tbody>
+</table>
+<p>An endpoint sends a CLOSE operation to close the indicated connection. It is a protocol violation if <em>ID</em> refers to a connection that is currently closed or pending close with respect to the sending endpoint (it may be pending close with respect to the receiving endpoint if it has also sent a CLOSE operation for this connection). After sending the CLOSE, the connection becomes pending close for the sending endpoint. Thus, it may not reopen the connection until it has received a CLOSE or a CLOSEACK for it from the other endpoint.</p>
+<p>Receipt of a CLOSE operation indicates that the other endpoint has closed the indicated connection, and it thus becomes closed on the receiving endpoint. Although the receiving endpoint may not send any more operations for this connection (until it is opened again), it still should provide data in the implementation's input buffers to readers of the connection. If the connection had previously been open instead of pending close, the receiving endpoint must respond with a CLOSEACK operation for the connection.</p>
+<h4 id="closeack-operation">CLOSEACK operation</h4>
+<p>The following is the format for records with the CLOSEACK operation:</p>
+<table>
+<thead>
+<tr class="header">
+<th>size (bytes)</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: left;"><em>opcode</em></td>
+<td style="text-align: left;">operation code (OPEN)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: left;"><em>ID</em></td>
+<td style="text-align: left;">connection identifier</td>
+</tr>
+</tbody>
+</table>
+<p>An endpoint sends a CLOSEACK operation to acknowledge a CLOSE operation from the receiving endpoint. It is a protocol violation if ID refers to a connection that is not pending close for the receiving endpoint when the operation is received.</p>
+<p>Receipt of a CLOSEACK operation changes the state of the indicated connection from pending close to closed, and thus the connection may be reopened in the future.</p>
+<h4 id="request-operation">REQUEST operation</h4>
+<p>This is the format for records of the REQUEST operation:</p>
+<table>
+<thead>
+<tr class="header">
+<th>size (bytes)</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: left;"><em>opcode</em></td>
+<td style="text-align: left;">operation code (OPEN)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: left;"><em>ID</em></td>
+<td style="text-align: left;">connection identifier</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td style="text-align: left;"><em>count</em></td>
+<td style="text-align: left;">number of additional bytes requested</td>
+</tr>
+</tbody>
+</table>
+<p>An endpoint sends a REQUEST operation to increase its input request count for the indicated connection. It is a protocol violation if <em>ID</em> does not refer to a connection that is open with respect to the sending endpoint. The endpoint's input request count is incremented by the value <em>count</em>. The value of <em>count</em> is a signed 32 bit integer, and it is a protocol violation if it is negative or zero.</p>
+<p>Receipt of a REQUEST operation causes the output request count for the indicated connection to increase by <em>count</em>. If the connection is pending close by the receiving endpoint, then any REQUEST operations may be ignored.</p>
+<h4 id="transmit-operation">TRANSMIT operation</h4>
+<p>This is the format for records of the TRANSMIT operation.</p>
+<table>
+<thead>
+<tr class="header">
+<th>size (bytes)</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td style="text-align: left;"><em>opcode</em></td>
+<td style="text-align: left;">operation code (OPEN)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td style="text-align: left;"><em>ID</em></td>
+<td style="text-align: left;">connection identifier</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td style="text-align: left;"><em>count</em></td>
+<td style="text-align: left;">number of bytes in transmission</td>
+</tr>
+<tr class="even">
+<td><em>count</em></td>
+<td style="text-align: left;">data</td>
+<td style="text-align: left;">transmission data</td>
+</tr>
+</tbody>
+</table>
+<p>An endpoint sends a TRANSMIT operation to actually transmit data over the indicated connection. It is a protocol violation if ID does not refer to a connection that is open with respect to the sending endpoint. The endpoint's output request count is decremented by the value <em>count</em>. The value of <em>count</em> is a signed 32 bit integer, and it is a protocol violation if it is negative or zero. It is also a protocol violation if the TRANSMIT operation would cause the sending endpoint's output request count to become negative.</p>
+<p>Receipt of a TRANSMIT operation causes the count bytes of data to be added to the queue of bytes available for reading from the connection. The receiving endpoint's input request count is decremented by <em>count</em>. If this causes the input request count to become zero and the user of the connection is trying to read more data, the endpoint should respond with another REQUEST operation. If the connection is pending close by the receiving endpoint, then any TRANSMIT operations may be ignored.</p>
+<h4 id="protocol-violations">Protocol Violations</h4>
+<p>If a protocol violation occurs, as defined above or if a communication error is detected in the concrete connection, then the multiplexed connection is <em>shut down</em>. The real connection is terminated, and all virtual connections become closed immediately. Data already available for reading from virtual connections may be read by the users of the connections.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="dgc.html">PREV</a> | <a href="exceptions.html">NEXT</a>
+</body>
+</html>

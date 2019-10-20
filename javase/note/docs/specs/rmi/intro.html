@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Remote Method Invocation: 1 - Introduction</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="index.html">PREV</a> | <a href="objmodel.html">NEXT</a>
+<h1 id="introduction">1 Introduction</h1>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#system-goals">System Goals</a></li>
+</ul>
+<hr />
+<h2 id="background">1.1 Background</h2>
+<p>Distributed systems require that computations running in different address spaces, potentially on different hosts, be able to communicate. For a basic communication mechanism, the Java<sup>TM</sup> programming language supports sockets, which are flexible and sufficient for general communication. However, sockets require the client and server to engage in applications-level protocols to encode and decode messages for exchange, and the design of such protocols is cumbersome and can be error-prone.</p>
+<p>An alternative to sockets is Remote Procedure Call (RPC), which abstracts the communication interface to the level of a procedure call. Instead of working directly with sockets, the programmer has the illusion of calling a local procedure, when in fact the arguments of the call are packaged up and shipped off to the remote target of the call. RPC systems encode arguments and return values using an external data representation, such as XDR.</p>
+<p>RPC, however, does not translate well into distributed object systems, where communication between program-level <em>objects</em> residing in different address spaces is needed. In order to match the semantics of object invocation, distributed object systems require <em>remote method invocation</em> or RMI. In such systems, a local surrogate (stub) object manages the invocation on a remote object.</p>
+<p>The Java platform's remote method invocation system described in this specification has been specifically designed to operate in the Java application environment. The Java programming language's RMI system assumes the homogeneous environment of the Java virtual machine (JVM), and the system can therefore take advantage of the Java platform's object model whenever possible.</p>
+<h2 id="system-goals">1.2 System Goals</h2>
+<p>The goals for supporting distributed objects in the Java programming language are:</p>
+<ul>
+<li>Support seamless remote invocation on objects in different virtual machines</li>
+<li>Support callbacks from servers to applets</li>
+<li>Integrate the distributed object model into the Java programming language in a natural way while retaining most of the Java programming language's object semantics</li>
+<li>Make differences between the distributed object model and local Java platform's object model apparent</li>
+<li>Make writing reliable distributed applications as simple as possible</li>
+<li>Preserve the type-safety provided by the Java platform's runtime environment</li>
+<li>Support various reference semantics for remote objects; for example live (nonpersistent) references, persistent references, and lazy activation</li>
+<li>Maintain the safe environment of the Java platform provided by security managers and class loaders</li>
+</ul>
+<p>Underlying all these goals is a general requirement that the RMI model be both simple (easy to use) and natural (fits well in the language).</p>
+<p>The first two chapters in this specification describe the distributed object model for the Java programming language and the system overview. The remaining chapters describe the RMI client and server visible APIs which are part of the Java SE platform.</p>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 1997, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="index.html">PREV</a> | <a href="objmodel.html">NEXT</a>
+</body>
+</html>

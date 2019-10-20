@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The keytool Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The keytool Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>keytool - manage a keystore (database) of cryptographic keys, X.509 certificate chains, and trusted certificates</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>keytool</code> [<em>commands</em>]</p>
+<dl>
+<dt><em>commands</em></dt>
+<dd><p>Commands for <code>keytool</code> include the following:</p>
+<ul>
+<li><p><code>-certreq</code>: Generates a certificate request</p></li>
+<li><p><code>-changealias</code>: Changes an entry's alias</p></li>
+<li><p><code>-delete</code>: Deletes an entry</p></li>
+<li><p><code>-exportcert</code>: Exports certificate</p></li>
+<li><p><code>-genkeypair</code>: Generates a key pair</p></li>
+<li><p><code>-genseckey</code>: Generates a secret key</p></li>
+<li><p><code>-gencert</code>: Generates a certificate from a certificate request</p></li>
+<li><p><code>-importcert</code>: Imports a certificate or a certificate chain</p></li>
+<li><p><code>-importpass</code>: Imports a password</p></li>
+<li><p><code>-importkeystore</code>: Imports one or all entries from another keystore</p></li>
+<li><p><code>-keypasswd</code>: Changes the key password of an entry</p></li>
+<li><p><code>-list</code>: Lists entries in a keystore</p></li>
+<li><p><code>-printcert</code>: Prints the content of a certificate</p></li>
+<li><p><code>-printcertreq</code>: Prints the content of a certificate request</p></li>
+<li><p><code>-printcrl</code>: Prints the content of a Certificate Revocation List (CRL) file</p></li>
+<li><p><code>-storepasswd</code>: Changes the store password of a keystore</p></li>
+</ul>
+<p>See <a href="#commands-and-options">Commands and Options</a> for a description of these commands with their options.</p>
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>keytool</code> command is a key and certificate management utility. It enables users to administer their own public/private key pairs and associated certificates for use in self-authentication (where a user authenticates themselves to other users and services) or data integrity and authentication services, by using digital signatures. The <code>keytool</code> command also enables users to cache the public keys (in the form of certificates) of their communicating peers.</p>
+<p>A certificate is a digitally signed statement from one entity (person, company, and so on), which says that the public key (and some other information) of some other entity has a particular value. When data is digitally signed, the signature can be verified to check the data integrity and authenticity. Integrity means that the data hasn't been modified or tampered with, and authenticity means that the data comes from the individual who claims to have created and signed it.</p>
+<p>The <code>keytool</code> command also enables users to administer secret keys and passphrases used in symmetric encryption and decryption (Data Encryption Standard).</p>
+<p>The <code>keytool</code> command stores the keys and certificates in a keystore.</p>
+<h2 id="command-and-option-notes">Command and Option Notes</h2>
+<p>The following notes apply to the descriptions in <a href="#commands-and-options">Commands and Options</a>:</p>
+<ul>
+<li><p>All command and option names are preceded by a hyphen sign (<code>-</code>).</p></li>
+<li><p>Options for each command can be provided in any order.</p></li>
+<li><p>All items not italicized or in braces ({ }) or brackets ([ ]) are required to appear as is.</p></li>
+<li><p>Braces surrounding an option signify that a default value is used when the option isn't specified on the command line. Braces are also used around the <code>-v</code>, <code>-rfc</code>, and <code>-J</code> options, which have meaning only when they appear on the command line. They don't have any default values.</p></li>
+<li><p>Brackets surrounding an option signify that the user is prompted for the values when the option isn't specified on the command line. For the <code>-keypass</code> option, if you don't specify the option on the command line, then the <code>keytool</code> command first attempts to use the keystore password to recover the private/secret key. If this attempt fails, then the <code>keytool</code> command prompts you for the private/secret key password.</p></li>
+<li><p>Items in italics (option values) represent the actual values that must be supplied. For example, here is the format of the <code>-printcert</code> command:</p>
+<blockquote>
+<p><code>keytool -printcert</code> {<code>-file</code> <em>cert_file</em>} {<code>-v</code>}</p>
+</blockquote>
+<p>When you specify a <code>-printcert</code> command, replace <em>cert_file</em> with the actual file name, as follows: <code>keytool -printcert -file VScert.cer</code></p></li>
+<li><p>Option values must be enclosed in quotation marks when they contain a blank (space).</p></li>
+</ul>
+<h2 id="commands-and-options">Commands and Options</h2>
+<p>The keytool commands and their options can be grouped by the tasks that they perform.</p>
+<p><a href="#commands-for-creating-or-adding-data-to-the-keystore">Commands for Creating or Adding Data to the Keystore</a>:</p>
+<ul>
+<li><p><code>-gencert</code></p></li>
+<li><p><code>-genkeypair</code></p></li>
+<li><p><code>-genseckey</code></p></li>
+<li><p><code>-importcert</code></p></li>
+<li><p><code>-importpass</code></p></li>
+</ul>
+<p><a href="#commands-for-importing-contents-from-another-keystore">Commands for Importing Contents from Another Keystore</a>:</p>
+<ul>
+<li><code>-importkeystore</code></li>
+</ul>
+<p><a href="#commands-for-generating-a-certificate-request">Commands for Generating a Certificate Request</a>:</p>
+<ul>
+<li><code>-certreq</code></li>
+</ul>
+<p><a href="#commands-for-exporting-data">Commands for Exporting Data</a>:</p>
+<ul>
+<li><code>-exportcert</code></li>
+</ul>
+<p><a href="#commands-for-displaying-data">Commands for Displaying Data</a>:</p>
+<ul>
+<li><p><code>-list</code></p></li>
+<li><p><code>-printcert</code></p></li>
+<li><p><code>-printcertreq</code></p></li>
+<li><p><code>-printcrl</code></p></li>
+</ul>
+<p><a href="#commands-for-managing-the-keystore">Commands for Managing the Keystore</a>:</p>
+<ul>
+<li><p><code>-storepasswd</code></p></li>
+<li><p><code>-keypasswd</code></p></li>
+<li><p><code>-delete</code></p></li>
+<li><p><code>-changealias</code></p></li>
+</ul>
+<h2 id="commands-for-creating-or-adding-data-to-the-keystore">Commands for Creating or Adding Data to the Keystore</h2>
+<dl>
+<dt><code>-gencert</code></dt>
+<dd><p>The following are the available options for the <code>-gencert</code> command:</p>
+<ul>
+<li><p>{<code>-rfc</code>}: Output in RFC (Request For Comment) style</p></li>
+<li><p>{<code>-infile</code> <em>infile</em>}: Input file name</p></li>
+<li><p>{<code>-outfile</code> <em>outfile</em>}: Output file name</p></li>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-sigalg</code> <em>sigalg</em>}: Signature algorithm name</p></li>
+<li><p>{<code>-dname</code> <em>dname</em>}: Distinguished name</p></li>
+<li><p>{<code>-startdate</code> <em>startdate</em>}: Certificate validity start date and time</p></li>
+<li><p>{<code>-ext</code> <em>ext</em>}*: X.509 extension</p></li>
+<li><p>{<code>-validity</code> <em>days</em>}: Validity number of days</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Adds a security provider by name (such as SunPKCS11) with an optional configure argument. The value of the security provider is the name of a security provider that is defined in a module.</p>
+<p>For example,</p>
+<blockquote>
+<p><code>keytool -addprovider SunPKCS11 -providerarg some.cfg ...</code></p>
+</blockquote>
+<p><strong>Note:</strong></p>
+<p>For compatibility reasons, the SunPKCS11 and OracleUcrypto providers can still be loaded with <code>-providerclass sun.security.pkcs11.SunPKCS11</code> and <code>-providerclass com.oracle.security.crypto.UcryptoProvider</code> even if they are now defined in modules. These are the only modules included in JDK that need a configuration, and therefore the most widely used with the <code>-providerclass</code> option. For legacy security providers located on classpath and loaded by reflection, <code>-providerclass</code> should still be used.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p>
+<p>For example, if <code>MyProvider</code> is a legacy provider loaded via reflection,</p>
+<blockquote>
+<p><code>keytool -providerclass com.example.MyProvider ...</code></p>
+</blockquote></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-gencert</code> command to generate a certificate as a response to a certificate request file (which can be created by the <code>keytool -certreq</code> command). The command reads the request either from <em>infile</em> or, if omitted, from the standard input, signs it by using the alias's private key, and outputs the X.509 certificate into either <em>outfile</em> or, if omitted, to the standard output. When <code>-rfc</code> is specified, the output format is Base64-encoded PEM; otherwise, a binary DER is created.</p>
+<p>The <code>-sigalg</code> value specifies the algorithm that should be used to sign the certificate. The <em>startdate</em> argument is the start time and date that the certificate is valid. The <em>days</em> argument tells the number of days for which the certificate should be considered valid.</p>
+<p>When <em>dname</em> is provided, it is used as the subject of the generated certificate. Otherwise, the one from the certificate request is used.</p>
+<p>The <code>-ext</code> value shows what X.509 extensions will be embedded in the certificate. Read <a href="#common-command-options">Common Command Options</a> for the grammar of <code>-ext</code>.</p>
+<p>The <code>-gencert</code> option enables you to create certificate chains. The following example creates a certificate, <code>e1</code>, that contains three certificates in its certificate chain.</p>
+<p>The following commands creates four key pairs named <code>ca</code>, <code>ca1</code>, <code>ca2</code>, and <code>e1</code>:</p>
+<pre><code>keytool -alias ca -dname CN=CA -genkeypair
+keytool -alias ca1 -dname CN=CA -genkeypair
+keytool -alias ca2 -dname CN=CA -genkeypair
+keytool -alias e1 -dname CN=E1 -genkeypair</code></pre>
+<p>The following two commands create a chain of signed certificates; <code>ca</code> signs <code>ca1</code> and <code>ca1</code> signs <code>ca2</code>, all of which are self-issued:</p>
+<pre><code>keytool -alias ca1 -certreq |
+    keytool -alias ca -gencert -ext san=dns:ca1 |
+    keytool -alias ca1 -importcert
+
+keytool -alias ca2 -certreq |
+    keytool -alias ca1 -gencert -ext san=dns:ca2 |
+    keytool -alias ca2 -importcert</code></pre>
+<p>The following command creates the certificate <code>e1</code> and stores it in the <code>e1.cert</code> file, which is signed by <code>ca2</code>. As a result, <code>e1</code> should contain <code>ca</code>, <code>ca1</code>, and <code>ca2</code> in its certificate chain:</p>
+<blockquote>
+<p><code>keytool -alias e1 -certreq | keytool -alias ca2 -gencert &gt; e1.cert</code></p>
+</blockquote>
+</dd>
+<dt><code>-genkeypair</code></dt>
+<dd><p>The following are the available options for the <code>-genkeypair</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-keyalg</code> <em>alg</em>}: Key algorithm name</p></li>
+<li><p>{<code>-keysize</code> <em>size</em>}: Key bit size</p></li>
+<li><p>{<code>-sigalg</code> <em>alg</em>}: Signature algorithm name</p></li>
+<li><p><code>-destalias</code> <em>alias</em>: Destination alias</p></li>
+<li><p>[<code>-dname</code> <em>name</em>]: Distinguished name</p></li>
+<li><p>{<code>-startdate</code> <em>date</em>}: Certificate validity start date and time</p></li>
+<li><p>[<code>-ext</code> <em>value</em>}*: X.509 extension</p></li>
+<li><p>{<code>-validity</code> <em>days</em>}: Validity number of days</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>] }: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-genkeypair</code> command to generate a key pair (a public key and associated private key). Wraps the public key in an X.509 v3 self-signed certificate, which is stored as a single-element certificate chain. This certificate chain and the private key are stored in a new keystore entry that is identified by its alias.</p>
+<p>The <code>-keyalg</code> value specifies the algorithm to be used to generate the key pair, and the <code>-keysize</code> value specifies the size of each key to be generated. The <code>-sigalg</code> value specifies the algorithm that should be used to sign the self-signed certificate. This algorithm must be compatible with the <code>-keyalg</code> value.</p>
+<p>The <code>-dname</code> value specifies the X.500 Distinguished Name to be associated with the value of <code>-alias</code>, and is used as the issuer and subject fields in the self-signed certificate. If a distinguished name is not provided at the command line, then the user is prompted for one.</p>
+<p>The value of <code>-keypass</code> is a password used to protect the private key of the generated key pair. If a password is not provided, then the user is prompted for it. If you press the <strong>Return</strong> key at the prompt, then the key password is set to the same password as the keystore password. The <code>-keypass</code> value must have at least six characters.</p>
+<p>The value of <code>-startdate</code> specifies the issue time of the certificate, also known as the &quot;Not Before&quot; value of the X.509 certificate's Validity field.</p>
+<p>The option value can be set in one of these two forms:</p>
+<p>([<code>+-</code>]<em>nnn</em>[<code>ymdHMS</code>])+</p>
+<p>[<em>yyyy</em><code>/</code><em>mm</em><code>/</code><em>dd</em>] [<em>HH</em><code>:</code><em>MM</em><code>:</code><em>SS</em>]</p>
+<p>With the first form, the issue time is shifted by the specified value from the current time. The value is a concatenation of a sequence of subvalues. Inside each subvalue, the plus sign (+) means shift forward, and the minus sign (-) means shift backward. The time to be shifted is <em>nnn</em> units of years, months, days, hours, minutes, or seconds (denoted by a single character of <code>y</code>, <code>m</code>, <code>d</code>, <code>H</code>, <code>M</code>, or <code>S</code> respectively). The exact value of the issue time is calculated by using the <code>java.util.GregorianCalendar.add(int field, int amount)</code> method on each subvalue, from left to right. For example, the issue time can be specified by:</p>
+<pre><code>Calendar c = new GregorianCalendar();
+c.add(Calendar.YEAR, -1);
+c.add(Calendar.MONTH, 1);
+c.add(Calendar.DATE, -1);
+return c.getTime()</code></pre>
+<p>With the second form, the user sets the exact issue time in two parts, year/month/day and hour:minute:second (using the local time zone). The user can provide only one part, which means the other part is the same as the current date (or time). The user must provide the exact number of digits shown in the format definition (padding with 0 when shorter). When both date and time are provided, there is one (and only one) space character between the two parts. The hour should always be provided in 24-hour format.</p>
+<p>When the option isn't provided, the start date is the current time. The option can only be provided one time.</p>
+<p>The value of <em>date</em> specifies the number of days (starting at the date specified by <code>-startdate</code>, or the current date when <code>-startdate</code> isn't specified) for which the certificate should be considered valid.</p>
+</dd>
+<dt><code>-genseckey</code></dt>
+<dd><p>The following are the available options for the <code>-genseckey</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keyalg</code> <em>alg</em>}: Key algorithm name</p></li>
+<li><p>{<code>-keysize</code> <em>size</em>}: Key bit size</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-genseckey</code> command to generate a secret key and store it in a new <code>KeyStore.SecretKeyEntry</code> identified by <code>alias</code>.</p>
+<p>The value of <code>-keyalg</code> specifies the algorithm to be used to generate the secret key, and the value of <code>-keysize</code> specifies the size of the key that is generated. The <code>-keypass</code> value is a password that protects the secret key. If a password is not provided, then the user is prompted for it. If you press the <strong>Return</strong> key at the prompt, then the key password is set to the same password that is used for the <code>-keystore</code>. The <code>-keypass</code> value must contain at least six characters.</p>
+</dd>
+<dt><code>-importcert</code></dt>
+<dd><p>The following are the available options for the <code>-importcert</code> command:</p>
+<ul>
+<li><p>{<code>-noprompt</code>}: Do not prompt</p></li>
+<li><p>{<code>-trustcacerts</code>}: Trust certificates from cacerts</p></li>
+<li><p>{<code>-protected</code>}: Password is provided through protected mechanism</p></li>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-file</code> <em>file</em>}: Input file name</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-importcert</code> command to read the certificate or certificate chain (where the latter is supplied in a PKCS#7 formatted reply or in a sequence of X.509 certificates) from <code>-file</code> <em>file</em>, and store it in the <code>keystore</code> entry identified by <code>-alias</code>. If <code>-file</code> <em>file</em> is not specified, then the certificate or certificate chain is read from <code>stdin</code>.</p>
+<p>The <code>keytool</code> command can import X.509 v1, v2, and v3 certificates, and PKCS#7 formatted certificate chains consisting of certificates of that type. The data to be imported must be provided either in binary encoding format or in printable encoding format (also known as Base64 encoding) as defined by the Internet RFC 1421 standard. In the latter case, the encoding must be bounded at the beginning by a string that starts with <code>-----BEGIN</code>, and bounded at the end by a string that starts with <code>-----END</code>.</p>
+<p>You import a certificate for two reasons: To add it to the list of trusted certificates, and to import a certificate reply received from a certificate authority (CA) as the result of submitting a Certificate Signing Request (CSR) to that CA. See the <code>-certreq</code> command in <a href="#commands-for-generating-a-certificate-request">Commands for Generating a Certificate Request</a>.</p>
+<p>The type of import is indicated by the value of the <code>-alias</code> option. If the alias doesn't point to a key entry, then the <code>keytool</code> command assumes you are adding a trusted certificate entry. In this case, the alias shouldn't already exist in the keystore. If the alias does exist, then the <code>keytool</code> command outputs an error because a trusted certificate already exists for that alias, and doesn't import the certificate. If <code>-alias</code> points to a key entry, then the <code>keytool</code> command assumes that you're importing a certificate reply.</p>
+</dd>
+<dt><code>-importpass</code></dt>
+<dd><p>The following are the available options for the <code>-importpass</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keyalg</code> <em>alg</em>}: Key algorithm name</p></li>
+<li><p>{<code>-keysize</code> <em>size</em>}: Key bit size</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-importpass</code> command to imports a passphrase and store it in a new <code>KeyStore.SecretKeyEntry</code> identified by <code>-alias</code>. The passphrase may be supplied via the standard input stream; otherwise the user is prompted for it. The <code>-keypass</code> option provides a password to protect the imported passphrase. If a password is not provided, then the user is prompted for it. If you press the <strong>Return</strong> key at the prompt, then the key password is set to the same password as that used for the <code>keystore</code>. The <code>-keypass</code> value must contain at least six characters.</p>
+</dd>
+</dl>
+<h2 id="commands-for-importing-contents-from-another-keystore">Commands for Importing Contents from Another Keystore</h2>
+<dl>
+<dt><code>-importkeystore</code></dt>
+<dd><p>The following are the available options for the <code>-importkeystore</code> command:</p>
+<ul>
+<li><p>{<code>-srckeystore</code> <em>keystore</em>}: Source keystore name</p></li>
+<li><p>{<code>-destkeystore</code> <em>keystore</em>}: Destination keystore name</p></li>
+<li><p>{<code>-srcstoretype</code> <em>type</em>}: Source keystore type</p></li>
+<li><p>{<code>-deststoretype</code> <em>type</em>}: Destination keystore type</p></li>
+<li><p>[<code>-srcstorepass</code> <em>arg</em>]: Source keystore password</p></li>
+<li><p>[<code>-deststorepass</code> <em>arg</em>]: Destination keystore password</p></li>
+<li><p>{<code>-srcprotected</code>}: Source keystore password protected</p></li>
+<li><p>{<code>-destprotected</code>}: Destination keystore password protected</p></li>
+<li><p>{<code>-srcprovidername</code> <em>name</em>}: Source keystore provider name</p></li>
+<li><p>{<code>-destprovidername</code> <em>name</em>}: Destination keystore provider name</p></li>
+<li><p>{<code>-srcalias</code> <em>alias</em>}: Source alias</p></li>
+<li><p>{<code>-destalias</code> <em>alias</em>}: Destination alias</p></li>
+<li><p>[<code>-srckeypass</code> <em>arg</em>]: Source key password</p></li>
+<li><p>[<code>-destkeypass</code> <em>arg</em>]: Destination key password</p></li>
+<li><p>{<code>-noprompt</code>}: Do not prompt</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p><strong>Note:</strong></p>
+<p>This is the first line of all options:</p>
+<blockquote>
+<p><code>-srckeystore</code> <em>keystore</em> <code>-destkeystore</code> <em>keystore</em></p>
+</blockquote>
+<p>Use the <code>-importkeystore</code> command to import a single entry or all entries from a source keystore to a destination keystore.</p>
+<p><strong>Note:</strong></p>
+<p>If you do not specify <code>-destkeystore</code> when using the <code>keytool -importkeystore</code> command, then the default keystore used is <code>$HOME/.keystore</code>.</p>
+<p>When the <code>-srcalias</code> option is provided, the command imports the single entry identified by the alias to the destination keystore. If a destination alias isn't provided with <code>-destalias</code>, then <code>-srcalias</code> is used as the destination alias. If the source entry is protected by a password, then <code>-srckeypass</code> is used to recover the entry. If <code>-srckeypass</code> isn't provided, then the <code>keytool</code> command attempts to use <code>-srcstorepass</code> to recover the entry. If <code>-srcstorepass</code> is not provided or is incorrect, then the user is prompted for a password. The destination entry is protected with <code>-destkeypass</code>. If <code>-destkeypass</code> isn't provided, then the destination entry is protected with the source entry password. For example, most third-party tools require <code>storepass</code> and <code>keypass</code> in a PKCS #12 keystore to be the same. To create a PKCS#12 keystore for these tools, always specify a <code>-destkeypass</code> that is the same as <code>-deststorepass</code>.</p>
+<p>If the <code>-srcalias</code> option isn't provided, then all entries in the source keystore are imported into the destination keystore. Each destination entry is stored under the alias from the source entry. If the source entry is protected by a password, then <code>-srcstorepass</code> is used to recover the entry. If <code>-srcstorepass</code> is not provided or is incorrect, then the user is prompted for a password. If a source keystore entry type isn't supported in the destination keystore, or if an error occurs while storing an entry into the destination keystore, then the user is prompted either to skip the entry and continue or to quit. The destination entry is protected with the source entry password.</p>
+<p>If the destination alias already exists in the destination keystore, then the user is prompted either to overwrite the entry or to create a new entry under a different alias name.</p>
+<p>If the <code>-noprompt</code> option is provided, then the user isn't prompted for a new destination alias. Existing entries are overwritten with the destination alias name. Entries that can't be imported are skipped and a warning is displayed.</p>
+</dd>
+</dl>
+<h2 id="commands-for-generating-a-certificate-request">Commands for Generating a Certificate Request</h2>
+<dl>
+<dt><code>-certreq</code></dt>
+<dd><p>The following are the available options for the <code>-certreq</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-sigalg</code> <em>alg</em>}: Signature algorithm name</p></li>
+<li><p>{<code>-file</code> <em>file</em>}: Output file name</p></li>
+<li><p>[ <code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-dname</code> <em>name</em>}: Distinguished name</p></li>
+<li><p>{<code>-ext</code> <em>value</em>}: X.509 extension</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-certreq</code> command to generate a Certificate Signing Request (CSR) using the PKCS #10 format.</p>
+<p>A CSR is intended to be sent to a CA. The CA authenticates the certificate requestor (usually offline) and returns a certificate or certificate chain to replace the existing certificate chain (initially a self-signed certificate) in the keystore.</p>
+<p>The private key associated with <em>alias</em> is used to create the PKCS #10 certificate request. To access the private key, the correct password must be provided. If <code>-keypass</code> isn't provided at the command line and is different from the password used to protect the integrity of the keystore, then the user is prompted for it. If <code>-dname</code> is provided, then it is used as the subject in the CSR. Otherwise, the X.500 Distinguished Name associated with alias is used.</p>
+<p>The <code>-sigalg</code> value specifies the algorithm that should be used to sign the CSR.</p>
+<p>The CSR is stored in the <code>-file</code> <em>file</em>. If a file is not specified, then the CSR is output to <code>-stdout</code>.</p>
+<p>Use the <code>-importcert</code> command to import the response from the CA.</p>
+</dd>
+</dl>
+<h2 id="commands-for-exporting-data">Commands for Exporting Data</h2>
+<dl>
+<dt><code>-exportcert</code></dt>
+<dd><p>The following are the available options for the <code>-exportcert</code> command:</p>
+<ul>
+<li><p>{<code>-rfc</code>}: Output in RFC style</p></li>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-file</code> <em>file</em>}: Output file name</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>] }: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-exportcert</code> command to read a certificate from the keystore that is associated with <code>-alias</code> <em>alias</em> and store it in the <code>-file</code> <em>file</em>. When a file is not specified, the certificate is output to <code>stdout</code>.</p>
+<p>By default, the certificate is output in binary encoding. If the <code>-rfc</code> option is specified, then the output in the printable encoding format defined by the Internet RFC 1421 Certificate Encoding Standard.</p>
+<p>If <code>-alias</code> refers to a trusted certificate, then that certificate is output. Otherwise, <code>-alias</code> refers to a key entry with an associated certificate chain. In that case, the first certificate in the chain is returned. This certificate authenticates the public key of the entity addressed by <code>-alias</code>.</p>
+</dd>
+</dl>
+<h2 id="commands-for-displaying-data">Commands for Displaying Data</h2>
+<dl>
+<dt><code>-list</code></dt>
+<dd><p>The following are the available options for the <code>-list</code> command:</p>
+<ul>
+<li><p>{<code>-rfc</code>}: Output in RFC style</p></li>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>] }: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-list</code> command to print the contents of the keystore entry identified by <code>-alias</code> to <code>stdout</code>. If <code>-alias</code> <em>alias</em> is not specified, then the contents of the entire keystore are printed.</p>
+<p>By default, this command prints the SHA-256 fingerprint of a certificate. If the <code>-v</code> option is specified, then the certificate is printed in human-readable format, with additional information such as the owner, issuer, serial number, and any extensions. If the <code>-rfc</code> option is specified, then the certificate contents are printed by using the printable encoding format, as defined by the Internet RFC 1421 Certificate Encoding Standard.</p>
+<p><strong>Note:</strong></p>
+<p>You can't specify both <code>-v</code> and <code>-rfc</code> in the same command. Otherwise, an error is reported.</p>
+</dd>
+<dt><code>-printcert</code></dt>
+<dd><p>The following are the available options for the <code>-printcert</code> command:</p>
+<ul>
+<li><p>{<code>-rfc</code>}: Output in RFC style</p></li>
+<li><p>{<code>-file</code> <em>cert_file</em>}: Input file name</p></li>
+<li><p>{<code>-sslserver</code> <em>server</em>[<code>:</code><em>port</em>]}:: Secure Sockets Layer (SSL) server host and port</p></li>
+<li><p>{<code>-jarfile</code> <em>JAR_file</em>}: Signed <code>.jar</code> file</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-printcert</code> command to read and print the certificate from <code>-file</code> <em>cert_file</em>, the SSL server located at <code>-sslserver</code> <em>server</em>[<code>:</code><em>port</em>], or the signed JAR file specified by <code>-jarfile</code> <em>JAR_file</em>. It prints its contents in a human-readable format. When a port is not specified, the standard HTTPS port 443 is assumed.</p>
+<p><strong>Note:</strong></p>
+<p>The <code>-sslserver</code> and <code>-file</code> options can't be provided in the same command. Otherwise, an error is reported. If you don't specify either option, then the certificate is read from <code>stdin</code>.</p>
+<p>When<code>-rfc</code> is specified, the <code>keytool</code> command prints the certificate in PEM mode as defined by the Internet RFC 1421 Certificate Encoding standard.</p>
+<p>If the certificate is read from a file or <code>stdin</code>, then it might be either binary encoded or in printable encoding format, as defined by the RFC 1421 Certificate Encoding standard.</p>
+<p>If the SSL server is behind a firewall, then the <code>-J-Dhttps.proxyHost=proxyhost</code> and <code>-J-Dhttps.proxyPort=proxyport</code> options can be specified on the command line for proxy tunneling.</p>
+<p><strong>Note:</strong></p>
+<p>This option can be used independently of a keystore.</p>
+</dd>
+<dt><code>-printcertreq</code></dt>
+<dd><p>The following are the available options for the <code>-printcertreq</code> command:</p>
+<ul>
+<li><p>{<code>-file</code> <em>file</em>}: Input file name</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-printcertreq</code> command to print the contents of a PKCS #10 format certificate request, which can be generated by the <code>keytool -certreq</code> command. The command reads the request from file. If there is no file, then the request is read from the standard input.</p>
+</dd>
+<dt><code>-printcrl</code></dt>
+<dd><p>The following are the available options for the <code>-printcrl</code> command:</p>
+<ul>
+<li><p><code>-file crl</code>: Input file name</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-printcrl</code> command to read the Certificate Revocation List (CRL) from <code>-file crl</code> . A CRL is a list of the digital certificates that were revoked by the CA that issued them. The CA generates the <code>crl</code> file.</p>
+<p><strong>Note:</strong></p>
+<p>This option can be used independently of a keystore.</p>
+</dd>
+</dl>
+<h2 id="commands-for-managing-the-keystore">Commands for Managing the Keystore</h2>
+<dl>
+<dt><code>-storepasswd</code></dt>
+<dd><p>The following are the available options for the <code>-storepasswd</code> command:</p>
+<ul>
+<li><p>[<code>-new</code> <em>arg</em>]: New password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-storepasswd</code> command to change the password used to protect the integrity of the keystore contents. The new password is set by <code>-new</code> <em>arg</em> and must contain at least six characters.</p>
+</dd>
+<dt><code>-keypasswd</code></dt>
+<dd><p>The following are the available options for the <code>-keypasswd</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>[<code>-keypass</code> <em>old_keypass</em>]: Key password</p></li>
+<li><p>[<code>-new</code> <em>new_keypass</em>]: New password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-storepass</code> <em>arg</em>}: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+</ul>
+<p>Use the <code>-keypasswd</code> command to change the password (under which private/secret keys identified by <code>-alias</code> are protected) from <code>-keypass</code> <em>old_keypass</em> to <code>-new</code> <em>new_keypass</em>. The password value must contain at least six characters.</p>
+<p>If the <code>-keypass</code> option isn't provided at the command line and the <code>-keypass</code> password is different from the keystore password (<code>-storepass</code> <em>arg</em>), then the user is prompted for it.</p>
+<p>If the <code>-new</code> option isn't provided at the command line, then the user is prompted for it.</p>
+</dd>
+<dt><code>-delete</code></dt>
+<dd><p>The following are the available options for the <code>-delete</code> command:</p>
+<ul>
+<li><p>[<code>-alias</code> <em>alias</em>]: Alias name of the entry to process</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-delete</code> command to delete the <code>-alias</code> <em>alias</em> entry from the keystore. When not provided at the command line, the user is prompted for the <code>alias</code>.</p>
+</dd>
+<dt><code>-changealias</code></dt>
+<dd><p>The following are the available options for the <code>-changealias</code> command:</p>
+<ul>
+<li><p>{<code>-alias</code> <em>alias</em>}: Alias name of the entry to process</p></li>
+<li><p>[<code>-destalias</code> <em>alias</em>]: Destination alias</p></li>
+<li><p>[<code>-keypass</code> <em>arg</em>]: Key password</p></li>
+<li><p>{<code>-keystore</code> <em>keystore</em>}: Keystore name</p></li>
+<li><p>{<code>-cacerts</code>}: Access the cacerts keystore</p></li>
+<li><p>[<code>-storepass</code> <em>arg</em>]: Keystore password</p></li>
+<li><p>{<code>-storetype</code> <em>type</em>}: Keystore type</p></li>
+<li><p>{<code>-providername</code> <em>name</em>}: Provider name</p></li>
+<li><p>{<code>-addprovider</code> <em>name</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by name (such as SunPKCS11) with an optional configure argument.</p></li>
+<li><p>{<code>-providerclass</code> <em>class</em> [<code>-providerarg</code> <em>arg</em>]}: Add security provider by fully qualified class name with an optional configure argument.</p></li>
+<li><p>{<code>-providerpath</code> <em>list</em>}: Provider classpath</p></li>
+<li><p>{<code>-v</code>}: Verbose output</p></li>
+<li><p>{<code>-protected</code>}: Password provided through a protected mechanism</p></li>
+</ul>
+<p>Use the <code>-changealias</code> command to move an existing keystore entry from <code>-alias</code> <em>alias</em> to a new <code>-destalias</code> <em>alias</em>. If a destination alias is not provided, then the command prompts you for one. If the original entry is protected with an entry password, then the password can be supplied with the <code>-keypass</code> option. If a key password is not provided, then the <code>-storepass</code> (if provided) is attempted first. If the attempt fails, then the user is prompted for a password.</p>
+</dd>
+</dl>
+<h2 id="commands-for-displaying-help-information">Commands for Displaying Help Information</h2>
+<p>You can use <code>--help</code> to display a list of <code>keytool</code> commands or to display help information about a specific <code>keytool</code> command.</p>
+<ul>
+<li><p>To display a list of <code>keytool</code> commands, enter:</p>
+<blockquote>
+<p><code>keytool --help</code></p>
+</blockquote></li>
+<li><p>To display help information about a specific <code>keytool</code> command, enter:</p>
+<blockquote>
+<p><code>keytool -&lt;command&gt; --help</code></p>
+</blockquote></li>
+</ul>
+<h2 id="common-command-options">Common Command Options</h2>
+<p>The <code>-v</code> option can appear for all commands except <code>--help</code>. When the <code>-v</code> option appears, it signifies verbose mode, which means that more information is provided in the output.</p>
+<p>The <code>-J</code><em>option</em> argument can appear for any command. When the <code>-J</code><em>option</em> is used, the specified <em>option</em> string is passed directly to the Java interpreter. This option doesn't contain any spaces. It's useful for adjusting the execution environment or memory usage. For a list of possible interpreter options, enter <code>java -h</code> or <code>java -X</code> at the command line.</p>
+<p>These options can appear for all commands operating on a keystore:</p>
+<dl>
+<dt><code>-storetype</code> <em>storetype</em></dt>
+<dd>This qualifier specifies the type of keystore to be instantiated.
+</dd>
+<dt><code>-keystore</code> <em>keystore</em></dt>
+<dd><p>The keystore location.</p>
+<p>If the JKS <code>storetype</code> is used and a keystore file doesn't yet exist, then certain <code>keytool</code> commands can result in a new keystore file being created. For example, if <code>keytool -genkeypair</code> is called and the <code>-keystore</code> option isn't specified, the default keystore file named <code>.keystore</code> is created in the user's home directory if it doesn't already exist. Similarly, if the <code>-keystore ks_file</code> option is specified but <code>ks_file</code> doesn't exist, then it is created. For more information on the JKS <code>storetype</code>, see the <strong>KeyStore Implementation</strong> section in <strong>KeyStore aliases</strong>.</p>
+<p>Note that the input stream from the <code>-keystore</code> option is passed to the <code>KeyStore.load</code> method. If <code>NONE</code> is specified as the URL, then a null stream is passed to the <code>KeyStore.load</code> method. <code>NONE</code> should be specified if the keystore isn't file-based. For example, when the keystore resides on a hardware token device.</p>
+</dd>
+<dt><code>-cacerts</code> <em>cacerts</em></dt>
+<dd>Operates on the <em>cacerts</em> keystore . This option is equivalent to <code>-keystore</code> <em>path_to_cacerts</em> <code>-storetype</code> <em>type_of_cacerts</em>. An error is reported if the <code>-keystore</code> or <code>-storetype</code> option is used with the <code>-cacerts</code> option.
+</dd>
+<dt><code>-storepass</code> [<code>:env</code> | <code>:file</code> ] <em>argument</em></dt>
+<dd><p>The password that is used to protect the integrity of the keystore.</p>
+<p>If the modifier <code>env</code> or <code>file</code> isn't specified, then the password has the value <em>argument</em>, which must contain at least six characters. Otherwise, the password is retrieved as follows:</p>
+<ul>
+<li><p><code>env</code>: Retrieve the password from the environment variable named <em>argument</em>.</p></li>
+<li><p><code>file</code>: Retrieve the password from the file named <em>argument</em>.</p></li>
+</ul>
+<p><strong>Note:</strong> All other options that require passwords, such as <code>-keypass</code>, <code>-srckeypass</code>, <code>-destkeypass</code>, <code>-srcstorepass</code>, and <code>-deststorepass</code>, accept the <code>env</code> and <code>file</code> modifiers. Remember to separate the password option and the modifier with a colon (:).</p>
+<p>The password must be provided to all commands that access the keystore contents. For such commands, when the <code>-storepass</code> option isn't provided at the command line, the user is prompted for it.</p>
+<p>When retrieving information from the keystore, the password is optional. If a password is not specified, then the integrity of the retrieved information can't be verified and a warning is displayed.</p>
+</dd>
+<dt><code>-providername</code> <em>name</em></dt>
+<dd>Used to identify a cryptographic service provider's name when listed in the security properties file.
+</dd>
+<dt><code>-addprovider</code> <em>name</em></dt>
+<dd>Used to add a security provider by name (such as SunPKCS11) .
+</dd>
+<dt><code>-providerclass</code> <em>class</em></dt>
+<dd>Used to specify the name of a cryptographic service provider's master class file when the service provider isn't listed in the security properties file.
+</dd>
+<dt><code>-providerpath</code> <em>list</em></dt>
+<dd>Used to specify the provider classpath.
+</dd>
+<dt><code>-providerarg</code> <em>arg</em></dt>
+<dd>Used with the <code>-addprovider</code> or <code>-providerclass</code> option to represent an optional string input argument for the constructor of <em>class</em> name.
+</dd>
+<dt><code>-protected=true</code>|<code>false</code></dt>
+<dd>Specify this value as <code>true</code> when a password must be specified by way of a protected authentication path, such as a dedicated PIN reader. Because there are two keystores involved in the <code>-importkeystore</code> command, the following two options, <code>-srcprotected</code> and <code>-destprotected</code>, are provided for the source keystore and the destination keystore respectively.
+</dd>
+<dt><code>-ext</code> {<em>name</em>{<code>:critical</code>} {<code>=</code><em>value</em>}}</dt>
+<dd>Denotes an X.509 certificate extension. The option can be used in <code>-genkeypair</code> and <code>-gencert</code> to embed extensions into the generated certificate, or in <code>-certreq</code> to show what extensions are requested in the certificate request. The option can appear multiple times. The <em>name</em> argument can be a supported extension name (see <a href="#supported-named-extensions">Supported Named Extensions</a>) or an arbitrary OID number. The <em>value</em> argument, when provided, denotes the argument for the extension. When <em>value</em> is omitted, the default value of the extension or the extension itself requires no argument. The <code>:critical</code> modifier, when provided, means the extension's <code>isCritical</code> attribute is <code>true</code>; otherwise, it is <code>false</code>. You can use <code>:c</code> in place of <code>:critical</code>.
+</dd>
+</dl>
+<h2 id="examples-of-option-values">Examples of Option Values</h2>
+<p>The following examples show the defaults for various option values:</p>
+<pre><code>-alias &quot;mykey&quot;
+
+-keyalg
+    &quot;DSA&quot; (when using -genkeypair)
+    &quot;DES&quot; (when using -genseckey)
+
+-keysize
+    2048 (when using -genkeypair and -keyalg is &quot;RSA&quot;)
+    2048 (when using -genkeypair and -keyalg is &quot;DSA&quot;)
+    256 (when using -genkeypair and -keyalg is &quot;EC&quot;)
+    56 (when using -genseckey and -keyalg is &quot;DES&quot;)
+    168 (when using -genseckey and -keyalg is &quot;DESede&quot;)
+
+-validity 90
+
+-keystore &lt;the file named .keystore in the user&#39;s home directory&gt;
+
+-destkeystore &lt;the file named .keystore in the user&#39;s home directory&gt;
+
+-storetype &lt;the value of the &quot;keystore.type&quot; property in the
+    security properties file, which is returned by the static
+    getDefaultType method in java.security.KeyStore&gt;
+
+-file
+    stdin (if reading)
+    stdout (if writing)
+
+-protected false</code></pre>
+<p>When generating a certificate or a certificate request, the default signature algorithm (<code>-sigalg</code> option) is derived from the algorithm of the underlying private key to provide an appropriate level of security strength as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">keyalg</th>
+<th style="text-align: left;">keysize</th>
+<th>default sigalg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DSA</td>
+<td style="text-align: left;">any size</td>
+<td>SHA256withDSA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RSA ??????</td>
+<td style="text-align: left;">&lt;= 3072</td>
+<td>SHA256withRSA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">&lt;= 7680</td>
+<td>SHA384withRSA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">&gt; 7680</td>
+<td>SHA512withRSA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">EC</td>
+<td style="text-align: left;">&lt; 384</td>
+<td>SHA256withECDSA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">&lt; 512</td>
+<td>SHA384withECDSA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">= 512</td>
+<td>SHA512withECDSA</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong></p>
+<p>To improve out of the box security, default key size and signature algorithm names are periodically updated to stronger values with each release of the JDK. If interoperability with older releases of the JDK is important, make sure that the defaults are supported by those releases. Alternatively, you can use the <code>-keysize</code> or <code>-sigalg</code> options to override the default values at your own risk.</p>
+<h2 id="supported-named-extensions">Supported Named Extensions</h2>
+<p>The <code>keytool</code> command supports these named extensions. The names aren't case-sensitive.</p>
+<dl>
+<dt><code>BC</code> or <code>BasicContraints</code></dt>
+<dd><p>Values:</p>
+<p>The full form is <code>ca:</code>{<code>true</code>|<code>false</code>}[<code>,pathlen:</code><em>len</em>] or <em>len</em>, which is short for <code>ca:true,pathlen:</code><em>len</em>.</p>
+<p>When <em>len</em> is omitted, the resulting value is <code>ca:true</code>.</p>
+</dd>
+<dt><code>KU</code> or <code>KeyUsage</code></dt>
+<dd><p>Values:</p>
+<p><em>usage</em>(<code>,</code> <em>usage</em>)*</p>
+<p><em>usage</em> can be one of the following:</p>
+<ul>
+<li><p><code>digitalSignature</code></p></li>
+<li><p><code>nonRepudiation</code> (<code>contentCommitment</code>)</p></li>
+<li><p><code>keyEncipherment</code></p></li>
+<li><p><code>dataEncipherment</code></p></li>
+<li><p><code>keyAgreement</code></p></li>
+<li><p><code>keyCertSign</code></p></li>
+<li><p><code>cRLSign</code></p></li>
+<li><p><code>encipherOnly</code></p></li>
+<li><p><code>decipherOnly</code></p></li>
+</ul>
+<p>Provided there is no ambiguity, the <em>usage</em> argument can be abbreviated with the first few letters (such as <code>dig</code> for <code>digitalSignature</code>) or in camel-case style (such as <code>dS</code> for <code>digitalSignature</code> or <code>cRLS</code> for <code>cRLSign</code>). The <em>usage</em> values are case-sensitive.</p>
+</dd>
+<dt><code>EKU</code> or <code>ExtendedKeyUsage</code></dt>
+<dd><p>Values:</p>
+<p><em>usage</em>(<code>,</code> <em>usage</em>)*</p>
+<p><em>usage</em> can be one of the following:</p>
+<ul>
+<li><p><code>anyExtendedKeyUsage</code></p></li>
+<li><p><code>serverAuth</code></p></li>
+<li><p><code>clientAuth</code></p></li>
+<li><p><code>codeSigning</code></p></li>
+<li><p><code>emailProtection</code></p></li>
+<li><p><code>timeStamping</code></p></li>
+<li><p><code>OCSPSigning</code></p></li>
+<li><p>Any OID string</p></li>
+</ul>
+<p>Provided there is no ambiguity, the <em>usage</em> argument can be abbreviated with the first few letters or in camel-case style. The <em>usage</em> values are case-sensitive.</p>
+</dd>
+<dt><code>SAN</code> or <code>SubjectAlternativeName</code></dt>
+<dd><p>Values:</p>
+<p><em>type</em><code>:</code><em>value</em>(<code>,</code> <em>type</em><code>:</code><em>value</em>)*</p>
+<p><em>type</em> can be one of the following:</p>
+<ul>
+<li><p><code>EMAIL</code></p></li>
+<li><p><code>URI</code></p></li>
+<li><p><code>DNS</code></p></li>
+<li><p><code>IP</code></p></li>
+<li><p><code>OID</code></p></li>
+</ul>
+<p>The <em>value</em> argument is the string format value for the <em>type</em>.</p>
+</dd>
+<dt><code>IAN</code> or <code>IssuerAlternativeName</code></dt>
+<dd><p>Values:</p>
+<p>Same as <code>SAN</code> or <code>SubjectAlternativeName</code>.</p>
+</dd>
+<dt><code>SIA</code> or <code>SubjectInfoAccess</code></dt>
+<dd><p>Values:</p>
+<p><em>method</em><code>:</code><em>location-type</em><code>:</code><em>location-value</em>(<code>,</code> <em>method</em><code>:</code><em>location-type</em><code>:</code><em>location-value</em>)*</p>
+<p><em>method</em> can be one of the following:</p>
+<ul>
+<li><p><code>timeStamping</code></p></li>
+<li><p><code>caRepository</code></p></li>
+<li><p>Any OID</p></li>
+</ul>
+<p>The <em>location-type</em> and <em>location-value</em> arguments can be any <em>type</em><code>:</code><em>value</em> supported by the <code>SubjectAlternativeName</code> extension.</p>
+</dd>
+<dt><code>AIA</code> or <code>AuthorityInfoAccess</code></dt>
+<dd><p>Values:</p>
+<p>Same as <code>SIA</code> or <code>SubjectInfoAccess</code>.</p>
+<p>The <em>method</em> argument can be one of the following:</p>
+<ul>
+<li><p><code>ocsp</code></p></li>
+<li><p><code>caIssuers</code></p></li>
+<li><p>Any OID</p></li>
+</ul>
+</dd>
+</dl>
+<p>When <em>name</em> is OID, the value is the hexadecimal dumped Definite Encoding Rules (DER) encoding of the <code>extnValue</code> for the extension excluding the OCTET STRING type and length bytes. Other than standard hexadecimal numbers (0-9, a-f, A-F), any extra characters are ignored in the HEX string. Therefore, both 01:02:03:04 and 01020304 are accepted as identical values. When there is no value, the extension has an empty value field.</p>
+<p>A special name <code>honored</code>, used only in <code>-gencert</code>, denotes how the extensions included in the certificate request should be honored. The value for this name is a comma-separated list of <code>all</code> (all requested extensions are honored), <em>name</em>{<code>:</code>[<code>critical</code>|<code>non-critical</code>]} (the named extension is honored, but it uses a different <code>isCritical</code> attribute), and <code>-name</code> (used with <code>all</code>, denotes an exception). Requested extensions aren't honored by default.</p>
+<p>If, besides the<code>-ext honored</code> option, another named or OID <code>-ext</code> option is provided, this extension is added to those already honored. However, if this name (or OID) also appears in the honored value, then its value and criticality override that in the request. If an extension of the same type is provided multiple times through either a name or an OID, only the last extension is used.</p>
+<p>The <code>subjectKeyIdentifier</code> extension is always created. For non-self-signed certificates, the <code>authorityKeyIdentifier</code> is created.</p>
+<p><strong>CAUTION:</strong></p>
+<p>Users should be aware that some combinations of extensions (and other certificate fields) may not conform to the Internet standard. See <a href="#certificate-conformance-warning">Certificate Conformance Warning</a>.</p>
+<h2 id="examples-of-tasks-in-creating-a-keystore">Examples of Tasks in Creating a keystore</h2>
+<p>The following examples describe the sequence actions in creating a keystore for managing public/private key pairs and certificates from trusted entities.</p>
+<ul>
+<li><p><a href="#generating-the-key-pair">Generating the Key Pair</a></p></li>
+<li><p><a href="#requesting-a-signed-certificate-from-a-ca">Requesting a Signed Certificate from a CA</a></p></li>
+<li><p><a href="#importing-a-certificate-for-the-ca">Importing a Certificate for the CA</a></p></li>
+<li><p><a href="#importing-the-certificate-reply-from-the-ca">Importing the Certificate Reply from the CA</a></p></li>
+<li><p><a href="#exporting-a-certificate-that-authenticates-the-public-key">Exporting a Certificate That Authenticates the Public Key</a></p></li>
+<li><p><a href="#importing-the-keystore">Importing the Keystore</a></p></li>
+<li><p><a href="#generating-certificates-for-an-ssl-server">Generating Certificates for an SSL Server</a></p></li>
+</ul>
+<h2 id="generating-the-key-pair">Generating the Key Pair</h2>
+<p>Create a keystore and then generate the key pair.</p>
+<p>You can enter the command as a single line such as the following:</p>
+<blockquote>
+<p><code>keytool -genkeypair -dname &quot;cn=myname, ou=mygroup, o=mycompany, c=mycountry&quot; -alias business -keypass</code> <em>password</em> <code>-keystore /working/mykeystore -storepass password -validity 180</code></p>
+</blockquote>
+<p>The command creates the keystore named <code>mykeystore</code> in the working directory (provided it doesn't already exist), and assigns it the password specified by <code>-keypass</code>. It generates a public/private key pair for the entity whose distinguished name is <code>myname</code>, <code>mygroup</code>, <code>mycompany</code>, and a two-letter country code of <code>mycountry</code>. It uses the default DSA key generation algorithm to create the keys; both are 2048 bits</p>
+<p>The command uses the default SHA256withDSA signature algorithm to create a self-signed certificate that includes the public key and the distinguished name information. The certificate is valid for 180 days, and is associated with the private key in a keystore entry referred to by <code>-alias business</code>. The private key is assigned the password specified by <code>-keypass</code>.</p>
+<p>The command is significantly shorter when the option defaults are accepted. In this case, no options are required, and the defaults are used for unspecified options that have default values. You are prompted for any required values. You could have the following:</p>
+<blockquote>
+<p><code>keytool -genkeypair</code></p>
+</blockquote>
+<p>In this case, a keystore entry with the alias <code>mykey</code> is created, with a newly generated key pair and a certificate that is valid for 90 days. This entry is placed in your home directory in a keystore named <code>.keystore</code> . <code>.keystore</code> is created if it doesn't already exist. You are prompted for the distinguished name information, the keystore password, and the private key password.</p>
+<p><strong>Note:</strong></p>
+<p>The rest of the examples assume that you executed the <code>-genkeypair</code> command without specifying options, and that you responded to the prompts with values equal to those specified in the first <code>-genkeypair</code> command. For example, a distinguished name of <code>cn=</code><em>myname</em><code>, ou=</code><em>mygroup</em><code>, o=</code><em>mycompany</em><code>, c=</code><em>mycountry</em>).</p>
+<h2 id="requesting-a-signed-certificate-from-a-ca">Requesting a Signed Certificate from a CA</h2>
+<p><strong>Note:</strong></p>
+<p>Generating the key pair created a self-signed certificate; however, a certificate is more likely to be trusted by others when it is signed by a CA.</p>
+<p>To get a CA signature, complete the following process:</p>
+<ol type="1">
+<li><p>Generate a CSR:</p>
+<blockquote>
+<p><code>keytool -certreq -file myname.csr</code></p>
+</blockquote>
+<p>This creates a CSR for the entity identified by the default alias <code>mykey</code> and puts the request in the file named <code>myname.csr</code>.</p></li>
+<li><p>Submit <code>myname.csr</code> to a CA, such as DigiCert.</p></li>
+</ol>
+<p>The CA authenticates you, the requestor (usually offline), and returns a certificate, signed by them, authenticating your public key. In some cases, the CA returns a chain of certificates, each one authenticating the public key of the signer of the previous certificate in the chain.</p>
+<h2 id="importing-a-certificate-for-the-ca">Importing a Certificate for the CA</h2>
+<p>To import a certificate for the CA, complete the following process:</p>
+<ol type="1">
+<li><p>Before you import the certificate reply from a CA, you need one or more trusted certificates either in your keystore or in the <code>cacerts</code> keystore file. See <code>-importcert</code> in <strong>Commands</strong>.</p>
+<ul>
+<li><p>If the certificate reply is a certificate chain, then you need the top certificate of the chain. The root CA certificate that authenticates the public key of the CA.</p></li>
+<li><p>If the certificate reply is a single certificate, then you need a certificate for the issuing CA (the one that signed it). If that certificate isn't self-signed, then you need a certificate for its signer, and so on, up to a self-signed root CA certificate.</p></li>
+</ul>
+<p>The <code>cacerts</code> keystore ships with a set of root certificates issued by the CAs of <a href="http://www.oracle.com/technetwork/java/javase/javasecarootcertsprogram-1876540.html">the Oracle Java Root Certificate program</a>. If you request a signed certificate from a CA, and a certificate authenticating that CA's public key hasn't been added to <code>cacerts</code>, then you must import a certificate from that CA as a trusted certificate.</p>
+<p>A certificate from a CA is usually self-signed or signed by another CA. If it is signed by another CA, you need a certificate that authenticates that CA's public key.</p>
+<p>For example, you have obtained a <em>X</em><code>.cer</code> file from a company that is a CA and the file is supposed to be a self-signed certificate that authenticates that CA's public key. Before you import it as a trusted certificate, you should ensure that the certificate is valid by:</p>
+<ol type="1">
+<li><p>Viewing it with the <code>keytool -printcert</code> command or the <code>keytool -importcert</code> command without using the <code>-noprompt</code> option. Make sure that the displayed certificate fingerprints match the expected fingerprints.</p></li>
+<li><p>Calling the person who sent the certificate, and comparing the fingerprints that you see with the ones that they show or that a secure public key repository shows.</p></li>
+</ol>
+<p>Only when the fingerprints are equal is it assured that the certificate wasn't replaced in transit with somebody else's certificate (such as an attacker's certificate). If such an attack takes place, and you didn't check the certificate before you imported it, then you would be trusting anything that the attacker signed.</p></li>
+<li><p>Replace the self-signed certificate with a certificate chain, where each certificate in the chain authenticates the public key of the signer of the previous certificate in the chain, up to a root CA.</p>
+<p>If you trust that the certificate is valid, then you can add it to your keystore by entering the following command:</p>
+<blockquote>
+<p><code>keytool -importcert -alias</code> <em>alias</em> <code>-file *X*</code>.cer`</p>
+</blockquote>
+<p>This command creates a trusted certificate entry in the keystore from the data in the CA certificate file and assigns the values of the <em>alias</em> to the entry.</p></li>
+</ol>
+<h2 id="importing-the-certificate-reply-from-the-ca">Importing the Certificate Reply from the CA</h2>
+<p>After you import a certificate that authenticates the public key of the CA that you submitted your certificate signing request to (or there is already such a certificate in the <code>cacerts</code> file), you can import the certificate reply and replace your self-signed certificate with a certificate chain.</p>
+<p>The certificate chain is one of the following:</p>
+<ul>
+<li><p>Returned by the CA when the CA reply is a chain.</p></li>
+<li><p>Constructed when the CA reply is a single certificate. This certificate chain is constructed by using the certificate reply and trusted certificates available either in the keystore where you import the reply or in the <code>cacerts</code> keystore file.</p></li>
+</ul>
+<p>For example, if you sent your certificate signing request to DigiCert, then you can import their reply by entering the following command:</p>
+<p><strong>Note:</strong></p>
+<p>In this example, the returned certificate is named <code>DCmyname.cer</code>.</p>
+<blockquote>
+<p><code>keytool -importcert -trustcacerts -file DCmyname.cer</code></p>
+</blockquote>
+<h2 id="exporting-a-certificate-that-authenticates-the-public-key">Exporting a Certificate That Authenticates the Public Key</h2>
+<p><strong>Note:</strong></p>
+<p>If you used the <code>jarsigner</code> command to sign a Java Archive (JAR) file, then clients that use the file will want to authenticate your signature.</p>
+<p>One way that clients can authenticate you is by importing your public key certificate into their keystore as a trusted entry. You can then export the certificate and supply it to your clients.</p>
+<p>For example:</p>
+<ol type="1">
+<li><p>Copy your certificate to a file named <code>myname.cer</code> by entering the following command:</p>
+<p><strong>Note:</strong></p>
+<p>In this example, the entry has an alias of <code>mykey</code>.</p>
+<blockquote>
+<p><code>keytool -exportcert -alias mykey -file myname.cer</code></p>
+</blockquote></li>
+<li><p>With the certificate and the signed JAR file, a client can use the <code>jarsigner</code> command to authenticate your signature.</p></li>
+</ol>
+<h2 id="importing-the-keystore">Importing the Keystore</h2>
+<p>Use the <code>importkeystore</code> command to import an entire keystore into another keystore. This imports all entries from the source keystore, including keys and certificates, to the destination keystore with a single command. You can use this command to import entries from a different type of keystore. During the import, all new entries in the destination keystore will have the same alias names and protection passwords (for secret keys and private keys). If the <code>keytool</code> command can't recover the private keys or secret keys from the source keystore, then it prompts you for a password. If it detects alias duplication, then it asks you for a new alias, and you can specify a new alias or simply allow the <code>keytool</code> command to overwrite the existing one.</p>
+<p>For example, import entries from a typical JKS type keystore <code>key.jks</code> into a PKCS #11 type hardware-based keystore, by entering the following command:</p>
+<blockquote>
+<p><code>keytool -importkeystore -srckeystore key.jks -destkeystore NONE -srcstoretype JKS -deststoretype PKCS11 -srcstorepass</code> <em>password</em> <code>-deststorepass</code> <em>password</em></p>
+</blockquote>
+<p>The <code>importkeystore</code> command can also be used to import a single entry from a source keystore to a destination keystore. In this case, besides the options you used in the previous example, you need to specify the alias you want to import. With the <code>-srcalias</code> option specified, you can also specify the destination alias name, protection password for a secret or private key, and the destination protection password you want as follows:</p>
+<blockquote>
+<p><code>keytool -importkeystore -srckeystore key.jks -destkeystore NONE -srcstoretype JKS -deststoretype PKCS11 -srcstorepass</code> <em>password</em> <code>-deststorepass</code> <em>password</em> <code>-srcalias myprivatekey -destalias myoldprivatekey -srckeypass</code> <em>password</em> <code>-destkeypass</code> <em>password</em> <code>-noprompt</code></p>
+</blockquote>
+<h2 id="generating-certificates-for-an-ssl-server">Generating Certificates for an SSL Server</h2>
+<p>The following are <code>keytool</code> commands used to generate key pairs and certificates for three entities:</p>
+<ul>
+<li><p>Root CA (<code>root</code>)</p></li>
+<li><p>Intermediate CA (<code>ca</code>)</p></li>
+<li><p>SSL server (<code>server</code>)</p></li>
+</ul>
+<p>Ensure that you store all the certificates in the same keystore. In the following examples, RSA is the recommended the key algorithm.</p>
+<pre><code>keytool -genkeypair -keystore root.jks -alias root -ext bc:c
+keytool -genkeypair -keystore ca.jks -alias ca -ext bc:c
+keytool -genkeypair -keystore server.jks -alias server
+
+keytool -keystore root.jks -alias root -exportcert -rfc &gt; root.pem
+
+keytool -storepass password -keystore ca.jks -certreq -alias ca |
+    keytool -storepass password -keystore root.jks
+    -gencert -alias root -ext BC=0 -rfc &gt; ca.pem
+keytool -keystore ca.jks -importcert -alias ca -file ca.pem
+
+keytool -storepass password -keystore server.jks -certreq -alias server |
+    keytool -storepass password -keystore ca.jks -gencert -alias ca
+    -ext ku:c=dig,kE -rfc &gt; server.pem
+cat root.pem ca.pem server.pem |
+    keytool -keystore server.jks -importcert -alias server
+</code></pre>
+<h2 id="terms">Terms</h2>
+<dl>
+<dt>Keystore</dt>
+<dd>A keystore is a storage facility for cryptographic keys and certificates.
+</dd>
+<dt>Keystore entries</dt>
+<dd><p>Keystores can have different types of entries. The two most applicable entry types for the <code>keytool</code> command include the following:</p>
+<p>Key entries: Each entry holds very sensitive cryptographic key information, which is stored in a protected format to prevent unauthorized access. Typically, a key stored in this type of entry is a secret key, or a private key accompanied by the certificate chain for the corresponding public key. See <strong>Certificate Chains</strong>. The <code>keytool</code> command can handle both types of entries, while the <code>jarsigner</code> tool only handles the latter type of entry, that is private keys and their associated certificate chains.</p>
+<p>Trusted certificate entries: Each entry contains a single public key certificate that belongs to another party. The entry is called a trusted certificate because the keystore owner trusts that the public key in the certificate belongs to the identity identified by the subject (owner) of the certificate. The issuer of the certificate vouches for this, by signing the certificate.</p>
+</dd>
+<dt>Keystore aliases</dt>
+<dd><p>All keystore entries (key and trusted certificate entries) are accessed by way of unique aliases.</p>
+<p>An alias is specified when you add an entity to the keystore with the <code>-genseckey</code> command to generate a secret key, the <code>-genkeypair</code> command to generate a key pair (public and private key), or the <code>-importcert</code> command to add a certificate or certificate chain to the list of trusted certificates. Subsequent <code>keytool</code> commands must use this same alias to refer to the entity.</p>
+<p>For example, you can use the alias <code>duke</code> to generate a new public/private key pair and wrap the public key into a self-signed certificate with the following command. See <strong>Certificate Chains</strong>.</p>
+<blockquote>
+<p><code>keytool -genkeypair -alias duke -keypass</code> <em>passwd</em></p>
+</blockquote>
+<p>This example specifies an initial <em>passwd</em> required by subsequent commands to access the private key associated with the alias <code>duke</code>. If you later want to change Duke's private key password, use a command such as the following:</p>
+<blockquote>
+<p><code>keytool -keypasswd -alias duke -keypass</code> <em>passwd</em> <code>-new</code> <em>newpasswd</em></p>
+</blockquote>
+<p>This changes the initial <em>passwd</em> to <em>newpasswd</em>. A password shouldn't be specified on a command line or in a script unless it is for testing purposes, or you are on a secure system. If you don't specify a required password option on a command line, then you are prompted for it.</p>
+</dd>
+<dt>Keystore implementation</dt>
+<dd><p>The <code>KeyStore</code> class provided in the <code>java.security</code> package supplies well-defined interfaces to access and modify the information in a keystore. It is possible for there to be multiple different concrete implementations, where each implementation is that for a particular type of keystore.</p>
+<p>Currently, two command-line tools (<code>keytool</code> and <code>jarsigner</code>) make use of keystore implementations. Because the <code>KeyStore</code> class is <code>public</code>, users can write additional security applications that use it.</p>
+<p>In JDK 9 and later, the default keystore implementation is <code>PKCS12</code>. This is a cross platform keystore based on the RSA PKCS12 Personal Information Exchange Syntax Standard. This standard is primarily meant for storing or transporting a user's private keys, certificates, and miscellaneous secrets. There is another built-in implementation, provided by Oracle. It implements the keystore as a file with a proprietary keystore type (format) named <code>JKS</code>. It protects each private key with its individual password, and also protects the integrity of the entire keystore with a (possibly different) password.</p>
+<p>Keystore implementations are provider-based. More specifically, the application interfaces supplied by <code>KeyStore</code> are implemented in terms of a Service Provider Interface (SPI). That is, there is a corresponding abstract <code>KeystoreSpi</code> class, also in the <code>java.security package</code>, which defines the Service Provider Interface methods that providers must implement. The term <em>provider</em> refers to a package or a set of packages that supply a concrete implementation of a subset of services that can be accessed by the Java Security API. To provide a keystore implementation, clients must implement a provider and supply a <code>KeystoreSpi</code> subclass implementation, as described in Steps to Implement and Integrate a Provider.</p>
+<p>Applications can choose different types of keystore implementations from different providers, using the <code>getInstance</code> factory method supplied in the <code>KeyStore</code> class. A keystore type defines the storage and data format of the keystore information, and the algorithms used to protect private/secret keys in the keystore and the integrity of the keystore. Keystore implementations of different types aren't compatible.</p>
+<p>The <code>keytool</code> command works on any file-based keystore implementation. It treats the keystore location that is passed to it at the command line as a file name and converts it to a <code>FileInputStream</code>, from which it loads the keystore information.)The <code>jarsigner</code> commands can read a keystore from any location that can be specified with a URL.</p>
+<p>For <code>keytool</code> and <code>jarsigner</code>, you can specify a keystore type at the command line, with the <code>-storetype</code> option.</p>
+<p>If you don't explicitly specify a keystore type, then the tools choose a keystore implementation based on the value of the <code>keystore.type</code> property specified in the security properties file. The security properties file is called <code>java.security</code>, and resides in the security properties directory:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> <code>java.home/lib/security</code></p></li>
+<li><p><strong>Windows:</strong> <code>java.home\lib\security</code></p></li>
+</ul>
+<p>Each tool gets the <code>keystore.type</code> value and then examines all the currently installed providers until it finds one that implements a keystores of that type. It then uses the keystore implementation from that provider.The <code>KeyStore</code> class defines a static method named <code>getDefaultType</code> that lets applications retrieve the value of the <code>keystore.type</code> property. The following line of code creates an instance of the default keystore type as specified in the <code>keystore.type</code> property:</p>
+<blockquote>
+<p><code>KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());</code></p>
+</blockquote>
+<p>The default keystore type is <code>pkcs12</code>, which is a cross-platform keystore based on the RSA PKCS12 Personal Information Exchange Syntax Standard. This is specified by the following line in the security properties file:</p>
+<blockquote>
+<p><code>keystore.type=pkcs12</code></p>
+</blockquote>
+<p>To have the tools utilize a keystore implementation other than the default, you can change that line to specify a different keystore type. For example, if you want to use the Oracle's <code>jks</code> keystore implementation, then change the line to the following:</p>
+<blockquote>
+<p><code>keystore.type=jks</code></p>
+</blockquote>
+<p><strong>Note:</strong></p>
+<p>Case doesn't matter in keystore type designations. For example, <code>JKS</code> would be considered the same as <code>jks</code>.</p>
+</dd>
+<dt>Certificate</dt>
+<dd><p>A certificate (or public-key certificate) is a digitally signed statement from one entity (the issuer), saying that the public key and some other information of another entity (the subject) has some specific value. The following terms are related to certificates:</p>
+<ul>
+<li><p>Public Keys: These are numbers associated with a particular entity, and are intended to be known to everyone who needs to have trusted interactions with that entity. Public keys are used to verify signatures.</p></li>
+<li><p>Digitally Signed: If some data is digitally signed, then it is stored with the identity of an entity and a signature that proves that entity knows about the data. The data is rendered unforgeable by signing with the entity's private key.</p></li>
+<li><p>Identity: A known way of addressing an entity. In some systems, the identity is the public key, and in others it can be anything from an Oracle Solaris UID to an email address to an X.509 distinguished name.</p></li>
+<li><p>Signature: A signature is computed over some data using the private key of an entity. The signer, which in the case of a certificate is also known as the issuer.</p></li>
+<li><p>Private Keys: These are numbers, each of which is supposed to be known only to the particular entity whose private key it is (that is, it is supposed to be kept secret). Private and public keys exist in pairs in all public key cryptography systems (also referred to as public key crypto systems). In a typical public key crypto system, such as DSA, a private key corresponds to exactly one public key. Private keys are used to compute signatures.</p></li>
+<li><p>Entity: An entity is a person, organization, program, computer, business, bank, or something else you are trusting to some degree.</p></li>
+</ul>
+<p>Public key cryptography requires access to users' public keys. In a large-scale networked environment, it is impossible to guarantee that prior relationships between communicating entities were established or that a trusted repository exists with all used public keys. Certificates were invented as a solution to this public key distribution problem. Now a Certification Authority (CA) can act as a trusted third party. CAs are entities such as businesses that are trusted to sign (issue) certificates for other entities. It is assumed that CAs only create valid and reliable certificates because they are bound by legal agreements. There are many public Certification Authorities, such as DigiCert, Comodo, Entrust, and so on.</p>
+<p>You can also run your own Certification Authority using products such as Microsoft Certificate Server or the Entrust CA product for your organization. With the <code>keytool</code> command, it is possible to display, import, and export certificates. It is also possible to generate self-signed certificates.</p>
+<p>The <code>keytool</code> command currently handles X.509 certificates.</p>
+</dd>
+<dt>X.509 Certificates</dt>
+<dd><p>The X.509 standard defines what information can go into a certificate and describes how to write it down (the data format). All the data in a certificate is encoded with two related standards called ASN.1/DER. Abstract Syntax Notation 1 describes data. The Definite Encoding Rules describe a single way to store and transfer that data.</p>
+<p>All X.509 certificates have the following data, in addition to the signature:</p>
+<ul>
+<li><p>Version: This identifies which version of the X.509 standard applies to this certificate, which affects what information can be specified in it. Thus far, three versions are defined. The <code>keytool</code> command can import and export v1, v2, and v3 certificates. It generates v3 certificates.</p>
+<ul>
+<li><p>X.509 Version 1 has been available since 1988, is widely deployed, and is the most generic.</p></li>
+<li><p>X.509 Version 2 introduced the concept of subject and issuer unique identifiers to handle the possibility of reuse of subject or issuer names over time. Most certificate profile documents strongly recommend that names not be reused and that certificates shouldn't make use of unique identifiers. Version 2 certificates aren't widely used.</p></li>
+<li><p>X.509 Version 3 is the most recent (1996) and supports the notion of extensions where anyone can define an extension and include it in the certificate. Some common extensions are: KeyUsage (limits the use of the keys to particular purposes such as <code>signing-only</code>) and AlternativeNames (allows other identities to also be associated with this public key, for example. DNS names, email addresses, IP addresses). Extensions can be marked critical to indicate that the extension should be checked and enforced or used. For example, if a certificate has the KeyUsage extension marked critical and set to <code>keyCertSign</code>, then when this certificate is presented during SSL communication, it should be rejected because the certificate extension indicates that the associated private key should only be used for signing certificates and not for SSL use.</p></li>
+</ul></li>
+<li><p>Serial number: The entity that created the certificate is responsible for assigning it a serial number to distinguish it from other certificates it issues. This information is used in numerous ways. For example, when a certificate is revoked its serial number is placed in a Certificate Revocation List (CRL).</p></li>
+<li><p>Signature algorithm identifier: This identifies the algorithm used by the CA to sign the certificate.</p></li>
+<li><p>Issuer name: The X.500 Distinguished Name of the entity that signed the certificate. This is typically a CA. Using this certificate implies trusting the entity that signed this certificate. In some cases, such as root or top-level CA certificates, the issuer signs its own certificate.</p></li>
+<li><p>Validity period: Each certificate is valid only for a limited amount of time. This period is described by a start date and time and an end date and time, and can be as short as a few seconds or almost as long as a century. The validity period chosen depends on a number of factors, such as the strength of the private key used to sign the certificate, or the amount one is willing to pay for a certificate. This is the expected period that entities can rely on the public value, when the associated private key has not been compromised.</p></li>
+<li><p>Subject name: The name of the entity whose public key the certificate identifies. This name uses the X.500 standard, so it is intended to be unique across the Internet. This is the X.500 Distinguished Name (DN) of the entity. For example,</p>
+<blockquote>
+<p><code>CN=Java Duke, OU=Java Software Division, O=Oracle Corporation, C=US</code></p>
+</blockquote>
+<p>These refer to the subject's common name (CN), organizational unit (OU), organization (O), and country (C).</p></li>
+<li><p>Subject public key information: This is the public key of the entity being named with an algorithm identifier that specifies which public key crypto system this key belongs to and any associated key parameters.</p></li>
+</ul>
+</dd>
+<dt>Certificate Chains</dt>
+<dd><p>The <code>keytool</code> command can create and manage keystore key entries that each contain a private key and an associated certificate chain. The first certificate in the chain contains the public key that corresponds to the private key.</p>
+<p>When keys are first generated, the chain starts off containing a single element, a self-signed certificate. See -genkeypair in <strong>Commands</strong>. A self-signed certificate is one for which the issuer (signer) is the same as the subject. The subject is the entity whose public key is being authenticated by the certificate. Whenever the <code>-genkeypair</code> command is called to generate a new public/private key pair, it also wraps the public key into a self-signed certificate.</p>
+<p>Later, after a Certificate Signing Request (CSR) was generated with the <code>-certreq</code> command and sent to a Certification Authority (CA), the response from the CA is imported with <code>-importcert</code>, and the self-signed certificate is replaced by a chain of certificates. At the bottom of the chain is the certificate (reply) issued by the CA authenticating the subject's public key. The next certificate in the chain is one that authenticates the CA's public key.</p>
+<p>In many cases, this is a self-signed certificate, which is a certificate from the CA authenticating its own public key, and the last certificate in the chain. In other cases, the CA might return a chain of certificates. In this case, the bottom certificate in the chain is the same (a certificate signed by the CA, authenticating the public key of the key entry), but the second certificate in the chain is a certificate signed by a different CA that authenticates the public key of the CA you sent the CSR to. The next certificate in the chain is a certificate that authenticates the second CA's key, and so on, until a self-signed root certificate is reached. Each certificate in the chain (after the first) authenticates the public key of the signer of the previous certificate in the chain.</p>
+<p>Many CAs only return the issued certificate, with no supporting chain, especially when there is a flat hierarchy (no intermediates CAs). In this case, the certificate chain must be established from trusted certificate information already stored in the keystore.</p>
+<p>A different reply format (defined by the PKCS #7 standard) includes the supporting certificate chain in addition to the issued certificate. Both reply formats can be handled by the <code>keytool</code> command.</p>
+<p>The top-level (root) CA certificate is self-signed. However, the trust into the root's public key doesn't come from the root certificate itself, but from other sources such as a newspaper. This is because anybody could generate a self-signed certificate with the distinguished name of, for example, the DigiCert root CA. The root CA public key is widely known. The only reason it is stored in a certificate is because this is the format understood by most tools, so the certificate in this case is only used as a vehicle to transport the root CA's public key. Before you add the root CA certificate to your keystore, you should view it with the <code>-printcert</code> option and compare the displayed fingerprint with the well-known fingerprint obtained from a newspaper, the root CA's Web page, and so on.</p>
+</dd>
+<dt>cacerts Certificates File</dt>
+<dd><p>A certificates file named <code>cacerts</code> resides in the security properties directory:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> <em>JAVA_HOME</em><code>/lib/security</code></p></li>
+<li><p><strong>Windows:</strong> <em>JAVA_HOME</em><code>\lib\security</code></p></li>
+</ul>
+<p><em>JAVA_HOME</em> is the runtime environment directory, which is the <code>jre</code> directory in the JDK or the top-level directory of the Java Runtime Environment (JRE).</p>
+<p>The <code>cacerts</code> file represents a system-wide keystore with CA certificates. System administrators can configure and manage that file with the <code>keytool</code> command by specifying <code>jks</code> as the keystore type. The <code>cacerts</code> keystore file ships with a default set of root CA certificates. For Oracle Solaris, Linux, OS X, and Windows, you can list the default certificates with the following command:</p>
+<blockquote>
+<p><code>keytool -list -cacerts</code></p>
+</blockquote>
+<p>The initial password of the <code>cacerts</code> keystore file is <code>changeit</code>. System administrators should change that password and the default access permission of that file upon installing the SDK.</p>
+<p><strong>Note:</strong></p>
+<p>It is important to verify your <code>cacerts</code> file. Because you trust the CAs in the <code>cacerts</code> file as entities for signing and issuing certificates to other entities, you must manage the <code>cacerts</code> file carefully. The <code>cacerts</code> file should contain only certificates of the CAs you trust. It is your responsibility to verify the trusted root CA certificates bundled in the <code>cacerts</code> file and make your own trust decisions.</p>
+<p>To remove an untrusted CA certificate from the <code>cacerts</code> file, use the <code>-delete</code> option of the <code>keytool</code> command. You can find the <code>cacerts</code> file in the JRE installation directory. Contact your system administrator if you don't have permission to edit this file</p>
+</dd>
+<dt>Internet RFC 1421 Certificate Encoding Standard</dt>
+<dd><p>Certificates are often stored using the printable encoding format defined by the Internet RFC 1421 standard, instead of their binary encoding. This certificate format, also known as Base64 encoding, makes it easy to export certificates to other applications by email or through some other mechanism.</p>
+<p>Certificates read by the <code>-importcert</code> and <code>-printcert</code> commands can be in either this format or binary encoded. The <code>-exportcert</code> command by default outputs a certificate in binary encoding, but will instead output a certificate in the printable encoding format, when the <code>-rfc</code> option is specified.</p>
+<p>The <code>-list</code> command by default prints the SHA-256 fingerprint of a certificate. If the <code>-v</code> option is specified, then the certificate is printed in human-readable format. If the <code>-rfc</code> option is specified, then the certificate is output in the printable encoding format.</p>
+<p>In its printable encoding format, the encoded certificate is bounded at the beginning and end by the following text:</p>
+<pre><code>-----BEGIN CERTIFICATE-----
+
+encoded certificate goes here.
+
+-----END CERTIFICATE-----</code></pre>
+</dd>
+<dt>X.500 Distinguished Names</dt>
+<dd><p>X.500 Distinguished Names are used to identify entities, such as those that are named by the <code>subject</code> and <code>issuer</code> (signer) fields of X.509 certificates. The <code>keytool</code> command supports the following subparts:</p>
+<ul>
+<li><p>commonName: The common name of a person such as Susan Jones.</p></li>
+<li><p>organizationUnit: The small organization (such as department or division) name. For example, Purchasing.</p></li>
+<li><p>localityName: The locality (city) name, for example, Palo Alto.</p></li>
+<li><p>stateName: State or province name, for example, California.</p></li>
+<li><p>country: Two-letter country code, for example, CH.</p></li>
+</ul>
+<p>When you supply a distinguished name string as the value of a <code>-dname</code> option, such as for the <code>-genkeypair</code> command, the string must be in the following format:</p>
+<blockquote>
+<p><code>CN=cName, OU=orgUnit, O=org, L=city, S=state, C=countryCode</code></p>
+</blockquote>
+<p>All the following items represent actual values and the previous keywords are abbreviations for the following:</p>
+<pre><code>CN=commonName
+OU=organizationUnit
+O=organizationName
+L=localityName
+S=stateName
+C=country</code></pre>
+<p>A sample distinguished name string is:</p>
+<blockquote>
+<p><code>CN=Mark Smith, OU=Java, O=Oracle, L=Cupertino, S=California, C=US</code></p>
+</blockquote>
+<p>A sample command using such a string is:</p>
+<blockquote>
+<p><code>keytool -genkeypair -dname &quot;CN=Mark Smith, OU=Java, O=Oracle, L=Cupertino, S=California, C=US&quot; -alias mark</code></p>
+</blockquote>
+<p>Case doesn't matter for the keyword abbreviations. For example, CN, cn, and Cn are all treated the same.</p>
+<p>Order matters; each subcomponent must appear in the designated order. However, it isn't necessary to have all the subcomponents. You can use a subset, for example:</p>
+<blockquote>
+<p><code>CN=Smith, OU=Java, O=Oracle, C=US</code></p>
+</blockquote>
+<p>If a distinguished name string value contains a comma, then the comma must be escaped by a backslash (\) character when you specify the string on a command line, as in:</p>
+<blockquote>
+<p><code>cn=Jack, ou=Java\, Product Development, o=Oracle, c=US</code></p>
+</blockquote>
+<p>It is never necessary to specify a distinguished name string on a command line. When the distinguished name is needed for a command, but not supplied on the command line, the user is prompted for each of the subcomponents. In this case, a comma doesn't need to be escaped by a backslash (\).</p>
+</dd>
+</dl>
+<h2 id="warnings">Warnings</h2>
+<h2 id="importing-trusted-certificates-warning">Importing Trusted Certificates Warning</h2>
+<p><strong>Important</strong>: Be sure to check a certificate very carefully before importing it as a trusted certificate.</p>
+<p><strong>Windows Example:</strong></p>
+<p>View the certificate first with the <code>-printcert</code> command or the <code>-importcert</code> command without the <code>-noprompt</code> option. Ensure that the displayed certificate fingerprints match the expected ones. For example, suppose someone sends or emails you a certificate that you put it in a file named <code>\tmp\cert</code>. Before you consider adding the certificate to your list of trusted certificates, you can execute a <code>-printcert</code> command to view its fingerprints, as follows:</p>
+<pre><code>  keytool -printcert -file \tmp\cert
+    Owner: CN=ll, OU=ll, O=ll, L=ll, S=ll, C=ll
+    Issuer: CN=ll, OU=ll, O=ll, L=ll, S=ll, C=ll
+    Serial Number: 59092b34
+    Valid from: Thu Jun 24 18:01:13 PDT 2016 until: Wed Jun 23 17:01:13 PST 2016
+    Certificate Fingerprints:
+
+                   SHA-1: 20:B6:17:FA:EF:E5:55:8A:D0:71:1F:E8:D6:9D:C0:37:13:0E:5E:FE
+                 SHA-256: 90:7B:70:0A:EA:DC:16:79:92:99:41:FF:8A:FE:EB:90:
+                          17:75:E0:90:B2:24:4D:3A:2A:16:A6:E4:11:0F:67:A4</code></pre>
+<p><strong>Oracle Solaris Example:</strong></p>
+<p>View the certificate first with the <code>-printcert</code> command or the <code>-importcert</code> command without the <code>-noprompt</code> option. Ensure that the displayed certificate fingerprints match the expected ones. For example, suppose someone sends or emails you a certificate that you put it in a file named <code>/tmp/cert</code>. Before you consider adding the certificate to your list of trusted certificates, you can execute a <code>-printcert</code> command to view its fingerprints, as follows:</p>
+<pre><code>  keytool -printcert -file /tmp/cert
+    Owner: CN=ll, OU=ll, O=ll, L=ll, S=ll, C=ll
+    Issuer: CN=ll, OU=ll, O=ll, L=ll, S=ll, C=ll
+    Serial Number: 59092b34
+    Valid from: Thu Jun 24 18:01:13 PDT 2016 until: Wed Jun 23 17:01:13 PST 2016
+    Certificate Fingerprints:
+
+                   SHA-1: 20:B6:17:FA:EF:E5:55:8A:D0:71:1F:E8:D6:9D:C0:37:13:0E:5E:FE
+                   SHA-256: 90:7B:70:0A:EA:DC:16:79:92:99:41:FF:8A:FE:EB:90:
+                           17:75:E0:90:B2:24:4D:3A:2A:16:A6:E4:11:0F:67:A4</code></pre>
+<p>Then call or otherwise contact the person who sent the certificate and compare the fingerprints that you see with the ones that they show. Only when the fingerprints are equal is it guaranteed that the certificate wasn't replaced in transit with somebody else's certificate such as an attacker's certificate. If such an attack took place, and you didn't check the certificate before you imported it, then you would be trusting anything the attacker signed, for example, a JAR file with malicious class files inside.</p>
+<p><strong>Note:</strong></p>
+<p>It isn't required that you execute a <code>-printcert</code> command before importing a certificate. This is because before you add a certificate to the list of trusted certificates in the keystore, the <code>-importcert</code> command prints out the certificate information and prompts you to verify it. You can then stop the import operation. However, you can do this only when you call the <code>-importcert</code> command without the <code>-noprompt</code> option. If the <code>-noprompt</code> option is specified, then there is no interaction with the user.</p>
+<h2 id="passwords-warning">Passwords Warning</h2>
+<p>Most commands that operate on a keystore require the store password. Some commands require a private/secret key password. Passwords can be specified on the command line in the <code>-storepass</code> and <code>-keypass</code> options. However, a password shouldn't be specified on a command line or in a script unless it is for testing, or you are on a secure system. When you don't specify a required password option on a command line, you are prompted for it.</p>
+<h2 id="certificate-conformance-warning">Certificate Conformance Warning</h2>
+<p><a href="https://tools.ietf.org/rfc/rfc5280.txt">Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</a> defined a profile on conforming X.509 certificates, which includes what values and value combinations are valid for certificate fields and extensions.</p>
+<p>The <code>keytool</code> command doesn't enforce all of these rules so it can generate certificates that don't conform to the standard, such as self-signed certificates that would be used for internal testing purposes. Certificates that don't conform to the standard might be rejected by JRE or other applications. Users should ensure that they provide the correct options for <code>-dname</code>, <code>-ext</code>, and so on.</p>
+<h2 id="import-a-new-trusted-certificate">Import a New Trusted Certificate</h2>
+<p>Before you add the certificate to the keystore, the <code>keytool</code> command verifies it by attempting to construct a chain of trust from that certificate to a self-signed certificate (belonging to a root CA), using trusted certificates that are already available in the keystore.</p>
+<p>If the <code>-trustcacerts</code> option was specified, then additional certificates are considered for the chain of trust, namely the certificates in a file named <code>cacerts</code>.</p>
+<p>If the <code>keytool</code> command fails to establish a trust path from the certificate to be imported up to a self-signed certificate (either from the keystore or the <code>cacerts</code> file), then the certificate information is printed, and the user is prompted to verify it by comparing the displayed certificate fingerprints with the fingerprints obtained from some other (trusted) source of information, which might be the certificate owner. Be very careful to ensure the certificate is valid before importing it as a trusted certificate. The user then has the option of stopping the import operation. If the <code>-noprompt</code> option is specified, then there is no interaction with the user.</p>
+<h2 id="import-a-certificate-reply">Import a Certificate Reply</h2>
+<p>When you import a certificate reply, the certificate reply is validated with trusted certificates from the keystore, and optionally, the certificates configured in the <code>cacerts</code> keystore file when the <code>-trustcacerts</code> option is specified.</p>
+<p>The methods of determining whether the certificate reply is trusted are as follows:</p>
+<ul>
+<li><p>If the reply is a single X.509 certificate, then the <code>keytool</code> command attempts to establish a trust chain, starting at the certificate reply and ending at a self-signed certificate (belonging to a root CA). The certificate reply and the hierarchy of certificates is used to authenticate the certificate reply from the new certificate chain of aliases. If a trust chain can't be established, then the certificate reply isn't imported. In this case, the <code>keytool</code> command doesn't print the certificate and prompt the user to verify it, because it is very difficult for a user to determine the authenticity of the certificate reply.</p></li>
+<li><p>If the reply is a PKCS #7 formatted certificate chain or a sequence of X.509 certificates, then the chain is ordered with the user certificate first followed by zero or more CA certificates. If the chain ends with a self-signed root CA certificate and the<code>-trustcacerts</code> option was specified, the <code>keytool</code> command attempts to match it with any of the trusted certificates in the keystore or the <code>cacerts</code> keystore file. If the chain doesn't end with a self-signed root CA certificate and the <code>-trustcacerts</code> option was specified, the <code>keytool</code> command tries to find one from the trusted certificates in the keystore or the <code>cacerts</code> keystore file and add it to the end of the chain. If the certificate isn't found and the <code>-noprompt</code> option isn't specified, the information of the last certificate in the chain is printed, and the user is prompted to verify it.</p></li>
+</ul>
+<p>If the public key in the certificate reply matches the user's public key already stored with <code>alias</code>, then the old certificate chain is replaced with the new certificate chain in the reply. The old chain can only be replaced with a valid <code>keypass</code>, and so the password used to protect the private key of the entry is supplied. If no password is provided, and the private key password is different from the keystore password, the user is prompted for it.</p>
+<p>This command was named <code>-import</code> in earlier releases. This old name is still supported in this release. The new name, <code>-importcert</code>, is preferred.</p>
+</body>
+</html>

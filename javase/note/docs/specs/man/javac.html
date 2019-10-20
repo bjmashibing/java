@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The javac Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The javac Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>javac - read Java class and interface definitions and compile them into bytecode and class files</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>javac</code> [<em>options</em>] [<em>sourcefiles</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>Command-line options. See <a href="#overview-of-javac-options">Overview of javac Options</a>.
+</dd>
+<dt><em>sourcefiles</em></dt>
+<dd>One or more source files to be compiled (such as <code>MyClass.java</code>) or processed for annotations (such as <code>MyPackage.MyClass</code>).
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>javac</code> command reads class and interface definitions, written in the Java programming language, and compiles them into bytecode class files. The <code>javac</code> command can also process annotations in Java source files and classes.</p>
+<p>A new launcher environment variable, <code>JDK_JAVAC_OPTIONS</code>, was introduced in JDK 9 that prepended its content to the command line to <code>javac</code> . See <a href="#using-jdk_javac_options-environment-variable">Using JDK_JAVAC_OPTIONS Environment Variable</a>.</p>
+<p>There are two ways to pass source code file names to <code>javac</code>.</p>
+<ul>
+<li><p>For a small number of source files, you can list the file names on the command line.</p></li>
+<li><p>For a large number of source files, you can use the <code>@</code><em>filename</em> option on the <code>javac</code> command line to include a file that lists the source file names. See <a href="#standard-options">Standard Options</a> for a description of the option and <a href="#javac-command-line-argument-files">javac Command-Line Argument Files</a> for a description of <code>javac</code> argument files.</p></li>
+</ul>
+<p>Source code file names must have <code>.java</code> suffixes, class file names must have <code>.class</code> suffixes, and both source and class files must have root names that identify the class. For example, a class called <code>MyClass</code> would be written in a source file called <code>MyClass.java</code> and compiled into a bytecode class file called <code>MyClass.class</code>.</p>
+<p>Inner class definitions produce additional class files. These class files have names that combine the inner and outer class names, such as <code>MyClass$MyInnerClass.class</code>.</p>
+<p>You should arrange the source files in a directory tree that reflects their package tree. For example:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> If all of your source files are in <code>/workspace</code>, then put the source code for <code>com.mysoft.mypack.MyClass</code> in <code>/workspace/com/mysoft/mypack/MyClass.java</code>.</p></li>
+<li><p><strong>Windows:</strong> If all of your source files are in <code>\workspace</code>, then put the source code for <code>com.mysoft.mypack.MyClass</code> in <code>\workspace\com\mysoft\mypack\MyClass.java</code>.</p></li>
+</ul>
+<p>By default, the compiler puts each class file in the same directory as its source file. You can specify a separate destination directory with the <code>-d</code> option described in <a href="#standard-options">Standard Options</a>.</p>
+<h2 id="programmatic-interface">Programmatic Interface</h2>
+<p>The <code>javac</code> command supports the new Java Compiler API defined by the classes and interfaces in the <code>javax.tools</code> package.</p>
+<h2 id="implicitly-loaded-source-files">Implicitly Loaded Source Files</h2>
+<p>To compile a set of source files, the compiler might need to implicitly load additional source files. See <a href="#searching-for-types">Searching for Types</a>. Such files are currently not subject to annotation processing. By default, the compiler gives a warning when annotation processing occurs and any implicitly loaded source files are compiled. The <code>-implicit</code> option provides a way to suppress the warning.</p>
+<h2 id="using-jdk_javac_options-environment-variable">Using JDK_JAVAC_OPTIONS Environment Variable</h2>
+<p>The content of the <code>JDK_JAVAC_OPTIONS</code> environment variable, separated by white-spaces ( ) or white-space characters (<code>\n</code>, <code>\t</code>, <code>\r</code>, or <code>\f</code>) is prepended to the command line arguments passed to <code>javac</code> as a list of arguments.</p>
+<p>The encoding requirement for the environment variable is the same as the <code>javac</code> command line on the system. <code>JDK_JAVAC_OPTIONS</code> environment variable content is treated in the same manner as that specified in the command line.</p>
+<p>Single quotes (<code>'</code>) or double quotes (<code>&quot;</code>) can be used to enclose arguments that??contain whitespace characters. All content between the open quote and the first matching close quote are preserved by simply removing the pair of quotes. In case a matching quote is not found, the launcher will abort with an error message. <code>@</code><em>files</em> are supported as they are specified in the command line. However, as in <code>@</code><em>files</em>, use of a wildcard is not supported.</p>
+<p><strong>Examples of quoting arguments containing white spaces:</strong></p>
+<blockquote>
+<p><code>export JDK_JAVAC_OPTIONS='@&quot;C:\white spaces\argfile&quot;'</code></p>
+</blockquote>
+<blockquote>
+<p><code>export JDK_JAVAC_OPTIONS='&quot;@C:\white spaces\argfile&quot;'</code></p>
+</blockquote>
+<blockquote>
+<p><code>export JDK_JAVAC_OPTIONS='@C:\&quot;white spaces&quot;\argfile'</code></p>
+</blockquote>
+<h2 id="overview-of-javac-options">Overview of javac Options</h2>
+<p>The compiler has sets of standard options, and cross-compilation options that are supported on the current development environment. The compiler also has a set of nonstandard options that are specific to the current virtual machine and compiler implementations but are subject to change in the future. The nonstandard options begin with <code>-X</code> . The different sets of <code>javac</code> options are described in the following sections:</p>
+<ul>
+<li><p><a href="#standard-options">Standard Options</a></p></li>
+<li><p><a href="#cross-compilation-options-for-javac">Cross-Compilation Options for javac</a></p></li>
+<li><p><a href="#extra-options">Extra Options</a></p></li>
+</ul>
+<h2 id="standard-options">Standard Options</h2>
+<dl>
+<dt><code>@</code><em>filename</em></dt>
+<dd>Reads options and file names from a file. To shorten or simplify the <code>javac</code> command, you can specify one or more files that contain arguments to the <code>javac</code> command (except <code>-J</code> options). This lets you to create <code>javac</code> commands of any length on any operating system. See <a href="#javac-command-line-argument-files">javac Command-Line Argument Files</a>.
+</dd>
+<dt><code>-A</code><em>key</em>[<code>=</code><em>value</em>]</dt>
+<dd>Specifies options to pass to annotation processors. These options aren't interpreted by <code>javac</code> directly, but are made available for use by individual processors. The <em>key</em> value should be one or more identifiers separated by a dot (<code>.</code>).
+</dd>
+<dt><code>--add-modules</code> <em>module</em><code>,</code><em>module</em></dt>
+<dd>Specifies root modules to resolve in addition to the initial modules, or all modules on the module path if <em>module</em> is <code>ALL-MODULE-PATH.</code>
+</dd>
+<dt><code>--boot-class-path</code> <em>path</em> or <code>-bootclasspath</code> <em>path</em></dt>
+<dd><p>Overrides the location of the bootstrap class files.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>--class-path</code> <em>path</em>, <code>-classpath</code> <em>path</em>, or <code>-cp</code> <em>path</em></dt>
+<dd><p>Specifies where to find user class files and annotation processors. This class path overrides the user class path in the <code>CLASSPATH</code> environment variable.</p>
+<ul>
+<li><p>If <code>--class-path</code>, <code>-classpath</code>, or <code>-cp</code> aren't specified, then the user class path is the current directory.</p></li>
+<li><p>If the <code>-sourcepath</code> option isn't specified, then the user class path is also searched for source files.</p></li>
+<li><p>If the <code>-processorpath</code> option isn't specified, then the class path is also searched for annotation processors.</p></li>
+</ul>
+</dd>
+<dt><code>-d</code> <em>directory</em></dt>
+<dd><p>Sets the destination directory for class files. If a class is part of a package, then <code>javac</code> puts the class file in a subdirectory that reflects the package name and creates directories as needed. For example:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> If you specify <code>-d /home/myclasses</code> and the class is called <code>com.mypackage.MyClass</code>, then the class file is <code>/home/myclasses/com/mypackage/MyClass.class</code>.</p></li>
+<li><p><strong>Windows:</strong> If you specify <code>-d C:\myclasses</code> and the class is called <code>com.mypackage.MyClass</code>, then the class file is <code>C:\myclasses\com\mypackage\MyClass.class</code>.</p></li>
+</ul>
+<p>If the <code>-d</code> option isn't specified, then <code>javac</code> puts each class file in the same directory as the source file from which it was generated.</p>
+<p><strong>Note:</strong></p>
+<p>The directory specified by the <code>-d</code> option isn't automatically added to your user class path.</p>
+</dd>
+<dt><code>-deprecation</code></dt>
+<dd>Shows a description of each use or override of a deprecated member or class. Without the <code>-deprecation</code> option, <code>javac</code> shows a summary of the source files that use or override deprecated members or classes. The <code>-deprecation</code> option is shorthand for <code>-Xlint:deprecation</code>.
+</dd>
+<dt><code>--enable-preview</code></dt>
+<dd>Enables preview language features. Used in conjunction with either <code>-source</code> or <code>--release</code>.
+</dd>
+<dt><code>-encoding</code> <em>encoding</em></dt>
+<dd>Specifies character encoding used by source files, such as EUC-JP and UTF-8. If the <code>-encoding</code> option isn't specified, then the platform default converter is used.
+</dd>
+<dt><code>-endorseddirs</code> <em>directories</em></dt>
+<dd><p>Overrides the location of the endorsed standards path.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-extdirs</code> <em>directories</em></dt>
+<dd><p>Overrides the location of the installed extensions. The <code>directories</code> variable is a colon-separated list of directories. Each JAR file in the specified directories is searched for class files. All JAR files found become part of the class path.</p>
+<p>If you are cross-compiling, then this option specifies the directories that contain the extension classes. See <a href="#cross-compilation-options-for-javac">Cross-Compilation Options for javac</a>.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-g</code></dt>
+<dd>Generates all debugging information, including local variables. By default, only line number and source file information is generated.
+</dd>
+<dt><code>-g:</code>[<code>lines</code>, <code>vars</code>, <code>source</code>]</dt>
+<dd><p>Generates only the kinds of debugging information specified by the comma-separated list of keywords. Valid keywords are:</p>
+<dl>
+<dt><code>lines</code></dt>
+<dd>Line number debugging information.
+</dd>
+<dt><code>vars</code></dt>
+<dd>Local variable debugging information.
+</dd>
+<dt><code>source</code></dt>
+<dd>Source file debugging information.
+</dd>
+</dl>
+</dd>
+<dt><code>-g:none</code></dt>
+<dd>Doesn't generate debugging information.
+</dd>
+<dt><code>-h</code> <em>directory</em></dt>
+<dd><p>Specfies where to place generated native header files.</p>
+<p>When you specify this option, a native header file is generated for each class that contains native methods or that has one or more constants annotated with the <a href="https://docs.oracle.com/javase/10/docs/api/java/lang/annotation/Native.html"><code>java.lang.annotation.Native</code></a> annotation. If the class is part of a package, then the compiler puts the native header file in a subdirectory that reflects the package name and creates directories as needed.</p>
+</dd>
+<dt><code>--help</code>, <code>-help</code> or <code>-?</code></dt>
+<dd>Prints a synopsis of the standard options.
+</dd>
+<dt><code>--help-extra</code> or <code>-X</code></dt>
+<dd>Prints the help for extra options.
+</dd>
+<dt><code>-implicit:</code>[<code>none</code>, <code>class</code>]</dt>
+<dd><p>Specifies whether or not to generate class files for implicitly referenced files:</p>
+<ul>
+<li><p><code>-implicit:class</code> --- Automatically generates class files.</p></li>
+<li><p><code>-implicit:none</code> --- Suppresses class file generation.</p></li>
+</ul>
+<p>If this option isn't specified, then the default automatically generates class files. In this case, the compiler issues a warning if any class files are generated when also doing annotation processing. The warning isn't issued when the <code>-implicit</code> option is explicitly set. See <a href="#searching-for-types">Searching for Types</a>.</p>
+</dd>
+<dt><code>-J</code><em>option</em></dt>
+<dd><p>Passes <em>option</em> to the runtime system, where <em>option</em> is one of the Java options described on <a href="java.html">java</a> command. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB.</p>
+<p><strong>Note:</strong></p>
+<p>The <code>CLASSPATH</code> environment variable, <code>-classpath</code> option, <code>-bootclasspath</code> option, and <code>-extdirs</code> option don't specify the classes used to run <code>javac</code>. Trying to customize the compiler implementation with these options and variables is risky and often doesn't accomplish what you want. If you must customize the complier implementation, then use the <code>-J</code> option to pass options through to the underlying Java launcher.</p>
+</dd>
+<dt><code>--limit-modules</code> <em>module</em><code>,</code><em>module</em>*</dt>
+<dd>Limits the universe of observable modules.
+</dd>
+<dt><code>--module</code> <em>module-name</em> or <code>-m</code> <em>module-name</em></dt>
+<dd>Compiles only the specified module and checks time stamps.
+</dd>
+<dt><code>--module-path</code> <em>path</em> or <code>-p</code> <em>path</em></dt>
+<dd>Specifies where to find application modules.
+</dd>
+<dt><code>--module-source-path</code> <em>module-source-path</em></dt>
+<dd>Specifies where to find input source files for multiple modules.
+</dd>
+<dt><code>--module-version</code> <em>version</em></dt>
+<dd>Specifies the version of modules that are being compiled.
+</dd>
+<dt><code>-nowarn</code></dt>
+<dd>Disables warning messages. This option operates the same as the <code>-Xlint:none</code> option.
+</dd>
+<dt><code>-parameters</code></dt>
+<dd>Generates metadata for reflection on method parameters. Stores formal parameter names of constructors and methods in the generated class file so that the method <code>java.lang.reflect.Executable.getParameters</code> from the Reflection API can retrieve them.
+</dd>
+<dt><code>-proc:</code>[<code>none</code>, <code>only</code>]</dt>
+<dd>Controls whether annotation processing and compilation are done. <code>-proc:none</code> means that compilation takes place without annotation processing. <code>-proc:only</code> means that only annotation processing is done, without any subsequent compilation.
+</dd>
+<dt><code>-processor</code> <em>class1</em>[<code>,</code><em>class2</em><code>,</code><em>class3</em>...]</dt>
+<dd>Names of the annotation processors to run. This bypasses the default discovery process.
+</dd>
+<dt><code>--processor-module-path</code> <em>path</em></dt>
+<dd>Specifies the module path used for finding annotation processors.
+</dd>
+<dt><code>--processor-path</code> <em>path</em> or <code>-processorpath</code> <em>path</em></dt>
+<dd>Specifies where to find annotation processors. If this option isn't used, then the class path is searched for processors.
+</dd>
+<dt><code>-profile</code> <em>profile</em></dt>
+<dd><p>Checks that the API used is available in the specified profile.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>--release</code> <em>release</em></dt>
+<dd><p>Compiles against the public, supported and documented API for a specific VM version. Supported <code>release</code> targets are<code>6</code>, <code>7</code>, <code>8</code>, <code>9</code>, <code>10</code>and <code>11</code>.</p>
+<p><strong>Note:</strong></p>
+<p>When using <code>--release</code> for a version of the Java Platform that supports modules, you can't use <code>--add-modules</code> to access internal JDK modules, nor can you use <code>--add-exports</code> to access internal JDK APIs in the modules.</p>
+</dd>
+<dt><code>-s</code> <em>directory</em></dt>
+<dd><p>Specifies the directory used to place the generated source files. If a class is part of a package, then the compiler puts the source file in a subdirectory that reflects the package name and creates directories as needed. For example:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> If you specify <code>-s /home/mysrc</code> and the class is called <code>com.mypackage.MyClass</code>, then the source file is put in <code>/home/mysrc/com/mypackage/MyClass.java</code>.</p></li>
+<li><p><strong>Windows:</strong> If you specify <code>-s C:\mysrc</code> and the class is called <code>com.mypackage.MyClass</code>, then the source file is put in <code>C:\mysrc\com\mypackage\MyClass.java</code>.</p></li>
+</ul>
+</dd>
+<dt><code>-source</code> <em>release</em></dt>
+<dd><p>Specifies the version of source code accepted. The following values for <em>release</em> are allowed:</p>
+<p><strong>Note:</strong></p>
+<p>Beginning with JDK 9, <code>javac</code> no longer supports <code>-source</code> release settings less than or equal to <code>5</code>. If settings less than or equal to <code>5</code> are used, then the <code>javac</code> command behaves as if <code>-source 6</code> were specified.</p>
+<dl>
+<dt><code>1.6</code></dt>
+<dd>No language changes were introduced in Java SE 6. However, encoding errors in source files are now reported as errors instead of warnings as was done in earlier releases of Java Platform, Standard Edition.
+</dd>
+<dt><code>6</code></dt>
+<dd>Synonym for 1.6.
+</dd>
+<dt><code>1.7</code></dt>
+<dd>The compiler accepts code with features introduced in Java SE 7.
+</dd>
+<dt><code>7</code></dt>
+<dd>Synonym for 1.7.
+</dd>
+<dt><code>1.8</code></dt>
+<dd>The compiler accepts code with features introduced in Java SE 8.
+</dd>
+<dt><code>8</code></dt>
+<dd>Synonym for 1.8.
+</dd>
+<dt><code>9</code></dt>
+<dd>The compiler accepts code with features introduced in Java SE 9.
+</dd>
+<dt><code>10</code></dt>
+<dd>The compiler accepts code with features introduced in Java SE 10.
+</dd>
+<dt><code>11</code></dt>
+<dd>The default value. The compiler accepts code with features introduced in Java SE 11.
+</dd>
+</dl>
+</dd>
+<dt><code>--source-path</code> <em>path</em> or <code>-sourcepath</code> <em>path</em></dt>
+<dd><p>Specifies where to find input source files. This is the source code path used to search for class or interface definitions. As with the user class path, source path entries are separated by colons (<code>:</code>) on Oracle Solaris and semicolons (<code>;</code>) on Windows. They can be directories, JAR archives, or ZIP archives. If packages are used, then the local path name within the directory or archive must reflect the package name.</p>
+<p><strong>Note:</strong></p>
+<p>Classes found through the class path might be recompiled when their source files are also found. See <a href="#searching-for-types">Searching for Types</a>.</p>
+</dd>
+<dt><code>--system</code> <em>jdk</em> | <code>none</code></dt>
+<dd>Overrides the location of system modules.
+</dd>
+<dt><code>-target</code> <em>release</em></dt>
+<dd>Generates class files for a specific VM version.
+</dd>
+<dt><code>--upgrade-module-path</code> <em>path</em></dt>
+<dd>Overrides the location of upgradeable modules.
+</dd>
+<dt><code>-verbose</code></dt>
+<dd>Outputs messages about what the compiler is doing. Messages include information about each class loaded and each source file compiled.
+</dd>
+<dt><code>--version</code> or <code>-version</code></dt>
+<dd>Prints version information.
+</dd>
+<dt><code>-Werror</code></dt>
+<dd>Terminates compilation when warnings occur.
+</dd>
+</dl>
+<h2 id="cross-compilation-options-for-javac">Cross-Compilation Options for javac</h2>
+<p>By default, for releases prior to JDK 9, classes were compiled against the bootstrap classes of the platform that shipped with the<code>javac</code> command. But <code>javac</code> also supports cross-compiling, in which classes are compiled against bootstrap classes of a different Java platform implementation. It's important to use the <code>-bootclasspath</code> and <code>-extdirs</code> options when cross-compiling.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+<h2 id="extra-options">Extra Options</h2>
+<dl>
+<dt><code>--add-exports</code> <em>module</em><code>/</code><em>package</em><code>=</code><em>other-module</em>(<code>,</code><em>other-module</em>)*</dt>
+<dd>Specifies a package to be considered as exported from its defining module to additional modules or to all unnamed modules when the value of <em>other-module</em> is <code>ALL-UNNAMED</code>.
+</dd>
+<dt><code>--add-reads</code> <em>module</em><code>=</code><em>other-module</em>(<code>,</code><em>other-module</em>)*</dt>
+<dd>Specifies additional modules to be considered as required by a given module.
+</dd>
+<dt><code>--default-module-for-created-files</code> <em>module-name</em></dt>
+<dd>Specifies the fallback target module for files created by annotation processors, if none is specified or inferred.
+</dd>
+<dt><code>-Djava.endorsed.dirs=</code><em>dirs</em></dt>
+<dd><p>Overrides the location of the endorsed standards path.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-Djava.ext.dirs=</code><em>dirs</em></dt>
+<dd><p>Overrides the location of installed extensions.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>--doclint-format</code> [<code>html4</code>|<code>html5</code>]</dt>
+<dd>Specifies the format for documentation comments.
+</dd>
+<dt><code>--patch-module</code> <em>module</em><code>=</code><em>file</em>(<code>:</code><em>file</em>)*</dt>
+<dd>Overrides or augments a module with classes and resources in JAR files or directories.
+</dd>
+<dt><code>-Xbootclasspath:</code><em>path</em></dt>
+<dd><p>Overrides the location of the bootstrap class files.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-Xbootclasspath/a:</code><em>path</em></dt>
+<dd><p>Adds a suffix to the bootstrap class path.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-Xbootclasspath/p:</code><em>path</em></dt>
+<dd><p>Adds a prefix to the bootstrap class path.</p>
+<p><strong>Note:</strong></p>
+<p>This can only be used when compiling for versions prior to JDK 9. As applicable, see the descriptions in??<code>--release</code>, <code>-source</code>, or <code>-target</code>??for details.</p>
+</dd>
+<dt><code>-Xdiags:</code>[<code>compact</code>, <code>verbose</code>]</dt>
+<dd>Selects a diagnostic mode.
+</dd>
+<dt><code>-Xdoclint</code></dt>
+<dd>Enables recommended checks for problems in <code>javadoc</code> comments
+</dd>
+<dt><code>-Xdoclint:</code>(<code>all</code>|<code>none</code>|[<code>-</code>]<em>group</em>)[<code>/</code><em>access</em>]</dt>
+<dd><p>Enables or disables specific groups of checks,</p>
+<p><em>group</em> can have one of the following values:</p>
+<ul>
+<li><p><code>accessibility</code></p></li>
+<li><p><code>html</code></p></li>
+<li><p><code>missing</code></p></li>
+<li><p><code>reference</code></p></li>
+<li><p><code>syntax</code></p></li>
+</ul>
+<p>The variable <em>access</em> specifies the minimum visibility level of classes and members that the <code>-Xdoclint</code> option checks. It can have one of the following values (in order of most to least visible):</p>
+<ul>
+<li><p><code>public</code></p></li>
+<li><p><code>protected</code></p></li>
+<li><p><code>package</code></p></li>
+<li><p><code>private</code></p></li>
+</ul>
+<p>The default <em>access</em> level is <code>private</code>.</p>
+<p>For more information about these groups of checks, see the <code>-Xdoclint</code> option of the <code>javadoc</code> command. The <code>-Xdoclint</code> option is disabled by default in the <code>javac</code> command.</p>
+<p>For example, the following option checks classes and members (with all groups of checks) that have the access level of protected and higher (which includes protected and public):</p>
+<blockquote>
+<p><code>-Xdoclint:all/protected</code></p>
+</blockquote>
+<p>The following option enables all groups of checks for all access levels, except it won't check for HTML errors for classes and members that have the access level of package and higher (which includes package, protected and public):</p>
+<blockquote>
+<p><code>-Xdoclint:all,-html/package</code></p>
+</blockquote>
+</dd>
+<dt><code>-Xdoclint/package:</code>[<code>-</code>]<em>packages</em>(<code>,</code>[<code>-</code>]<em>package</em>)*</dt>
+<dd>Enables or disables checks in specific packages. Each <em>package</em> is either the qualified name of a package or a package name prefix followed by <code>.*</code>, which expands to all sub-packages of the given package. Each <em>package</em> can be prefixed with a hyphen (<code>-</code>) to disable checks for a specified package or packages.
+</dd>
+<dt><code>-Xlint</code></dt>
+<dd>Enables all recommended warnings. In this release, enabling all available warnings is recommended.
+</dd>
+<dt><code>-Xlint:</code>[<code>-</code>]<em>key</em>(<code>,</code>[<code>-</code>]<em>key</em>)*</dt>
+<dd><p>Supplies warnings to enable or disable, separated by comma. Precede a key by a hyphen (<code>-</code>) to disable the specified warning.</p>
+<p>Supported values for <em>key</em> are:</p>
+<ul>
+<li><p><code>all</code>: Enables all warnings.</p></li>
+<li><p><code>auxiliaryclass</code>: Warns about an auxiliary class that's hidden in a source file, and is used from other files.</p></li>
+<li><p><code>cast</code>: Warns about the use of unnecessary casts.</p></li>
+<li><p><code>classfile</code>: Warns about the issues related to classfile contents.</p></li>
+<li><p><code>deprecation</code>: Warns about the use of deprecated items.</p></li>
+<li><p><code>dep-ann</code>: Warns about the items marked as deprecated in <code>javadoc</code> but without the <code>@Deprecated</code> annotation.</p></li>
+<li><p><code>divzero</code>: Warns about the division by the constant integer 0.</p></li>
+<li><p><code>empty</code>: Warns about an empty statement after <code>if</code>.</p></li>
+<li><p><code>exports</code>: Warns about the issues regarding module exports.</p></li>
+<li><p><code>fallthrough</code>: Warns about the falling through from one case of a switch statement to the next.</p></li>
+<li><p><code>finally</code>: Warns about <code>finally</code> clauses that don't terminate normally.</p></li>
+<li><p><code>module</code>: Warns about the module system-related issues.</p></li>
+<li><p><code>opens</code>: Warns about the issues related to module opens.</p></li>
+<li><p><code>options</code>: Warns about the issues relating to use of command line options.</p></li>
+<li><p><code>overloads</code>: Warns about the issues related to method overloads.</p></li>
+<li><p><code>overrides</code>: Warns about the issues related to method overrides.</p></li>
+<li><p><code>path</code>: Warns about the invalid path elements on the command l ine.</p></li>
+<li><p><code>processing</code>: Warns about the issues related to annotation processing.</p></li>
+<li><p><code>rawtypes</code>: Warns about the use of raw types.</p></li>
+<li><p><code>removal</code>: Warns about the use of an API that has been marked for removal.</p></li>
+<li><p><code>requires-automatic</code>: Warns developers about the use of automatic modules in requires clauses.</p></li>
+<li><p><code>requires-transitive-automatic</code>: Warns about automatic modules in requires transitive.</p></li>
+<li><p><code>serial</code>: Warns about the serializable classes that don't provide a serial version ID. Also warns about access to non-public members from a serializable element.</p></li>
+<li><p><code>static</code>: Warns about the accessing a static member using an instance.</p></li>
+<li><p><code>try</code>: Warns about the issues relating to the use of try blocks ( that is, try-with-resources).</p></li>
+<li><p><code>unchecked</code>: Warns about the unchecked operations.</p></li>
+<li><p><code>varargs</code>: Warns about the potentially unsafe <code>vararg</code> methods.</p></li>
+<li><p><code>none</code>: Disables all warnings.</p></li>
+</ul>
+<p>See <a href="#examples-of-using--xlint-keys">Examples of Using -Xlint keys</a>.</p>
+</dd>
+<dt><code>-Xmaxerrs</code> <em>number</em></dt>
+<dd>Sets the maximum number of errors to print.
+</dd>
+<dt><code>-Xmaxwarns</code> <em>number</em></dt>
+<dd>Sets the maximum number of warnings to print.
+</dd>
+<dt><code>-Xpkginfo:</code>[<code>always</code>, <code>legacy</code>, <code>nonempty</code>]</dt>
+<dd><p>Specifies when and how the <code>javac</code> command generates <code>package-info.class</code> files from <code>package-info.java</code> files using one of the following options:</p>
+<dl>
+<dt><code>always</code></dt>
+<dd>Generates a <code>package-info.class</code> file for every <code>package-info.java</code> file. This option may be useful if you use a build system such as Ant, which checks that each <code>.java</code> file has a corresponding <code>.class</code> file.
+</dd>
+<dt><code>legacy</code></dt>
+<dd><p>Generates a <code>package-info.class</code> file only if <code>package-info.java</code> contains annotations. This option doesn't generate a <code>package-info.class</code> file if <code>package-info.java</code> contains only comments.</p>
+<p><strong>Note:</strong></p>
+<p>A <code>package-info.class</code> file might be generated but be empty if all the annotations in the <code>package-info.java</code> file have <code>RetentionPolicy.SOURCE</code>.</p>
+</dd>
+<dt><code>nonempty</code></dt>
+<dd>Generates a <code>package-info.class</code> file only if <code>package-info.java</code> contains annotations with <code>RetentionPolicy.CLASS</code> or <code>RetentionPolicy.RUNTIME</code>.
+</dd>
+</dl>
+</dd>
+<dt><code>-Xplugin:</code><em>name</em> <em>args</em></dt>
+<dd>Specifies the name and optional arguments for a plug-in to be run.
+</dd>
+<dt><code>-Xprefer:</code>[<code>source</code>, <code>newer</code>]</dt>
+<dd><p>Specifies which file to read when both a source file and class file are found for an implicitly compiled class using one of the following options. See <a href="#searching-for-types">Searching for Types</a>.</p>
+<ul>
+<li><p><code>-Xprefer:newer</code>: Reads the newer of the source or class files for a type (default).</p></li>
+<li><p><code>-Xprefer:source</code> : Reads the source file. Use <code>-Xprefer:source</code> when you want to be sure that any annotation processors can access annotations declared with a retention policy of <code>SOURCE</code>.</p></li>
+</ul>
+</dd>
+<dt><code>-Xprint</code></dt>
+<dd>Prints a textual representation of specified types for debugging purposes. This doesn't perform annotation processing or compilation. The format of the output could change.
+</dd>
+<dt><code>-XprintProcessorInfo</code></dt>
+<dd>Prints information about which annotations a processor is asked to process.
+</dd>
+<dt><code>-XprintRounds</code></dt>
+<dd>Prints information about initial and subsequent annotation processing rounds.
+</dd>
+<dt><code>-Xstdout</code> <em>filename</em></dt>
+<dd>Sends compiler messages to the named file. By default, compiler messages go to <code>System.err</code>.
+</dd>
+</dl>
+<h2 id="javac-command-line-argument-files">javac Command-Line Argument Files</h2>
+<p>An argument file can include <code>javac</code> options and source file names in any combination. The arguments within a file can be separated by spaces or new line characters. If a file name contains embedded spaces, then put the whole file name in double quotation marks.</p>
+<p>File names within an argument file are relative to the current directory, not to the location of the argument file. Wildcards (*) aren't allowed in these lists (such as for specifying <code>*.java</code>). Use of the at sign (<code>@</code>) to recursively interpret files isn't supported. The <code>-J</code> options aren't supported because they're passed to the launcher, which doesn't support argument files.</p>
+<p>When executing the <code>javac</code> command, pass in the path and name of each argument file with the at sign (<code>@</code>) leading character. When the <code>javac</code> command encounters an argument beginning with the at sign (<code>@</code>), it expands the contents of that file into the argument list.</p>
+<h2 id="examples-of-using-javac-filename">Examples of Using javac <span class="citation" data-cites="filename">@filename</span></h2>
+<dl>
+<dt>Single Argument File</dt>
+<dd><p>You could use a single argument file named <code>argfile</code> to hold all <code>javac</code> arguments:</p>
+<blockquote>
+<p><code>javac @argfile</code></p>
+</blockquote>
+<p>This argument file could contain the contents of both files shown in the following <strong>Two Argument Files</strong> example.</p>
+</dd>
+<dt>Two Argument Files</dt>
+<dd><p>You can create two argument files: one for the <code>javac</code> options and the other for the source file names. Note that the following lists have no line-continuation characters.</p>
+<p>Create a file named <code>options</code> that contains the following:</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<pre><code>-d classes
+-g
+-sourcepath /java/pubs/ws/1.3/src/share/classes</code></pre>
+<p><strong>Windows:</strong></p>
+<pre><code>-d classes
+-g
+-sourcepath C:\java\pubs\ws\1.3\src\share\classes</code></pre>
+<p>Create a file named <code>classes</code> that contains the following:</p>
+<pre><code>MyClass1.java
+MyClass2.java
+MyClass3.java</code></pre>
+<p>Then, run the <code>javac</code> command as follows:</p>
+<blockquote>
+<p><code>javac @options @classes</code></p>
+</blockquote>
+</dd>
+<dt>Argument Files with Paths</dt>
+<dd><p>The argument files can have paths, but any file names inside the files are relative to the current working directory (not <code>path1</code> or <code>path2</code>):</p>
+<blockquote>
+<p><code>javac @path1/options @path2/classes</code></p>
+</blockquote>
+</dd>
+</dl>
+<h2 id="examples-of-using--xlint-keys">Examples of Using -Xlint keys</h2>
+<dl>
+<dt><code>cast</code></dt>
+<dd><p>Warns about unnecessary and redundant casts, for example:</p>
+<blockquote>
+<p><code>String s = (String) &quot;Hello!&quot;</code></p>
+</blockquote>
+</dd>
+<dt><code>classfile</code></dt>
+<dd>Warns about issues related to class file contents.
+</dd>
+<dt><code>deprecation</code></dt>
+<dd><p>Warns about the use of deprecated items. For example:</p>
+<pre><code>java.util.Date myDate = new java.util.Date();
+int currentDay = myDate.getDay();</code></pre>
+<p>The method <code>java.util.Date.getDay</code> has been deprecated since JDK 1.1.</p>
+</dd>
+<dt><code>dep-ann</code></dt>
+<dd><p>Warns about items that are documented with the <code>@deprecated</code> Javadoc comment, but don't have the <code>@Deprecated</code> annotation, for example:</p>
+<pre><code>/**
+  * @deprecated As of Java SE 7, replaced by {@link #newMethod()}
+  */
+public static void deprecatedMethod() { }
+public static void newMethod() { }</code></pre>
+</dd>
+<dt><code>divzero</code></dt>
+<dd><p>Warns about division by the constant integer 0, for example:</p>
+<blockquote>
+<p><code>int divideByZero = 42 / 0;</code></p>
+</blockquote>
+</dd>
+<dt><code>empty</code></dt>
+<dd><p>Warns about empty statements after <code>if</code>statements, for example:</p>
+<pre><code>class E {
+    void m() {
+         if (true) ;
+    }
+}</code></pre>
+</dd>
+<dt><code>fallthrough</code></dt>
+<dd><p>Checks the switch blocks for fall-through cases and provides a warning message for any that are found. Fall-through cases are cases in a switch block, other than the last case in the block, whose code doesn't include a break statement, allowing code execution to fall through from that case to the next case. For example, the code following the case 1 label in this switch block doesn't end with a break statement:</p>
+<pre><code>switch (x) {
+case 1:
+  System.out.println(&quot;1&quot;);
+  // No break statement here.
+case 2:
+  System.out.println(&quot;2&quot;);
+}</code></pre>
+<p>If the <code>-Xlint:fallthrough</code> option was used when compiling this code, then the compiler emits a warning about possible fall-through into case, with the line number of the case in question.</p>
+</dd>
+<dt><code>finally</code></dt>
+<dd><p>Warns about <code>finally</code> clauses that can't be completed normally, for example:</p>
+<pre><code>public static int m() {
+  try {
+     throw new NullPointerException();
+  }  catch (NullPointerException(); {
+     System.err.println(&quot;Caught NullPointerException.&quot;);
+     return 1;
+   } finally {
+     return 0;
+   }
+  }</code></pre>
+<p>The compiler generates a warning for the <code>finally</code> block in this example. When the <code>int</code> method is called, it returns a value of 0. A <code>finally</code> block executes when the <code>try</code> block exits. In this example, when control is transferred to the <code>catch</code> block, the <code>int</code> method exits. However, the <code>finally</code> block must execute, so it's executed, even though control was transferred outside the method.</p>
+</dd>
+<dt><code>options</code></dt>
+<dd>Warns about issues that related to the use of command-line options. See <a href="#cross-compilation-options-for-javac">Cross-Compilation Options for javac</a>.
+</dd>
+<dt><code>overrides</code></dt>
+<dd><p>Warns about issues related to method overrides. For example, consider the following two classes:</p>
+<pre><code>public class ClassWithVarargsMethod {
+  void varargsMethod(String... s) { }
+}
+
+public class ClassWithOverridingMethod extends ClassWithVarargsMethod {
+   @Override
+   void varargsMethod(String[] s) { }
+}</code></pre>
+<p>The compiler generates a warning similar to the following:.</p>
+<pre><code>warning: [override] varargsMethod(String[]) in ClassWithOverridingMethod
+overrides varargsMethod(String...) in ClassWithVarargsMethod; overriding
+method is missing &#39;...&#39;</code></pre>
+<p>When the compiler encounters a <code>varargs</code> method, it translates the <code>varargs</code> formal parameter into an array. In the method <code>ClassWithVarargsMethod.varargsMethod</code>, the compiler translates the <code>varargs</code> formal parameter <code>String... s</code> to the formal parameter <code>String[] s</code>, an array that matches the formal parameter of the method <code>ClassWithOverridingMethod.varargsMethod</code>. Consequently, this example compiles.</p>
+</dd>
+<dt><code>path</code></dt>
+<dd><p>Warns about invalid path elements and nonexistent path directories on the command line (with regard to the class path, the source path, and other paths). Such warnings can't be suppressed with the <code>@SuppressWarnings</code> annotation. For example:</p>
+<ul>
+<li><p><strong>Oracle Solaris, Linux, and OS X:</strong> <code>javac -Xlint:path -classpath /nonexistentpath Example.java</code></p></li>
+<li><p><strong>Windows:</strong> <code>javac -Xlint:path -classpath C:\nonexistentpath Example.java</code></p></li>
+</ul>
+</dd>
+<dt><code>processing</code></dt>
+<dd><p>Warns about issues related to annotation processing. The compiler generates this warning when you have a class that has an annotation, and you use an annotation processor that can't handle that type of exception. For example, the following is a simple annotation processor:</p>
+<p><strong>Source file AnnocProc.java</strong>:</p>
+<pre><code>import java.util.*;
+import javax.annotation.processing.*;
+import javax.lang.model.*;
+import javaz.lang.model.element.*;
+
+@SupportedAnnotationTypes(&quot;NotAnno&quot;)
+public class AnnoProc extends AbstractProcessor {
+  public boolean process(Set&lt;? extends TypeElement&gt; elems, RoundEnvironment renv){
+     return true;
+  }
+
+  public SourceVersion getSupportedSourceVersion() {
+     return SourceVersion.latest();
+   }
+}</code></pre>
+<p><strong>Source file AnnosWithoutProcessors.java</strong>:</p>
+<pre><code>@interface Anno { }
+
+@Anno
+class AnnosWithoutProcessors { }</code></pre>
+<p>The following commands compile the annotation processor <code>AnnoProc</code>, then run this annotation processor against the source file <code>AnnosWithoutProcessors.java</code>:</p>
+<pre><code>javac AnnoProc.java
+javac -cp . -Xlint:processing -processor AnnoProc -proc:only AnnosWithoutProcessors.java</code></pre>
+<p>When the compiler runs the annotation processor against the source file <code>AnnosWithoutProcessors.java</code>, it generates the following warning:</p>
+<pre><code>warning: [processing] No processor claimed any of these annotations: Anno</code></pre>
+<p>To resolve this issue, you can rename the annotation defined and used in the class <code>AnnosWithoutProcessors</code> from <code>Anno</code> to <code>NotAnno</code>.</p>
+</dd>
+<dt><code>rawtypes</code></dt>
+<dd><p>Warns about unchecked operations on raw types. The following statement generates a <code>rawtypes</code> warning:</p>
+<blockquote>
+<p><code>void countElements(List l) { ... }</code></p>
+</blockquote>
+<p>The following example doesn't generate a <code>rawtypes</code> warning:</p>
+<blockquote>
+<p><code>void countElements(List&lt;?&gt; l) { ... }</code></p>
+</blockquote>
+<p><code>List</code> is a raw type. However, <code>List&lt;?&gt;</code> is an unbounded wildcard parameterized type. Because <code>List</code> is a parameterized interface, always specify its type argument. In this example, the <code>List</code> formal argument is specified with an unbounded wildcard (<code>?</code>) as its formal type parameter, which means that the <code>countElements</code> method can accept any instantiation of the <code>List</code> interface.</p>
+</dd>
+<dt><code>serial</code></dt>
+<dd><p>Warns about missing <code>serialVersionUID</code> definitions on serializable classes. For example:</p>
+<pre><code>public class PersistentTime implements Serializable
+{
+  private Date time;
+
+   public PersistentTime() {
+     time = Calendar.getInstance().getTime();
+   }
+
+   public Date getTime() {
+     return time;
+   }
+}</code></pre>
+<p>The compiler generates the following warning:</p>
+<pre><code>warning: [serial] serializable class PersistentTime has no definition of
+serialVersionUID</code></pre>
+<p>If a serializable class doesn't explicitly declare a field named <code>serialVersionUID</code>, then the serialization runtime environment calculates a default <code>serialVersionUID</code> value for that class based on various aspects of the class, as described in the Java Object Serialization Specification. However, it's strongly recommended that all serializable classes explicitly declare <code>serialVersionUID</code> values because the default process of computing <code>serialVersionUID</code> values is highly sensitive to class details that can vary depending on compiler implementations. As a result, this might cause an unexpected <code>InvalidClassExceptions</code> during deserialization. To guarantee a consistent <code>serialVersionUID</code> value across different Java compiler implementations, a serializable class must declare an explicit <code>serialVersionUID</code> value.</p>
+</dd>
+<dt><code>static</code></dt>
+<dd><p>Warns about issues relating to the use of statics variables, for example:</p>
+<pre><code>class XLintStatic {
+    static void m1() { }
+    void m2() { this.m1(); }
+}</code></pre>
+<p>The compiler generates the following warning:</p>
+<pre><code>warning: [static] static method should be qualified by type name,
+XLintStatic, instead of by an expression</code></pre>
+<p>To resolve this issue, you can call the <code>static</code> method <code>m1</code> as follows:</p>
+<blockquote>
+<p><code>XLintStatic.m1();</code></p>
+</blockquote>
+<p>Alternately, you can remove the <code>static</code> keyword from the declaration of the method <code>m1</code>.</p>
+</dd>
+<dt><code>try</code></dt>
+<dd><p>Warns about issues relating to the use of <code>try</code> blocks, including try-with-resources statements. For example, a warning is generated for the following statement because the resource <code>ac</code> declared in the <code>try</code> block isn't used:</p>
+<pre><code>try ( AutoCloseable ac = getResource() ) {    // do nothing}</code></pre>
+</dd>
+<dt><code>unchecked</code></dt>
+<dd><p>Gives more detail for unchecked conversion warnings that are mandated by the Java Language Specification, for example:</p>
+<pre><code>List l = new ArrayList&lt;Number&gt;();
+List&lt;String&gt; ls = l;       // unchecked warning</code></pre>
+<p>During type erasure, the types <code>ArrayList&lt;Number&gt;</code> and <code>List&lt;String&gt;</code> become <code>ArrayList</code> and <code>List</code>, respectively.</p>
+<p>The <code>ls</code> command has the parameterized type <code>List&lt;String&gt;</code>. When the <code>List</code> referenced by <code>l</code> is assigned to <code>ls</code>, the compiler generates an unchecked warning. At compile time, the compiler and JVM can't determine whether <code>l</code> refers to a <code>List&lt;String&gt;</code> type. In this case, <code>l</code> doesn't refer to a <code>List&lt;String&gt;</code> type. As a result, heap pollution occurs.</p>
+<p>A heap pollution situation occurs when the <code>List</code> object <code>l</code>, whose static type is <code>List&lt;Number&gt;</code>, is assigned to another <code>List</code> object, <code>ls</code>, that has a different static type, <code>List&lt;String&gt;</code>. However, the compiler still allows this assignment. It must allow this assignment to preserve backward compatibility with releases of Java SE that don't support generics. Because of type erasure, <code>List&lt;Number&gt;</code> and <code>List&lt;String&gt;</code> both become <code>List</code>. Consequently, the compiler allows the assignment of the object <code>l</code>, which has a raw type of <code>List</code>, to the object <code>ls</code>.</p>
+</dd>
+<dt><code>varargs</code></dt>
+<dd><p>Warns about unsafe use of variable arguments (<code>varargs</code>) methods, in particular, those that contain non-reifiable arguments, for example:</p>
+<pre><code>public class ArrayBuilder {
+  public static &lt;T&gt; void addToList (List&lt;T&gt; listArg, T... elements) {
+    for (T x : elements) {
+      listArg.add(x);
+    }
+  }
+}</code></pre>
+<p>A non-reifiable type is a type whose type information isn't fully available at runtime.</p>
+<p>The compiler generates the following warning for the definition of the method <code>ArrayBuilder.addToList</code>:</p>
+<pre><code>warning: [varargs] Possible heap pollution from parameterized vararg type T</code></pre>
+<p>When the compiler encounters a varargs method, it translates the <code>varargs</code> formal parameter into an array. However, the Java programming language doesn't permit the creation of arrays of parameterized types. In the method <code>ArrayBuilder.addToList</code>, the compiler translates the <code>varargs</code> formal parameter <code>T...</code> elements to the formal parameter <code>T[]</code> elements, an array. However, because of type erasure, the compiler converts the <code>varargs</code> formal parameter to <code>Object[]</code> elements. Consequently, there's a possibility of heap pollution.</p>
+</dd>
+</dl>
+<h2 id="example-of-compiling-by-providing-command-line-arguments">Example of Compiling by Providing Command-Line Arguments</h2>
+<p>To compile as though providing command-line arguments, use the following syntax:</p>
+<blockquote>
+<p><code>JavaCompiler javac = ToolProvider.getSystemJavaCompiler();</code></p>
+</blockquote>
+<p>The example writes diagnostics to the standard output stream and returns the exit code that <code>javac</code> command would give when called from the command line.</p>
+<p>You can use other methods in the <code>javax.tools.JavaCompiler</code> interface to handle diagnostics, control where files are read from and written to, and more.</p>
+<h2 id="old-interface">Old Interface</h2>
+<p><strong>Note:</strong></p>
+<p>This API is retained for backward compatibility only. All new code should use the Java Compiler API.</p>
+<p>The <code>com.sun.tools.javac.Main</code> class provides two static methods to call the compiler from a program:</p>
+<pre><code>public static int compile(String[] args);
+public static int compile(String[] args, PrintWriter out);</code></pre>
+<p>The <code>args</code> parameter represents any of the command-line arguments that would typically be passed to the compiler.</p>
+<p>The <code>out</code> parameter indicates where the compiler diagnostic output is directed.</p>
+<p>The <code>return</code> value is equivalent to the <code>exit</code> value from <code>javac</code>.</p>
+<p><strong>Note:</strong></p>
+<p>All other classes and methods found in a package with names that start with <code>com.sun.tools.javac</code> (subpackages of <code>com.sun.tools.javac</code>) are strictly internal and subject to change at any time.</p>
+<h2 id="example-of-compiling-multiple-source-files">Example of Compiling Multiple Source Files</h2>
+<p>This example compiles the <code>Aloha.java</code>, <code>GutenTag.java</code>, <code>Hello.java</code>, and <code>Hi.java</code> source files in the <code>greetings</code> package.</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<pre><code>% javac greetings/*.java
+% ls greetings
+Aloha.class         GutenTag.class      Hello.class         Hi.class
+Aloha.java          GutenTag.java       Hello.java          Hi.java</code></pre>
+<p><strong>Windows:</strong></p>
+<pre><code>C:\&gt;javac greetings\*.java
+C:\&gt;dir greetings
+Aloha.class         GutenTag.class      Hello.class         Hi.class
+Aloha.java          GutenTag.java       Hello.java          Hi.java</code></pre>
+<h2 id="example-of-specifying-a-user-class-path">Example of Specifying a User Class Path</h2>
+<p>After changing one of the source files in the previous example, recompile it:</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<pre><code>pwd
+/examples
+javac greetings/Hi.java</code></pre>
+<p><strong>Windows:</strong></p>
+<pre><code>C:\&gt;cd
+\examples
+C:\&gt;javac greetings\Hi.java</code></pre>
+<p>Because <code>greetings.Hi</code> refers to other classes in the <code>greetings</code> package, the compiler needs to find these other classes. The previous example works because the default user class path is the directory that contains the package directory. If you want to recompile this file without concern for which directory you are in, then add the examples directory to the user class path by setting <code>CLASSPATH</code>. This example uses the <code>-classpath</code> option.</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<blockquote>
+<p><code>javac -classpath /examples /examples/greetings/Hi.java</code></p>
+</blockquote>
+<p><strong>Windows:</strong></p>
+<blockquote>
+<p><code>C:\&gt;javac -classpath \examples \examples\greetings\Hi.java</code></p>
+</blockquote>
+<p>If you change <code>greetings.Hi</code> to use a banner utility, then that utility also needs to be accessible through the user class path.</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<pre><code>javac -classpath /examples:/lib/Banners.jar \
+            /examples/greetings/Hi.java</code></pre>
+<p><strong>Windows:</strong></p>
+<pre><code>C:\&gt;javac -classpath \examples;\lib\Banners.jar ^
+            \examples\greetings\Hi.java</code></pre>
+<p>To execute a class in the <code>greetings</code> package, the program needs access to the <code>greetings</code> package, and to the classes that the <code>greetings</code> classes use.</p>
+<p><strong>Oracle Solaris, Linux, and OS X:</strong></p>
+<blockquote>
+<p><code>java -classpath /examples:/lib/Banners.jar greetings.Hi</code></p>
+</blockquote>
+<p><strong>Windows:</strong></p>
+<blockquote>
+<p><code>C:\&gt;java -classpath \examples;\lib\Banners.jar greetings.Hi</code></p>
+</blockquote>
+<p>The <code>-source 1.7</code> option specifies that release 1.7 (or 7) of the Java programming language must be used to compile OldCode.java. The <code>-target 1.7</code> option ensures that the generated class files are compatible with JVM 1.7.</p>
+<h2 id="annotation-processing">Annotation Processing</h2>
+<p>The <code>javac</code> command provides direct support for annotation processing, superseding the need for the separate annotation processing command, <code>apt</code>.</p>
+<p>The API for annotation processors is defined in the <code>javax.annotation.processing</code> and <code>javax.lang.model</code> packages and subpackages.</p>
+<h3 id="how-annotation-processing-works">How Annotation Processing Works</h3>
+<p>Unless annotation processing is disabled with the <code>-proc:none</code> option, the compiler searches for any annotation processors that are available. The search path can be specified with the <code>-processorpath</code> option. If no path is specified, then the user class path is used. Processors are located by means of service provider-configuration files named <code>META-INF/services/javax.annotation.processing</code>. Processor on the search path. Such files should contain the names of any annotation processors to be used, listed one per line. Alternatively, processors can be specified explicitly, using the <code>-processor</code> option.</p>
+<p>After scanning the source files and classes on the command line to determine what annotations are present, the compiler queries the processors to determine what annotations they process. When a match is found, the processor is called. A processor can claim the annotations it processes, in which case no further attempt is made to find any processors for those annotations. After all of the annotations are claimed, the compiler does not search for additional processors.</p>
+<p>If any processors generate new source files, then another round of annotation processing occurs: Any newly generated source files are scanned, and the annotations processed as before. Any processors called on previous rounds are also called on all subsequent rounds. This continues until no new source files are generated.</p>
+<p>After a round occurs where no new source files are generated, the annotation processors are called one last time, to give them a chance to complete any remaining work. Finally, unless the <code>-proc:only</code> option is used, the compiler compiles the original and all generated source files.</p>
+<h2 id="searching-for-types">Searching for Types</h2>
+<p>To compile a source file, the compiler often needs information about a type, but the type definition is not in the source files specified on the command line.</p>
+<p>The compiler needs type information for every class or interface used, extended, or implemented in the source file. This includes classes and interfaces not explicitly mentioned in the source file, but that provide information through inheritance.</p>
+<p>For example, when you create a subclass of <code>java.awt.Window</code>, you are also using the ancestor classes of <code>Window</code>: <code>java.awt.Container</code>, <code>java.awt.Component</code>, and <code>java.lang.Object</code>.</p>
+<p>When the compiler needs type information, it searches for a source file or class file that defines the type. The compiler searches for class files first in the bootstrap and extension classes, then in the user class path (which by default is the current directory). The user class path is defined by setting the <code>CLASSPATH</code> environment variable or by using the <code>-classpath</code> option.</p>
+<p>If you set the <code>-sourcepath</code> option, then the compiler searches the indicated path for source files. Otherwise, the compiler searches the user class path for both class files and source files.</p>
+<p>You can specify different bootstrap or extension classes with the <code>-bootclasspath</code> and the <code>-extdirs</code> options. See <a href="#cross-compilation-options-for-javac">Cross-Compilation Options for javac</a>.</p>
+<p>A successful type search may produce a class file, a source file, or both. If both are found, then you can use the <code>-Xprefer</code> option to instruct the compiler which to use. If <code>newer</code> is specified, then the compiler uses the newer of the two files. If <code>source</code> is specified, the compiler uses the source file. The default is <code>newer</code>.</p>
+<p>If a type search finds a source file for a required type, either by itself, or as a result of the setting for the <code>-Xprefer</code> option, then the compiler reads the source file to get the information it needs. By default the compiler also compiles the source file. You can use the <code>-implicit</code> option to specify the behavior. If <code>none</code> is specified, then no class files are generated for the source file. If <code>class</code> is specified, then class files are generated for the source file.</p>
+<p>The compiler might not discover the need for some type information until after annotation processing completes. When the type information is found in a source file and no <code>-implicit</code> option is specified, the compiler gives a warning that the file is being compiled without being subject to annotation processing. To disable the warning, either specify the file on the command line (so that it will be subject to annotation processing) or use the <code>-implicit</code> option to specify whether or not class files should be generated for such source files.</p>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Object Serialization Specification: Contents</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+CONTENTS | PREV | <a href="serial-arch.html">NEXT</a>
+<header id="title-block-header">
+<h1 class="title">Java Object Serialization Specification: Contents</h1>
+</header>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<h3 id="system-architecture">1 <a href="serial-arch.html">System Architecture</a></h3>
+<ul>
+<li>1.1 <a href="serial-arch.html#overview">Overview</a></li>
+<li>1.2 <a href="serial-arch.html#writing-to-an-object-stream">Writing to an Object Stream</a></li>
+<li>1.3 <a href="serial-arch.html#reading-from-an-object-stream">Reading from an Object Stream</a></li>
+<li>1.4 <a href="serial-arch.html#object-streams-as-containers">Object Streams as Containers</a></li>
+<li>1.5 <a href="serial-arch.html#defining-serializable-fields-for-a-class">Defining Serializable Fields for a Class</a></li>
+<li>1.6 <a href="serial-arch.html#documenting-serializable-fields-and-data-for-a-class">Documenting Serializable Fields and Data for a Class</a></li>
+<li>1.7 <a href="serial-arch.html#accessing-serializable-fields-of-a-class">Accessing Serializable Fields of a Class</a></li>
+<li>1.8 <a href="serial-arch.html#the-objectoutput-interface">The ObjectOutput Interface</a></li>
+<li>1.9 <a href="serial-arch.html#the-objectinput-interface">The ObjectInput Interface</a></li>
+<li>1.10 <a href="serial-arch.html#the-serializable-interface">The Serializable Interface</a></li>
+<li>1.11 <a href="serial-arch.html#the-externalizable-interface">The Externalizable Interface</a></li>
+<li>1.12 <a href="serial-arch.html#serialization-of-enum-constants">Serialization of Enum Constants</a></li>
+<li>1.13 <a href="serial-arch.html#protecting-sensitive-information">Protecting Sensitive Information</a></li>
+</ul>
+<h3 id="object-output-classes">2 <a href="output.html">Object Output Classes</a></h3>
+<ul>
+<li>2.1 <a href="output.html#the-objectoutputstream-class">The ObjectOutputStream Class</a></li>
+<li>2.2 <a href="output.html#the-objectoutputstream.putfield-class">The ObjectOutputStream.PutField Class</a></li>
+<li>2.3 <a href="output.html#the-writeobject-method">The writeObject Method</a></li>
+<li>2.4 <a href="output.html#the-writeexternal-method">The writeExternal Method</a></li>
+<li>2.5 <a href="output.html#the-writereplace-method">The writeReplace Method</a></li>
+<li>2.6 <a href="output.html#the-useprotocolversion-method">The useProtocolVersion Method</a></li>
+</ul>
+<h3 id="object-input-classes">3 <a href="input.html">Object Input Classes</a></h3>
+<ul>
+<li>3.1 <a href="input.html#the-objectinputstream-class">The ObjectInputStream Class</a></li>
+<li>3.2 <a href="input.html#the-objectinputstream.getfield-class">The ObjectInputStream.GetField Class</a></li>
+<li>3.3 <a href="input.html#the-objectinputvalidation-interface">The ObjectInputValidation Interface</a></li>
+<li>3.4 <a href="input.html#the-readobject-method">The readObject Method</a></li>
+<li>3.5 <a href="input.html#the-readobjectnodata-method">The readObjectNoData Method</a></li>
+<li>3.6 <a href="input.html#the-readexternal-method">The readExternal Method</a></li>
+<li>3.7 <a href="input.html#the-readresolve-method">The readResolve Method</a></li>
+</ul>
+<h3 id="class-descriptors">4 <a href="class.html">Class Descriptors</a></h3>
+<ul>
+<li>4.1 <a href="class.html#the-objectstreamclass-class">The ObjectStreamClass Class</a></li>
+<li>4.2 <a href="class.html#dynamic-proxy-class-descriptors">Dynamic Proxy Class Descriptors</a></li>
+<li>4.3 <a href="class.html#serialized-form">Serialized Form</a></li>
+<li>4.4 <a href="class.html#the-objectstreamfield-class">The ObjectStreamField Class</a></li>
+<li>4.5 <a href="class.html#inspecting-serializable-classes">Inspecting Serializable Classes</a></li>
+<li>4.6 <a href="class.html#stream-unique-identifiers">Stream Unique Identifiers</a></li>
+</ul>
+<h3 id="versioning-of-serializable-objects">5 <a href="version.html">Versioning of Serializable Objects</a></h3>
+<ul>
+<li>5.1 <a href="version.html#overview">Overview</a></li>
+<li>5.2 <a href="version.html#goals">Goals</a></li>
+<li>5.3 <a href="version.html#assumptions">Assumptions</a></li>
+<li>5.4 <a href="version.html#whos-responsible-for-versioning-of-streams">Who's Responsible for Versioning of Streams</a></li>
+<li>5.5 <a href="version.html#compatible-java-type-evolution">Compatible Java Type Evolution</a></li>
+<li>5.6 <a href="version.html#type-changes-affecting-serialization">Type Changes Affecting Serialization</a>
+<ul>
+<li>5.6.1 <a href="version.html#incompatible-changes">Incompatible Changes</a></li>
+<li>5.6.2 <a href="version.html#compatible-changes">Compatible Changes</a></li>
+</ul></li>
+</ul>
+<h3 id="object-serialization-stream-protocol">6 <a href="protocol.html">Object Serialization Stream Protocol</a></h3>
+<ul>
+<li>6.1 <a href="protocol.html#overview">Overview</a></li>
+<li>6.2 <a href="protocol.html#stream-elements">Stream Elements</a></li>
+<li>6.3 <a href="protocol.html#stream-protocol-versions">Stream Protocol Versions</a></li>
+<li>6.4 <a href="protocol.html#grammar-for-the-stream-format">Grammar for the Stream Format</a>
+<ul>
+<li>6.4.1 <a href="protocol.html#rules-of-the-grammar">Rules of the Grammar</a></li>
+<li>6.4.2 <a href="protocol.html#terminal-symbols-and-constants">Terminal Symbols and Constants</a></li>
+</ul></li>
+</ul>
+<h3 id="a-security-in-object-serialization">A <a href="security.html">Security in Object Serialization</a></h3>
+<h3 id="b-exceptions-in-object-serialization">B <a href="exceptions.html">Exceptions In Object Serialization</a></h3>
+<h3 id="c-example-of-serializable-fields">C <a href="examples.html">Example of Serializable Fields</a></h3>
+<ul>
+<li><a href="examples.html#c.1-example-alternate-implementation-of-java.io.file">C.1 Example Alternate Implementation of <code>java.io.File</code></a></li>
+</ul>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 2005, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+CONTENTS | PREV | <a href="serial-arch.html">NEXT</a>
+</body>
+</html>

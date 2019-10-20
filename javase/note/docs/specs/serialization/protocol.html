@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Object Serialization Specification: 6 - Object Serialization Stream Protocol</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<a href="index.html">CONTENTS</a> | <a href="version.html">PREV</a> | <a href="security.html">NEXT</a>
+<header id="title-block-header">
+<h1 class="title">Java Object Serialization Specification: 6 - Object Serialization Stream Protocol</h1>
+</header>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#stream-elements">Stream Elements</a></li>
+<li><a href="#stream-protocol-versions">Stream Protocol Versions</a></li>
+<li><a href="#grammar-for-the-stream-format">Grammar for the Stream Format</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+<hr />
+<h2 id="overview">6.1 Overview</h2>
+<p>The stream format satisfies the following design goals:</p>
+<ul>
+<li>Is compact and is structured for efficient reading.</li>
+<li>Allows skipping through the stream using only the knowledge of the structure and format of the stream. Does not require invoking any per class code.</li>
+<li>Requires only stream access to the data.</li>
+</ul>
+<h2 id="stream-elements">6.2 Stream Elements</h2>
+<p>A basic structure is needed to represent objects in a stream. Each attribute of the object needs to be represented: its classes, its fields, and data written and later read by class-specific methods. The representation of objects in the stream can be described with a grammar. There are special representations for null objects, new objects, classes, arrays, strings, and back references to any object already in the stream. Each object written to the stream is assigned a handle that is used to refer back to the object. Handles are assigned sequentially starting from 0x7E0000. The handles restart at 0x7E0000 when the stream is reset.</p>
+<p>A class object is represented by the following:</p>
+<ul>
+<li>Its <code>ObjectStreamClass</code> object.</li>
+</ul>
+<p>An <code>ObjectStreamClass</code> object for a Class that is not a dynamic proxy class is represented by the following:</p>
+<ul>
+<li><p>The Stream Unique Identifier (SUID) of compatible classes.</p></li>
+<li><p>A set of flags indicating various properties of the class, such as whether the class defines a <code>writeObject</code> method, and whether the class is serializable, externalizable, or an enum type</p></li>
+<li><p>The number of serializable fields</p></li>
+<li><p>The array of fields of the class that are serialized by the default mechanismFor arrays and object fields, the type of the field is included as a string which must be in &quot;field descriptor&quot; format (e.g., &quot;<code>Ljava/lang/Object;</code>&quot;) as specified in The Java Virtual Machine Specification.</p></li>
+<li><p>Optional block-data records or objects written by the <code>annotateClass</code> method</p></li>
+<li><p>The <code>ObjectStreamClass</code> of its supertype (null if the superclass is not serializable)</p></li>
+</ul>
+<p>An <code>ObjectStreamClass</code> object for a dynamic proxy class is represented by the following:</p>
+<ul>
+<li><p>The number of interfaces that the dynamic proxy class implements</p></li>
+<li><p>The names of all of the interfaces implemented by the dynamic proxy class, listed in the order that they are returned by invoking the <code>getInterfaces</code> method on the Class object.</p></li>
+<li><p>Optional block-data records or objects written by the <code>annotateProxyClass</code> method.</p></li>
+<li><p>The ObjectStreamClass of its supertype, <code>java.lang.reflect.Proxy</code>.</p></li>
+</ul>
+<p>The representation of <code>String</code> objects consists of length information followed by the contents of the string encoded in modified UTF-8. The modified UTF-8 encoding is the same as used in the Java Virtual Machine and in the <code>java.io.DataInput</code> and <code>DataOutput</code> interfaces; it differs from standard UTF-8 in the representation of supplementary characters and of the null character. The form of the length information depends on the length of the string in modified UTF-8 encoding. If the modified UTF-8 encoding of the given <code>String</code> is less than 65536 bytes in length, the length is written as 2 bytes representing an unsigned 16-bit integer. Starting with the Java 2 platform, Standard Edition, v1.3, if the length of the string in modified UTF-8 encoding is 65536 bytes or more, the length is written in 8 bytes representing a signed 64-bit integer. The typecode preceding the <code>String</code> in the serialization stream indicates which format was used to write the <code>String</code>.</p>
+<p>Arrays are represented by the following:</p>
+<ul>
+<li><p>Their <code>ObjectStreamClass</code> object.</p></li>
+<li><p>The number of elements.</p></li>
+<li><p>The sequence of values. The type of the values is implicit in the type of the array. for example the values of a byte array are of type byte.</p></li>
+</ul>
+<p>Enum constants are represented by the following:</p>
+<ul>
+<li><p>The <code>ObjectStreamClass</code> object of the constant's base enum type.</p></li>
+<li><p>The constant's name string.</p></li>
+</ul>
+<p>New objects in the stream are represented by the following:</p>
+<ul>
+<li><p>The most derived class of the object.</p></li>
+<li><p>Data for each serializable class of the object, with the highest superclass first. For each class the stream contains the following:</p>
+<ul>
+<li><p>The serializable fields.See <a href="serial-arch.html#defining-serializable-fields-for-a-class">Section 1.5, &quot;Defining Serializable Fields for a Class&quot;</a>.</p></li>
+<li><p>If the class has <code>writeObject</code>/<code>readObject</code> methods, there may be optional objects and/or block-data records of primitive types written by the <code>writeObject</code> method followed by an <code>endBlockData</code> code.</p></li>
+</ul></li>
+</ul>
+<p>All primitive data written by classes is buffered and wrapped in block-data records, regardless if the data is written to the stream within a <code>writeObject</code> method or written directly to the stream from outside a <code>writeObject</code> method. This data can only be read by the corresponding <code>readObject</code> methods or be read directly from the stream. Objects written by the <code>writeObject</code> method terminate any previous block-data record and are written either as regular objects or null or back references, as appropriate. The block-data records allow error recovery to discard any optional data. When called from within a class, the stream can discard any data or objects until the <code>endBlockData</code>.</p>
+<h2 id="stream-protocol-versions">6.3 Stream Protocol Versions</h2>
+<p>It was necessary to make a change to the serialization stream format in JDK 1.2 that is not backwards compatible to all minor releases of JDK 1.1. To provide for cases where backwards compatibility is required, a capability has been added to indicate what <code>PROTOCOL_VERSION</code> to use when writing a serialization stream. The method <code>ObjectOutputStream.useProtocolVersion</code> takes as a parameter the protocol version to use to write the serialization stream.</p>
+<p>The Stream Protocol Versions are as follows:</p>
+<ul>
+<li><p><code>ObjectStreamConstants.PROTOCOL_VERSION_1</code>: Indicates the initial stream format.</p></li>
+<li><p><code>ObjectStreamConstants.PROTOCOL_VERSION_2</code>: Indicates the new external data format. Primitive data is written in block data mode and is terminated with <code>TC_ENDBLOCKDATA</code>.</p>
+<p>Block data boundaries have been standardized. Primitive data written in block data mode is normalized to not exceed 1024 byte chunks. The benefit of this change was to tighten the specification of serialized data format within the stream. This change is fully backward and forward compatible.</p></li>
+</ul>
+<p>JDK 1.2 defaults to writing <code>PROTOCOL_VERSION_2</code>.</p>
+<p>JDK 1.1 defaults to writing <code>PROTOCOL_VERSION_1</code>.</p>
+<p>JDK 1.1.7 and greater can read both versions.</p>
+<p>Releases prior to JDK 1.1.7 can only read <code>PROTOCOL_VERSION_1</code>.</p>
+<h2 id="grammar-for-the-stream-format">6.4 Grammar for the Stream Format</h2>
+<p>The table below contains the grammar for the stream format. Nonterminal symbols are shown in italics. Terminal symbols in a <em>fixed width font</em>. Definitions of nonterminals are followed by a &quot;:&quot;. The definition is followed by one or more alternatives, each on a separate line. The following table describes the notation:</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Notation</strong></th>
+<th style="text-align: left;"><strong>Meaning</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(<em>datatype</em>)</td>
+<td style="text-align: left;">This token has the data type specified, such as byte.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>token</em>[n]</td>
+<td style="text-align: left;">A predefined number of occurrences of the token, that is an array.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>x0001</em></td>
+<td style="text-align: left;">A literal value expressed in hexadecimal. The number of hex digits reflects the size of the value.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">&lt;<em>xxx</em>&gt;</td>
+<td style="text-align: left;">A value read from the stream used to indicate the length of an array.</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the symbol (utf) is used to designate a string written using 2-byte length information, and (long-utf) is used to designate a string written using 8-byte length information. For details, refer to <a href="#stream-elements">Section 6.2, &quot;Stream Elements&quot;</a>.</p>
+<h3 id="rules-of-the-grammar">6.4.1 Rules of the Grammar</h3>
+<p>A Serialized stream is represented by any stream satisfying the <em>stream</em> rule.</p>
+<pre><code>stream:
+  magic version contents
+
+contents:
+  content
+  contents content
+
+content:
+  object
+  blockdata
+
+object:
+  newObject
+  newClass
+  newArray
+  newString
+  newEnum
+  newClassDesc
+  prevObject
+  nullReference
+  exception
+  TC_RESET
+
+newClass:
+  TC_CLASS classDesc newHandle
+
+classDesc:
+  newClassDesc
+  nullReference
+  (ClassDesc)prevObject      // an object required to be of type ClassDesc
+
+superClassDesc:
+  classDesc
+
+newClassDesc:
+  TC_CLASSDESC className serialVersionUID newHandle classDescInfo
+  TC_PROXYCLASSDESC newHandle proxyClassDescInfo
+
+classDescInfo:
+  classDescFlags fields classAnnotation superClassDesc
+
+className:
+  (utf)
+
+serialVersionUID:
+  (long)
+
+classDescFlags:
+  (byte)                  // Defined in Terminal Symbols and Constants
+
+proxyClassDescInfo:
+  (int)&lt;count&gt; proxyInterfaceName[count] classAnnotation
+      superClassDesc
+
+proxyInterfaceName:
+  (utf)
+
+fields:
+  (short)&lt;count&gt; fieldDesc[count]
+
+fieldDesc:
+  primitiveDesc
+  objectDesc
+
+primitiveDesc:
+  prim_typecode fieldName
+
+objectDesc:
+  obj_typecode fieldName className1
+
+fieldName:
+  (utf)
+
+className1:
+  (String)object             // String containing the field&#39;s type,
+                             // in field descriptor format
+
+classAnnotation:
+  endBlockData
+  contents endBlockData      // contents written by annotateClass
+
+prim_typecode:
+  &#39;B&#39;       // byte
+  &#39;C&#39;       // char
+  &#39;D&#39;       // double
+  &#39;F&#39;       // float
+  &#39;I&#39;       // integer
+  &#39;J&#39;       // long
+  &#39;S&#39;       // short
+  &#39;Z&#39;       // boolean
+
+obj_typecode:
+  &#39;[&#39;       // array
+  &#39;L&#39;       // object
+
+newArray:
+  TC_ARRAY classDesc newHandle (int)&lt;size&gt; values[size]
+
+newObject:
+  TC_OBJECT classDesc newHandle classdata[]  // data for each class
+
+classdata:
+  nowrclass                 // SC_SERIALIZABLE &amp; classDescFlag &amp;&amp;
+                            // !(SC_WRITE_METHOD &amp; classDescFlags)
+  wrclass objectAnnotation  // SC_SERIALIZABLE &amp; classDescFlag &amp;&amp;
+                            // SC_WRITE_METHOD &amp; classDescFlags
+  externalContents          // SC_EXTERNALIZABLE &amp; classDescFlag &amp;&amp;
+                            // !(SC_BLOCKDATA  &amp; classDescFlags
+  objectAnnotation          // SC_EXTERNALIZABLE &amp; classDescFlag&amp;&amp;
+                            // SC_BLOCKDATA &amp; classDescFlags
+
+nowrclass:
+  values                    // fields in order of class descriptor
+
+wrclass:
+  nowrclass
+
+objectAnnotation:
+  endBlockData
+  contents endBlockData     // contents written by writeObject
+                            // or writeExternal PROTOCOL_VERSION_2.
+
+blockdata:
+  blockdatashort
+  blockdatalong
+
+blockdatashort:
+  TC_BLOCKDATA (unsigned byte)&lt;size&gt; (byte)[size]
+
+blockdatalong:
+  TC_BLOCKDATALONG (int)&lt;size&gt; (byte)[size]
+
+endBlockData:
+  TC_ENDBLOCKDATA
+
+externalContent:         // Only parseable by readExternal
+  (bytes)                // primitive data
+   object
+
+externalContents:         // externalContent written by
+  externalContent         // writeExternal in PROTOCOL_VERSION_1.
+  externalContents externalContent
+
+newString:
+  TC_STRING newHandle (utf)
+  TC_LONGSTRING newHandle (long-utf)
+
+newEnum:
+  TC_ENUM classDesc newHandle enumConstantName
+
+enumConstantName:
+  (String)object
+
+prevObject:
+  TC_REFERENCE (int)handle
+
+nullReference:
+  TC_NULL
+
+exception:
+  TC_EXCEPTION reset (Throwable)object reset
+
+magic:
+  STREAM_MAGIC
+
+version:
+  STREAM_VERSION
+
+values:          // The size and types are described by the
+                 // classDesc for the current object
+
+newHandle:       // The next number in sequence is assigned
+                 // to the object being serialized or deserialized
+
+reset:           // The set of known objects is discarded
+                 // so the objects of the exception do not
+                 // overlap with the previously sent objects
+                 // or with objects that may be sent after
+                 // the exception</code></pre>
+<h3 id="terminal-symbols-and-constants">6.4.2 Terminal Symbols and Constants</h3>
+<p>The following symbols in <code>java.io.ObjectStreamConstants</code> define the terminal and constant values expected in a stream.</p>
+<pre><code>final static short STREAM_MAGIC = (short)0xaced;
+final static short STREAM_VERSION = 5;
+final static byte TC_NULL = (byte)0x70;
+final static byte TC_REFERENCE = (byte)0x71;
+final static byte TC_CLASSDESC = (byte)0x72;
+final static byte TC_OBJECT = (byte)0x73;
+final static byte TC_STRING = (byte)0x74;
+final static byte TC_ARRAY = (byte)0x75;
+final static byte TC_CLASS = (byte)0x76;
+final static byte TC_BLOCKDATA = (byte)0x77;
+final static byte TC_ENDBLOCKDATA = (byte)0x78;
+final static byte TC_RESET = (byte)0x79;
+final static byte TC_BLOCKDATALONG = (byte)0x7A;
+final static byte TC_EXCEPTION = (byte)0x7B;
+final static byte TC_LONGSTRING = (byte) 0x7C;
+final static byte TC_PROXYCLASSDESC = (byte) 0x7D;
+final static byte TC_ENUM = (byte) 0x7E;
+final static  int   baseWireHandle = 0x7E0000;</code></pre>
+<p>The flag byte <em>classDescFlags</em> may include values of</p>
+<pre><code>final static byte SC_WRITE_METHOD = 0x01; //if SC_SERIALIZABLE
+final static byte SC_BLOCK_DATA = 0x08;    //if SC_EXTERNALIZABLE
+final static byte SC_SERIALIZABLE = 0x02;
+final static byte SC_EXTERNALIZABLE = 0x04;
+final static byte SC_ENUM = 0x10;</code></pre>
+<p>The flag <code>SC_WRITE_METHOD</code> is set if the Serializable class writing the stream had a <code>writeObject</code> method that may have written additional data to the stream. In this case a <code>TC_ENDBLOCKDATA</code> marker is always expected to terminate the data for that class.</p>
+<p>The flag <code>SC_BLOCKDATA</code> is set if the <code>Externalizable</code> class is written into the stream using <code>STREAM_PROTOCOL_2</code>. By default, this is the protocol used to write <code>Externalizable</code> objects into the stream in JDK 1.2. JDK 1.1 writes <code>STREAM_PROTOCOL_1</code>.</p>
+<p>The flag <code>SC_SERIALIZABLE</code> is set if the class that wrote the stream extended <code>java.io.Serializable</code> but not <code>java.io.Externalizable</code>, the class reading the stream must also extend <code>java.io.Serializable</code> and the default serialization mechanism is to be used.</p>
+<p>The flag <code>SC_EXTERNALIZABLE</code> is set if the class that wrote the stream extended <code>java.io.Externalizable</code>, the class reading the data must also extend <code>Externalizable</code> and the data will be read using its <code>writeExternal</code> and <code>readExternal</code> methods.</p>
+<p>The flag <code>SC_ENUM</code> is set if the class that wrote the stream was an enum type. The receiver's corresponding class must also be an enum type. Data for constants of the enum type will be written and read as described in <a href="serial-arch.html#serialization-of-enum-constants">Section 1.12, &quot;Serialization of Enum Constants&quot;</a>.</p>
+<h4 id="example">Example</h4>
+<p>Consider the case of an original class and two instances in a linked list:</p>
+<pre><code>class List implements java.io.Serializable {
+    int value;
+    List next;
+    public static void main(String[] args) {
+        try {
+            List list1 = new List();
+            List list2 = new List();
+            list1.value = 17;
+            list1.next = list2;
+            list2.value = 19;
+            list2.next = null;
+
+            ByteArrayOutputStream o = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(o);
+            out.writeObject(list1);
+            out.writeObject(list2);
+            out.flush();
+            ...
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+}</code></pre>
+<p>The resulting stream contains:</p>
+<pre><code>    00: ac ed 00 05 73 72 00 04 4c 69 73 74 69 c8 8a 15 &gt;....sr..Listi...&lt;
+    10: 40 16 ae 68 02 00 02 49 00 05 76 61 6c 75 65 4c &gt;Z......I..valueL&lt;
+    20: 00 04 6e 65 78 74 74 00 06 4c 4c 69 73 74 3b 78 &gt;..nextt..LList;x&lt;
+    30: 70 00 00 00 11 73 71 00 7e 00 00 00 00 00 13 70 &gt;p....sq.~......p&lt;
+    40: 71 00 7e 00 03                                  &gt;q.~..&lt;</code></pre>
+<hr />
+<p><em><a href="../../legal/copyright.html">Copyright</a> © 2005, 2017, Oracle and/or its affiliates. All rights reserved.</em></p>
+<a href="index.html">CONTENTS</a> | <a href="version.html">PREV</a> | <a href="security.html">NEXT</a>
+</body>
+</html>

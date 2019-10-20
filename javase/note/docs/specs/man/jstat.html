@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The jstat Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The jstat Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>jstat - monitor JVM statistics</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><strong>Note:</strong> This command is experimental??and unsupported.</p>
+<p><code>jstat</code> <em>generalOptions</em></p>
+<p><code>jstat</code> <em>outputOptions</em> [<code>-t</code>] [<code>-h</code> <em>lines</em>] <em>vmid</em> [<em>interval</em> [<em>count</em>]]</p>
+<dl>
+<dt><em>generalOptions</em></dt>
+<dd>A single general command-line option. See <a href="#general-options">General Options</a>.
+</dd>
+<dt><em>outputOptions</em></dt>
+<dd>An option reported by the <code>-options</code> option. One or more output options that consist of a single <code>statOption</code>, plus any of the <code>-t</code>, <code>-h</code>, and <code>-J</code> options. See <a href="#output-options-for-the-jstat-command">Output Options for the jstat Command</a>.
+</dd>
+<dt><code>-t</code></dt>
+<dd>Displays a time-stamp column as the first column of output. The time stamp is the time since the start time of the target JVM.
+</dd>
+<dt><code>-h</code> <em>n</em></dt>
+<dd>Displays a column header every <em>n</em> samples (output rows), where <em>n</em> is a positive integer. The default value is <code>0</code>, which displays the column header of the first row of data.
+</dd>
+<dt><em>vmid</em></dt>
+<dd>A virtual machine identifier, which is a string that indicates the target JVM. See <a href="#virtual-machine-identifier">Virtual Machine Identifier</a>.
+</dd>
+<dt><em>interval</em></dt>
+<dd>The sampling interval in the specified units, seconds (s) or milliseconds (ms). Default units are milliseconds. This must be a positive integer. When specified, the <code>jstat</code> command produces its output at each interval.
+</dd>
+<dt><em>count</em></dt>
+<dd>The number of samples to display. The default value is infinity, which causes the <code>jstat</code> command to display statistics until the target JVM terminates or the <code>jstat</code> command is terminated. This value must be a positive integer.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>jstat</code> command displays performance statistics for an instrumented Java HotSpot VM. The target JVM is identified by its virtual machine identifier, or <code>vmid</code> option.</p>
+<p>The <code>jstat</code> command supports two types of options, general options and output options. General options cause the <code>jstat</code> command to display simple usage and version information. Output options determine the content and format of the statistical output.</p>
+<p>All options and their functionality are subject to change or removal in future releases.</p>
+<h2 id="general-options">General Options</h2>
+<p>If you specify one of the general options, then you can't specify any other option or parameter.</p>
+<dl>
+<dt><code>-help</code></dt>
+<dd>Displays a help message.
+</dd>
+<dt><code>-options</code></dt>
+<dd>Displays a list of static options. See <a href="#output-options-for-the-jstat-command">Output Options for the jstat Command</a>.
+</dd>
+</dl>
+<h2 id="output-options-for-the-jstat-command">Output Options for the jstat Command</h2>
+<p>If you don't specify a general option, then you can specify output options. Output options determine the content and format of the <code>jstat</code> command's output, and consist of a single <code>statOption</code>, plus any of the other output options (<code>-h</code>, <code>-t</code>, and <code>-J</code>). The <code>statOption</code> must come first.</p>
+<p>Output is formatted as a table, with columns that are separated by spaces. A header row with titles describes the columns. Use the <code>-h</code> option to set the frequency at which the header is displayed. Column header names are consistent among the different options. In general, if two options provide a column with the same name, then the data source for the two columns is the same.</p>
+<p>Use the <code>-t</code> option to display a time-stamp column, labeled Timestamp as the first column of output. The Timestamp column contains the elapsed time, in seconds, since the target JVM started. The resolution of the time stamp is dependent on various factors and is subject to variation due to delayed thread scheduling on heavily loaded systems.</p>
+<p>Use the interval and count parameters to determine how frequently and how many times, respectively, the <code>jstat</code> command displays its output.</p>
+<p><strong>Note:</strong></p>
+<p>Don't write scripts to parse the <code>jstat</code> command's output because the format might change in future releases. If you write scripts that parse the <code>jstat</code> command output, then expect to modify them for future releases of this tool.</p>
+<dl>
+<dt><code>-statOption</code></dt>
+<dd><p>Determines the statistics information that the <code>jstat</code> command displays. The following lists the available options. Use the <code>-options</code> general option to display the list of options for a particular platform installation. See <a href="#stat-options-and-output">Stat Options and Output</a>.</p>
+<p><code>class</code>: Displays statistics about the behavior of the class loader.</p>
+<p><code>compiler</code>: Displays statistics about the behavior of the Java HotSpot VM Just-in-Time compiler.</p>
+<p><code>gc</code>: Displays statistics about the behavior of the garbage collected heap.</p>
+<p><code>gccapacity</code>: Displays statistics about the capacities of the generations and their corresponding spaces.</p>
+<p><code>gccause</code>: Displays a summary about garbage collection statistics (same as <code>-gcutil</code>), with the cause of the last and current (when applicable) garbage collection events.</p>
+<p><code>gcnew</code>: Displays statistics about the behavior of the new generation.</p>
+<p><code>gcnewcapacity</code>: Displays statistics about the sizes of the new generations and their corresponding spaces.</p>
+<p><code>gcold</code>: Displays statistics about the behavior of the old generation and metaspace statistics.</p>
+<p><code>gcoldcapacity</code>: Displays statistics about the sizes of the old generation.</p>
+<p><code>gcmetacapacity</code>: Displays statistics about the sizes of the metaspace.</p>
+<p><code>gcutil</code>: Displays a summary about garbage collection statistics.</p>
+<p><code>printcompilation</code>: Displays Java HotSpot VM compilation method statistics.</p>
+</dd>
+<dt><code>-J</code><em>javaOption</em></dt>
+<dd>Passes <em>javaOption</em> to the Java application launcher. For example, <code>-J-Xms48m</code> sets the startup memory to 48 MB. For a complete list of options, see <a href="java.html">java</a>.
+</dd>
+</dl>
+<h2 id="stat-options-and-output">Stat Options and Output</h2>
+<p>The following information summarizes the columns that the <code>jstat</code> command outputs for each <em>statOption</em>.</p>
+<dl>
+<dt><code>-class</code> <em>option</em></dt>
+<dd><p>Class loader statistics.</p>
+<p><code>Loaded</code>: Number of classes loaded.</p>
+<p><code>Bytes</code>: Number of KB loaded.</p>
+<p><code>Unloaded</code>: Number of classes unloaded.</p>
+<p><code>Bytes</code>: Number of KB loaded.</p>
+<p><code>Time</code>: Time spent performing class loading and unloading operations.</p>
+</dd>
+<dt><code>-compiler</code> <em>option</em></dt>
+<dd><p>Java HotSpot VM Just-in-Time compiler statistics.</p>
+<p><code>Compiled</code>: Number of compilation tasks performed.</p>
+<p><code>Failed</code>: Number of compilations tasks failed.</p>
+<p><code>Invalid</code>: Number of compilation tasks that were invalidated.</p>
+<p><code>Time</code>: Time spent performing compilation tasks.</p>
+<p><code>FailedType</code>: Compile type of the last failed compilation.</p>
+<p><code>FailedMethod</code>: Class name and method of the last failed compilation.</p>
+</dd>
+<dt><code>-gc</code> <em>option</em></dt>
+<dd><p>Garbage collected heap statistics.</p>
+<p><code>S0C</code>: Current survivor space 0 capacity (KB).</p>
+<p><code>S1C</code>: Current survivor space 1 capacity (KB).</p>
+<p><code>S0U</code>: Survivor space 0 utilization (KB).</p>
+<p><code>S1U</code>: Survivor space 1 utilization (KB).</p>
+<p><code>EC</code>: Current eden space capacity (KB).</p>
+<p><code>EU</code>: Eden space utilization (KB).</p>
+<p><code>OC</code>: Current old space capacity (KB).</p>
+<p><code>OU</code>: Old space utilization (KB).</p>
+<p><code>MC</code>: Metaspace Committed Size (KB).</p>
+<p><code>MU</code>: Metaspace utilization (KB).</p>
+<p><code>CCSC</code>: Compressed class committed size (KB).</p>
+<p><code>CCSU</code>: Compressed class space used (KB).</p>
+<p><code>YGC</code>: Number of young generation garbage collection (GC) events.</p>
+<p><code>YGCT</code>: Young generation garbage collection time.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+<p><code>FGCT</code>: Full garbage collection time.</p>
+<p><code>GCT</code>: Total garbage collection time.</p>
+</dd>
+<dt><code>-gccapacity</code> <em>option</em></dt>
+<dd><p>Memory pool generation and space capacities.</p>
+<p><code>NGCMN</code>: Minimum new generation capacity (KB).</p>
+<p><code>NGCMX</code>: Maximum new generation capacity (KB).</p>
+<p><code>NGC</code>: Current new generation capacity (KB).</p>
+<p><code>S0C</code>: Current survivor space 0 capacity (KB).</p>
+<p><code>S1C</code>: Current survivor space 1 capacity (KB).</p>
+<p><code>EC</code>: Current eden space capacity (KB).</p>
+<p><code>OGCMN</code>: Minimum old generation capacity (KB).</p>
+<p><code>OGCMX</code>: Maximum old generation capacity (KB).</p>
+<p><code>OGC</code>: Current old generation capacity (KB).</p>
+<p><code>OC</code>: Current old space capacity (KB).</p>
+<p><code>MCMN</code>: Minimum metaspace capacity (KB).</p>
+<p><code>MCMX</code>: Maximum metaspace capacity (KB).</p>
+<p><code>MC</code>: Metaspace Committed Size (KB).</p>
+<p><code>CCSMN</code>: Compressed class space minimum capacity (KB).</p>
+<p><code>CCSMX</code>: Compressed class space maximum capacity (KB).</p>
+<p><code>CCSC</code>: Compressed class committed size (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+</dd>
+<dt><code>-gccause</code> <em>option</em></dt>
+<dd><p>This option displays the same summary of garbage collection statistics as the <code>-gcutil</code> option, but includes the causes of the last garbage collection event and (when applicable), the current garbage collection event. In addition to the columns listed for <code>-gcutil</code>, this option adds the following columns:</p>
+<p><code>LGCC</code>: Cause of last garbage collection</p>
+<p><code>GCC</code>: Cause of current garbage collection</p>
+</dd>
+<dt><code>-gcnew</code> <em>option</em></dt>
+<dd><p>New generation statistics.</p>
+<p><code>S0C</code>: Current survivor space 0 capacity (KB).</p>
+<p><code>S1C</code>: Current survivor space 1 capacity (KB).</p>
+<p><code>S0U</code>: Survivor space 0 utilization (KB).</p>
+<p><code>S1U</code>: Survivor space 1 utilization (KB).</p>
+<p><code>TT</code>: Tenuring threshold.</p>
+<p><code>MTT</code>: Maximum tenuring threshold.</p>
+<p><code>DSS</code>: Desired survivor size (KB).</p>
+<p><code>EC</code>: Current eden space capacity (KB).</p>
+<p><code>EU</code>: Eden space utilization (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>YGCT</code>: Young generation garbage collection time.</p>
+</dd>
+<dt><code>-gcnewcapacity</code> <em>option</em></dt>
+<dd><p>New generation space size statistics.</p>
+<p><code>NGCMN</code>: Minimum new generation capacity (KB).</p>
+<p><code>NGCMX</code>: Maximum new generation capacity (KB).</p>
+<p><code>NGC</code>: Current new generation capacity (KB).</p>
+<p><code>S0CMX</code>: Maximum survivor space 0 capacity (KB).</p>
+<p><code>S0C</code>: Current survivor space 0 capacity (KB).</p>
+<p><code>S1CMX</code>: Maximum survivor space 1 capacity (KB).</p>
+<p><code>S1C</code>: Current survivor space 1 capacity (KB).</p>
+<p><code>ECMX</code>: Maximum eden space capacity (KB).</p>
+<p><code>EC</code>: Current eden space capacity (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+</dd>
+<dt><code>-gcold</code> <em>option</em></dt>
+<dd><p>Old generation size statistics.</p>
+<p><code>MC</code>: Metaspace Committed Size (KB).</p>
+<p><code>MU</code>: Metaspace utilization (KB).</p>
+<p><code>CCSC</code>: Compressed class committed size (KB).</p>
+<p><code>CCSU</code>: Compressed class space used (KB).</p>
+<p><code>OC</code>: Current old space capacity (KB).</p>
+<p><code>OU</code>: Old space utilization (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+<p><code>FGCT</code>: Full garbage collection time.</p>
+<p><code>GCT</code>: Total garbage collection time.</p>
+</dd>
+<dt><code>-gcoldcapacity</code> <em>option</em></dt>
+<dd><p>Old generation statistics.</p>
+<p><code>OGCMN</code>: Minimum old generation capacity (KB).</p>
+<p><code>OGCMX</code>: Maximum old generation capacity (KB).</p>
+<p><code>OGC</code>: Current old generation capacity (KB).</p>
+<p><code>OC</code>: Current old space capacity (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+<p><code>FGCT</code>: Full garbage collection time.</p>
+<p><code>GCT</code>: Total garbage collection time.</p>
+</dd>
+<dt><code>-gcmetacapacity</code> <em>option</em></dt>
+<dd><p>Metaspace size statistics.</p>
+<p><code>MCMN</code>: Minimum metaspace capacity (KB).</p>
+<p><code>MCMX</code>: Maximum metaspace capacity (KB).</p>
+<p><code>MC</code>: Metaspace Committed Size (KB).</p>
+<p><code>CCSMN</code>: Compressed class space minimum capacity (KB).</p>
+<p><code>CCSMX</code>: Compressed class space maximum capacity (KB).</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+<p><code>FGCT</code>: Full garbage collection time.</p>
+<p><code>GCT</code>: Total garbage collection time.</p>
+</dd>
+<dt><code>-gcutil</code> <em>option</em></dt>
+<dd><p>Summary of garbage collection statistics.</p>
+<p><code>S0</code>: Survivor space 0 utilization as a percentage of the space's current capacity.</p>
+<p><code>S1</code>: Survivor space 1 utilization as a percentage of the space's current capacity.</p>
+<p><code>E</code>: Eden space utilization as a percentage of the space's current capacity.</p>
+<p><code>O</code>: Old space utilization as a percentage of the space's current capacity.</p>
+<p><code>M</code>: Metaspace utilization as a percentage of the space's current capacity.</p>
+<p><code>CCS</code>: Compressed class space utilization as a percentage.</p>
+<p><code>YGC</code>: Number of young generation GC events.</p>
+<p><code>YGCT</code>: Young generation garbage collection time.</p>
+<p><code>FGC</code>: Number of full GC events.</p>
+<p><code>FGCT</code>: Full garbage collection time.</p>
+<p><code>GCT</code>: Total garbage collection time.</p>
+</dd>
+<dt><code>-printcompilation</code> <em>option</em></dt>
+<dd><p>Java HotSpot VM compiler method statistics.</p>
+<p><code>Compiled</code>: Number of compilation tasks performed by the most recently compiled method.</p>
+<p><code>Size</code>: Number of bytes of byte code of the most recently compiled method.</p>
+<p><code>Type</code>: Compilation type of the most recently compiled method.</p>
+<p><code>Method</code>: Class name and method name identifying the most recently compiled method. Class name uses a slash (/) instead of a dot (.) as a name space separator. The method name is the method within the specified class. The format for these two fields is consistent with the HotSpot <code>-XX:+PrintCompilation</code> option.</p>
+</dd>
+</dl>
+<h2 id="virtual-machine-identifier">Virtual Machine Identifier</h2>
+<p>The syntax of the <code>vmid</code> string corresponds to the syntax of a URI:</p>
+<blockquote>
+<p>[<em>protocol</em><code>:</code>][<code>//</code>]<em>lvmid</em>[<code>@</code><em>hostname</em>[<code>:</code><em>port</em>][<code>/</code><em>servername</em>]</p>
+</blockquote>
+<p>The syntax of the <code>vmid</code> string corresponds to the syntax of a URI. The <code>vmid</code> string can vary from a simple integer that represents a local JVM to a more complex construction that specifies a communications protocol, port number, and other implementation-specific values.</p>
+<dl>
+<dt><em>protocol</em></dt>
+<dd>The communications protocol. If the <em>protocol</em> value is omitted and a host name isn't specified, then the default protocol is a platform-specific optimized local protocol. If the <em>protocol</em> value is omitted and a host name is specified, then the default protocol is <code>rmi</code>.
+</dd>
+<dt><em>lvmid</em></dt>
+<dd><p>The local virtual machine identifier for the target JVM. The <em>lvmid</em> is a platform-specific value that uniquely identifies a JVM on a system. The <em>lvmid</em> is the only required component of a virtual machine identifier. The <em>lvmid</em> is typically, but not necessarily, the operating system's process identifier for the target JVM process. You can use the <code>jps</code> command to determine the <em>lvmid</em> provided the JVM processes is not running in a separate docker instance. You can also determine the <em>lvmid</em> on Oracle Solaris, Linux, and OS X platforms with the <code>ps</code> command, and on Windows with the Windows Task Manager.</p>
+<p><strong>Note:</strong> JDK 10 has added support for using the Attach API when attaching to Java processes running in a separate docker process. However, the <code>jps</code> command will not list the JVM processes that are running in a separate docker instance. If you are trying to connect a Linux host with a Virtual Machine that is in a docker container, you must use tools such as <code>ps</code> to look up the PID of the JVM.</p>
+</dd>
+<dt><em>hostname</em></dt>
+<dd>A host name or IP address that indicates the target host. If the <em>hostname</em> value is omitted, then the target host is the local host.
+</dd>
+<dt><em>port</em></dt>
+<dd>The default port for communicating with the remote server. If the <em>hostname</em> value is omitted or the <em>protocol</em> value specifies an optimized, local protocol, then the <em>port</em> value is ignored. Otherwise, treatment of the <em>port</em> parameter is implementation-specific. For the default <code>rmi</code> protocol, the port value indicates the port number for the <code>rmiregistry</code> on the remote host. If the <em>port</em> value is omitted and the <em>protocol</em> value indicates <code>rmi</code>, then the default rmiregistry port (1099) is used.
+</dd>
+<dt><em>servername</em></dt>
+<dd>The treatment of the <em>servername</em> parameter depends on implementation. For the optimized local protocol, this field is ignored. For the <code>rmi</code> protocol, it represents the name of the RMI remote object on the remote host.
+</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<p>This section presents some examples of monitoring a local JVM with an <em>lvmid</em> of 21891.</p>
+<h2 id="the-gcutil-option">The gcutil Option</h2>
+<p>This example attaches to lvmid 21891 and takes 7 samples at 250 millisecond intervals and displays the output as specified by the <code>-gcutil</code> option.</p>
+<p>The output of this example shows that a young generation collection occurred between the third and fourth sample. The collection took 0.078 seconds and promoted objects from the eden space (E) to the old space (O), resulting in an increase of old space utilization from 66.80% to 68.19%. Before the collection, the survivor space was 97.02% utilized, but after this collection it's 91.03% utilized.</p>
+<pre><code>jstat -gcutil 21891 250 7
+  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT
+  0.00  97.02  70.31  66.80  95.52  89.14      7    0.300     0    0.000    0.300
+  0.00  97.02  86.23  66.80  95.52  89.14      7    0.300     0    0.000    0.300
+  0.00  97.02  96.53  66.80  95.52  89.14      7    0.300     0    0.000    0.300
+ 91.03   0.00   1.98  68.19  95.89  91.24      8    0.378     0    0.000    0.378
+ 91.03   0.00  15.82  68.19  95.89  91.24      8    0.378     0    0.000    0.378
+ 91.03   0.00  17.80  68.19  95.89  91.24      8    0.378     0    0.000    0.378
+ 91.03   0.00  17.80  68.19  95.89  91.24      8    0.378     0    0.000    0.378</code></pre>
+<h2 id="repeat-the-column-header-string">Repeat the Column Header String</h2>
+<p>This example attaches to lvmid 21891 and takes samples at 250 millisecond intervals and displays the output as specified by <code>-gcnew</code> option. In addition, it uses the <code>-h3</code> option to output the column header after every 3 lines of data.</p>
+<p>In addition to showing the repeating header string, this example shows that between the second and third samples, a young GC occurred. Its duration was 0.001 seconds. The collection found enough active data that the survivor space 0 utilization (S0U) would have exceeded the desired survivor size (DSS). As a result, objects were promoted to the old generation (not visible in this output), and the tenuring threshold (TT) was lowered from 31 to 2.</p>
+<p>Another collection occurs between the fifth and sixth samples. This collection found very few survivors and returned the tenuring threshold to 31.</p>
+<pre><code>jstat -gcnew -h3 21891 250
+ S0C    S1C    S0U    S1U   TT MTT  DSS      EC       EU     YGC     YGCT
+  64.0   64.0    0.0   31.7 31  31   32.0    512.0    178.6    249    0.203
+  64.0   64.0    0.0   31.7 31  31   32.0    512.0    355.5    249    0.203
+  64.0   64.0   35.4    0.0  2  31   32.0    512.0     21.9    250    0.204
+ S0C    S1C    S0U    S1U   TT MTT  DSS      EC       EU     YGC     YGCT
+  64.0   64.0   35.4    0.0  2  31   32.0    512.0    245.9    250    0.204
+  64.0   64.0   35.4    0.0  2  31   32.0    512.0    421.1    250    0.204
+  64.0   64.0    0.0   19.0 31  31   32.0    512.0     84.4    251    0.204
+ S0C    S1C    S0U    S1U   TT MTT  DSS      EC       EU     YGC     YGCT
+  64.0   64.0    0.0   19.0 31  31   32.0    512.0    306.7    251    0.204</code></pre>
+<h2 id="include-a-time-stamp-for-each-sample">Include a Time Stamp for Each Sample</h2>
+<p>This example attaches to lvmid 21891 and takes 3 samples at 250 millisecond intervals. The <code>-t</code> option is used to generate a time stamp for each sample in the first column.</p>
+<p>The Timestamp column reports the elapsed time in seconds since the start of the target JVM. In addition, the <code>-gcoldcapacity</code> output shows the old generation capacity (OGC) and the old space capacity (OC) increasing as the heap expands to meet allocation or promotion demands. The old generation capacity (OGC) has grown from 11,696 KB to 13,820 KB after the eighty-first full garbage collection (FGC). The maximum capacity of the generation (and space) is 60,544 KB (OGCMX), so it still has room to expand.</p>
+<pre><code>Timestamp      OGCMN    OGCMX     OGC       OC       YGC   FGC    FGCT    GCT
+          150.1   1408.0  60544.0  11696.0  11696.0   194    80    2.874   3.799
+          150.4   1408.0  60544.0  13820.0  13820.0   194    81    2.938   3.863
+          150.7   1408.0  60544.0  13820.0  13820.0   194    81    2.938   3.863</code></pre>
+<h2 id="monitor-instrumentation-for-a-remote-jvm">Monitor Instrumentation for a Remote JVM</h2>
+<p>This example attaches to lvmid 40496 on the system named <code>remote.domain</code> using the <code>-gcutil</code> option, with samples taken every second indefinitely.</p>
+<p>The lvmid is combined with the name of the remote host to construct a vmid of <code>40496@remote.domain</code>. This vmid results in the use of the <code>rmi</code> protocol to communicate to the default <code>jstatd</code> server on the remote host. The <code>jstatd</code> server is located using the <code>rmiregistry</code> command on <code>remote.domain</code> that's bound to the default port of the <code>rmiregistry</code> command (port 1099).</p>
+<pre><code>jstat -gcutil 40496@remote.domain 1000
+... output omitted</code></pre>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>The rmiregistry Command</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../resources/jdk-default.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The rmiregistry Command</h1>
+</header>
+<h2 id="name">Name</h2>
+<p>rmiregistry - create and start a remote object registry on the specified port on the current host</p>
+<h2 id="synopsis">Synopsis</h2>
+<p><code>rmiregistry</code> [<em>options</em>] [<em>port</em>]</p>
+<dl>
+<dt><em>options</em></dt>
+<dd>This represents the option for the <code>rmiregistry</code> command. See <a href="#options">Options</a>
+</dd>
+<dt><em>port</em></dt>
+<dd>The number of a port on the current host at which to start the remote object registry.
+</dd>
+</dl>
+<h2 id="description">Description</h2>
+<p>The <code>rmiregistry</code> command creates and starts a remote object registry on the specified port on the current host. If the port is omitted, then the registry is started on port 1099. The <code>rmiregistry</code> command produces no output and is typically run in the background, for example:</p>
+<blockquote>
+<p><code>rmiregistry &amp;</code></p>
+</blockquote>
+<p>A remote object registry is a bootstrap naming service that's used by RMI servers on the same host to bind remote objects to names. Clients on local and remote hosts can then look up remote objects and make remote method invocations.</p>
+<p>The registry is typically used to locate the first remote object on which an application needs to call methods. That object then provides application-specific support for finding other objects.</p>
+<p>The methods of the <code>java.rmi.registry.LocateRegistry</code> class are used to get a registry operating on the local host or local host and port.</p>
+<p>The URL-based methods of the <code>java.rmi.Naming</code> class operate on a registry and can be used to:</p>
+<ul>
+<li><p>Bind the specified name to a remote object</p></li>
+<li><p>Return an array of the names bound in the registry</p></li>
+<li><p>Return a reference, a stub, for the remote object associated with the specified name</p></li>
+<li><p>Rebind the specified name to a new remote object</p></li>
+<li><p>Destroy the binding for the specified name that's associated with a remote object</p></li>
+</ul>
+<h2 id="options">Options</h2>
+<dl>
+<dt><code>-J</code><em>option</em></dt>
+<dd>Used with any Java option to pass the <em>option</em> following the <code>-J</code> (no spaces between the <code>-J</code> and the option) to the Java interpreter.
+</dd>
+</dl>
+</body>
+</html>
