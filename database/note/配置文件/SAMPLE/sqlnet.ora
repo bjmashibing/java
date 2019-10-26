@@ -1,0 +1,1116 @@
+# Copyright (c) 1996, 2006, Oracle. All rights reserved.  
+# 
+# NAME
+#   sqlnet.ora
+# FUNCTION
+#   Oracle Network Client startup parameter file example
+# NOTES
+#   This file contains examples and instructions for defining all
+#   Oracle Network Client parameters. It should be possible to read
+#   this file and setup a Client by uncommenting parameter definitions
+#   and substituting values. The comments should provide enough
+#   explanation to enable a reasonable user to manage his TNS connections
+#   without having to resort to 'real' documentation.
+# SECTIONS
+#   ONames Client
+#   Namesctl
+#   Native Naming Adpaters
+#   ...
+# MODIFIED
+#    nwoo       04/26/07 - Add SDP.PF_INET_SDP parameter.
+#    rachacos   09/15/06 - Add BUCKET_SIZE parameter.
+#    rachacos   08/10/06 - Add ADR/DDE parameters.
+#    ajacobs    09/09/03 - Fix wallet_location parameter 
+#    ajacobs    01/20/03 - CyberSafe desupport
+#    ajacobs    09/17/02 - remove crypto_seed
+#    cozhang    03/07/02 - Change connect_time to inbound_connect_time.
+#    mhho       01/15/02 - update sample with new parameter changes
+#    cozhang    12/04/01 - Add params for DoS timout handling
+#    ajacobs    10/23/00 - Remove identix, securid
+#    ajacobs    09/07/00 - Update for Oracle Advanced Security encryption/integ
+#    tclarke    05/26/00 - bug 515765
+#    jtran      03/24/98 - add radius configuration
+#    skanjila   06/06/97 - Correct default for Automatic_IPC
+#    eminer     05/15/97 - Add the relevant onrsd parameters.
+#    asriniva   04/23/97 - Merge with version from doc
+#    ggilchri   03/31/97 - mods
+#    bvasudev   02/07/97 - Change sqlnet.authentication_services documentation
+#    bvasudev   11/25/96 - Merge sqlnet.ora transport related parameters
+#    asriniva   11/12/96 - Revise with new OSS parameters.
+#    asriniva   11/05/96 - Add ANO parameters.
+# ____________________________________________________________________
+
+# - ONames Client ----------------------------------------------------
+#
+#names.default_domain = world
+#
+#Syntax:  domain-name
+#Default: NULL
+#
+# Indicates the domain from which the client most often requests names. When
+# this parameter is set the default domain name (for example, US.ACME), the
+# domain name will be automatically appended to any unqualified name in an
+# ONAmes request (query, register, deregister, etc). Any name which contains
+# an unescaped dot ('.') will not have the default domain appended. Simple
+# names may be qualified with a trailing dot (for example 'rootserver.').
+#
+#
+#names.initial_retry_timeout = 30
+#
+#Syntax:  1-600 seconds
+#Default: 15 (OSD)
+#
+# Determines how long a client will wait for a response from a Names Server
+# before reiterating the request to the next server in the preferred_servers
+# list.
+#
+#
+#names.max_open_connections = 3
+#
+#Syntax:  3-64
+#Default: ADDRS in preferred_servers
+#
+# Determines how many connections an ONames client may have open at one time.
+# Clients will ordinarily keep connections to servers open once they are
+# established until the operation (or session in namesctl) is complete. A
+# connection will be opened whenever needed, and if the maximum would be 
+# exceeded the least recently used connection will be closed.
+#
+#
+#names.message_pool_start_size = 10
+#
+#Syntax:  3-256
+#Default: 10
+#
+# Determines the initial number of messages allocated in the client's message
+# pool. This pool provides the client with pre-allocated messages to be used
+# for requests to ONames servers. Messages which are in the pool and unused
+# may be reused. If a message is needed and no free messages are available in
+# the pool more will be allocated.
+#
+#
+#names.preferred_servers = (address_list =
+#  (address=(protocol=ipc)(key=n23))
+#  (address=(protocol=tcp)(host=nineva)(port=1383))
+#  (address=(protocol=tcp)(host=cicada)(port=1575))
+# )
+#
+#Syntax:  ADDR_LIST
+#Default: Well-Known (OSD)
+#
+# Specifies a list of ONames servers in the client's region; requests will be
+# sent to each ADDRESS in the list until a response is recieved, or the list
+# (and number of retries) is exhausted.
+#
+# Addresses of the following form specify that messages to the ONames server
+# should use Oracle Remote Operations (RPC):
+#
+#     (description = 
+#       (address=(protocol=tcp)(host=nineva)(port=1383))
+#       (connect_data=(rpc=on))
+#     )
+#
+#
+#
+#names.request_retries = 2
+#
+#Syntax:  1-5
+#Default: 1
+#
+# Specifies the number of times the client should try each server in the list
+# of preferred_servers before allowing the operation to fail.
+#
+#
+#names.directory_path
+#
+#Syntax:  <adapter-name>
+#Default: TNSNAMES,ONAMES,HOSTNAME
+#
+# Sets the (ordered) list of naming adaptors to use in resolving a name.
+# The default is as shown for 3.0.2 of sqlnet onwards. The default was
+# (TNSNAMES, ONAMES) before that. The value can be presented without
+# parentheses if only a single entry is being specified. The parameter is
+# recognized from version 2.3.2 of sqlnet onward. Acceptable values include: 
+#  TNSNAMES -- tnsnames.ora lookup
+#  ONAMES   -- Oracle Names
+#  HOSTNAME -- use the hostname (or an alias of the hostname)
+#  NIS      -- NIS (also known as "yp")
+#  CDS      -- OSF DCE's Cell Directory Service
+#  NDS      -- Novell's Netware Directory Service
+#
+# - Client Cache (ONRSD) ---------------------------------------------
+#names.addresses = (ADDRESS=(PROTOCOL=IPC)(KEY=ONAMES))
+#
+#Syntax:  ADDR
+#Default: (ADDRESS=(PROTOCOL=IPC)(KEY=ONAMES))
+#
+# Address on which the client cache listens (is available to clients).
+# Any valid TNS address is allowed. The default should be used if at
+# all possible; clients have this entry hardwired as the first line
+# of their server-list file (sdns.ora). If the address is set to a
+# non-default value the client's preferred_servers parameter should
+# be set to include the client-cache address first.
+#
+#
+#names.authority_required = False
+#
+#Syntax:  T/F
+#Default: False
+#
+# Determines whether system querys (for the root etc) require Authoritative
+# answers. 
+#
+#
+#names.auto_refresh_expire = 259200
+#
+#Syntax:  Number of seconds, 60-1209600
+#Default: 259200
+#
+# This is the amount of time (in seconds) the server will cache the addresses
+# of servers listed in server-list file (sdns.ora). When this time expires the
+# server will issue another query to the servers in those regions to refresh
+# the data.
+#
+#
+#names.auto_refresh_retry = 180
+#
+#Syntax:  Number of seconds, 60-3600
+#Default: sec.	180
+#
+# This set how often the server will retry when the auto_refresh query fails.
+#
+#
+#names.cache_checkpoint_file = cache.ckp
+#
+#Syntax:  filename
+#Default: $ORACLE_HOME/network/names/ckpcch.ora
+#
+# Specifies the name of the operating system file to which the Names Server
+# writes its foreign data cache.
+#
+#
+#names.cache_checkpoint_interval = 7200
+#
+#Syntax:  Number of seconds, 10-259200
+#Default: 0 (off)
+#
+# Indicates the interval at which a Names Server writes a checkpoint of its
+# data cache to the checkpoint file. 
+#
+#
+#names.default_forwarders=
+# (FORWARDER_LIST=
+#    (FORWARDER=
+#       (NAME= rootserv1.world)
+#       (ADDRESS=(PROTOCOL=tcp)(PORT=42100)(HOST=roothost))))
+#
+#Syntax:  Name-Value/address_list
+#Default: NULL
+#
+# A list (in NV form) of the addresses of other servers which should be used to 
+# forward querys while in default_forwarder (slave) mode. NAME is the global
+# names for the server to which forwards whould be directed, and ADDRESS is its
+# address.
+#
+#
+#names.default_forwarders_only = True
+#
+#Syntax:  T/F
+#Default: False
+#
+# When set to true this server will use the servers listed in default_forwarders
+# to forward all operations which involve data in foreign regions. Otherwise it
+# will use the servers defined in the server-list file (sdns.ora) in addition
+# to any defined in the default_forwarders parameter.
+#
+#
+#names.log_directory = /oracle/network/log
+#
+#Syntax:  directory
+#Default: $ORACLE_HOME/network/log
+#
+# Indicates the name of the directory where the log file for Names Server
+# operational events are written.
+#
+#
+#names.log_file = names.log
+#
+#Syntax:  filename
+#Default: names.log
+#
+# The name of the output file to which Names Server operational events are
+# written.
+#
+#names.log_stats_interval = 3600
+#
+#Syntax:  Number of seconds, 10-ub4max
+#Default: sec.	0 (off)
+#
+#Specifies the number of seconds between statistical entries in log file. 
+#
+#names.log_unique = False
+#
+#Syntax:  T/F
+#Default: False
+#
+# If set to true the server will guarantee that the log file will have a unique
+# name which will not overwrite any existing files (note that log files are
+# appended to, so log information will not be lost if log_unique is not true).
+#
+#names.max_open_connections = 10
+#
+#Syntax:  3-64
+#Default: 10
+#
+# Specifies the number of connections that the Names Server can have open at any
+# given time. The value is generated as the value 10 or the sum of one
+# connection for listening, five for clients, plus one for each foreign domain
+# defined in the local administrative region, whichever is greater. Any
+# operation which requires the server to open a network connection will use
+# an already open connection if it is available, or will open a connection
+# if not. Higher settings will save time and cost network resources; lower
+# settings save network resources, cost time.
+#
+#
+#names.max_reforwards = 2
+#
+#Syntax:  1-15
+#Default: 2
+#
+# The maximum number of times the server will attempt to forward a certain
+# operation.
+#
+#
+#names.message_pool_start_size = 24
+#
+#Syntax:  3-256
+#Default: 10
+#
+# Determines the initial number of messages allocated in the server's message
+# pool. This pool provides the server with pre-allocated messages to be used
+# for incoming or outgoing messages (forwards). Messages which are in the pool
+# and unused may be reused. If a message is needed and no free messages are
+# available in the pool more will be allocated.
+#
+#
+#names.no_modify_requests = False
+#
+#Syntax:  T/F
+#Default: False
+#
+# If set to true, the server will refuse any operations which modify the
+# data in its region (it will still save foreign info in the cache which is 
+# returned from foreign querys).
+#
+#
+#names.password = 625926683431AA55
+#
+#Syntax:  encrypted string
+#Default: NULL
+#
+# If set the server will require that the user provide a password in his
+# namesctl session (either with sqlnet.ora:namesctl.server_password or 'set
+# password') in order to do 'sensitive' operations, like stop, restart, reload.
+# This parameter is generally set in encrypted form, so it can not be set
+# manually.
+#
+#names.reset_stats_interval = 3600
+#
+#Syntax:  10-ub4max
+#Default: 0 (off)
+#
+# Specifies the number of seconds during which the statistics collected by the
+# Names Servers should accumulate. At the frequency specified, they are reset
+# to zero. The default value of 0 means never reset statistics. 
+#
+#
+#names.trace_directory = /oracle/network/trace
+#
+#Syntax:  directory
+#Default: $ORACLE_HOME/network/trace
+#
+# Indicates the name of the directory to which trace files from a Names Server
+# trace session are written. 
+#
+#
+#names.trace_file = names.trc
+#
+#Syntax:  filename
+#Default: names.trc
+#
+# Indicates the name of the output file from a Names Server trace session.
+#
+#
+#names.trace_func # NA
+#
+#Syntax:  T/F
+#Default: False
+#
+# Internal mechanism to control tracing by function name.
+#
+#
+#names.trace_level = ADMIN
+#
+#Syntax:  T/F
+#Default: False
+#
+#Syntax:  {OFF,USER,ADMIN,0-16}
+#Default: OFF (0)
+#
+# Indicates the level at which the Names Server is to be traced.
+# Available Values:
+#	0 or OFF - No trace output
+#	4 or USER - User trace information
+#	10 or ADMIN - Administration trace information
+#	16 or SUPPORT - WorldWide Customer Support trace information
+#
+#
+#names.trace_mask = (200,201,202,203,205,206,207)
+#
+#Syntax:  list of numbers
+#Default: NULL
+#
+# Internal mechanism to control trace behavior. 
+#
+#
+#names.trace_unique = True
+#
+#Syntax:  T/F
+#Default: False
+#
+# Indicates whether each trace file has a unique name, allowing multiple trace
+# files to coexist. If the value is set to ON, a process identifier is appended
+# to the name of each trace file generated. 
+#
+#
+# - Namesctl ---------------------------------------------------------
+#
+#namesctl.trace_directory = /oracle/network/trace
+#
+#Syntax:  directory
+#Default: $ON/trace
+#
+# Indicates the name of the directory to which trace files from a namesctl
+# trace session are written. 
+#
+#
+#namesctl.trace_file = namesctl.trc
+#
+#Syntax:  filename
+#Default: namesctl.trc
+#
+# Indicates the name of the output file from a namesctl trace session.
+#
+#
+#namesctl.trace_func # NA
+#
+#Syntax:  word list
+#Default: NULL
+#
+# Internal mechanism to control tracing by function name.
+#
+#
+#namesctl.trace_level = ADMIN
+#
+#Syntax:  {OFF,USER,ADMIN,0-16}
+#Default: OFF (0)
+#
+# Indicates the level at which the namesctl is to be traced.
+# Available Values:
+#	0 or OFF - No trace output
+#	4 or USER - User trace information
+#	10 or ADMIN - Administration trace information
+#	16 or SUPPORT - WorldWide Customer Support trace information
+#
+#
+#namesctl.trace_mask # NA
+#
+#Syntax:  number list
+#Default: NULL
+#
+# Internal mechanism to control trace behavior. 
+#
+#
+#namesctl.trace_unique = True
+#
+#Syntax:  T/F
+#Default: False
+#
+# Indicates whether each trace file has a unique name, allowing multiple trace
+# files to coexist. If the value is set to ON, a process identifier is appended
+# to the name of each trace file generated. 
+# 
+#
+#namesctl.no_initial_server = False
+#
+#Syntax:  T/F
+#Default: False
+#
+# If set to TRUE namesctl will suppress any error messages when namesctl is
+# unable to connect to a default names server.
+#
+#
+#namesctl.internal_use = True
+#
+#Syntax:  T/F
+#Default: False
+#
+# If set to true namesctl will enable a set of internal undocumented commands.
+# All internal commands are preceded by an underscore ('_') in order to
+# distinguish them as internal. Without going into details, the commands
+# enabled are:
+#
+#     _add_data              _create_name           _delete_name           
+#     _full_status           _ireplace_data         _newttl_name           
+#     _pause                 _remove_data           _rename_name           
+#     _replace_data          _start                 _walk*                 
+#
+# There are also a set of names server variables which may be set when
+# namesctl is in internal mode:
+#
+#     _authority_required             _auto_refresh*                  
+#     _cache_checkpoint_interval      _cache_dump                     
+#     _default_autorefresh_expire     _default_autorefresh_retry      
+#     _default_forwarders_only        _forwarding_desired             
+#     _max_reforwards                 _modify_ops_enabled             
+#     _next_cache_checkpoint          _next_cache_flush               
+#     _next_stat_log                  _next_stat_reset                
+#     _reload                         _request_delay                  
+#     _restart                        _shutdown                       
+#
+#
+#namesctl.noconfirm = True
+#
+#Syntax:  T/F
+#Default: False
+#
+# When set to TRUE namesctl will suppress the confirmation prompt when 
+# sensitive operations (stop, restart, reload) are requested. This is
+# quite helpful when using namesctl scripts.
+#
+#
+#namesctl.server_password = mangler
+#
+#Syntax:  string
+#Default: NULL
+#
+# Automatically sets the password for the names server in order to perform
+# sensitive operations (stop, restart, reload). The password may also be
+# set manually during a namesctl session using 'set password'.
+#
+#
+#namesctl.internal_encrypt_password = False
+#
+#Syntax:  T/F
+#Default: True
+#
+# When set to TRUE namesctl will not encrypt the password when it is sent to
+# the names server. This would enable an unencrypted password to be set in
+# names.ora:names.server_password
+#
+# - Native Naming Adpaters -------------------------------------------
+#
+#names.dce.prefix = /.:/subsys/oracle/names
+#
+#Syntax:  DCE cell name
+#Default: /.:/subsys/oracle/names
+#
+#Specifies the DCE cell (prefix) to use for name lookup.
+#
+#
+#names.nds.name_context = personnel.acme
+#
+#Syntax:  NDS name
+#Default: (OSD?)
+#
+# Specifies the default NDS name context in which to look for the name to
+# be resolved.
+#
+#
+#names.nis.meta_map # NA
+#
+# Syntax:  filename
+# Default: sqlnet.maps
+#
+# Specifies the file to be used to map NIS attributes to an NIS mapname.
+# Currently unused.
+
+# - Oracle Advanced Security Authentication Adapters ----------------
+
+#sqlnet.authentication_services
+#
+# Syntax: A single value or a list from {beq, none, all, kerberos5,
+#	  radius, nts}
+# Default: NONE
+#
+# Enables one or more authentication services.  If
+# Oracle Advanced Security has been installed with Kerberos5
+# support, using (beq, kerberos5) would enable authentication via
+# Kerberos.
+#
+#sqlnet.authentication_services=(beq, kerberos5)
+ 
+##
+## Parmeters used with Kerberos adapter.
+##
+
+#sqlnet.kerberos5_cc_name
+#
+# Syntax: Any valid pathname.
+# Default: /tmp/krb5cc_<uid>
+#
+# The Kerberos credential cache pathname.
+#
+#sqlnet.kerberos5_cc_name=/tmp/mycc
+
+#sqlnet.kerberos5_clockskew
+#
+# Syntax: Any positive integer.
+# Default: 300
+#
+# The acceptable difference in the number of seconds between when a
+# credential was sent and when it was received.
+#
+#sqlnet.kerberos5_clockskew=600
+
+#sqlnet.kerberos5_conf
+#
+# Syntax: Any valid pathname.
+# Default: /krb5/krb.conf
+#
+# The Kerberos configuration pathname.
+#
+#sqlnet.kerberos5_conf=/tmp/mykrb.conf
+
+#sqlnet.kerberos5_realms
+#
+# Syntax: Any valid pathname
+# Default: /krb5/krb.realms
+#
+# The Kerberos host name to realm translation file.
+#
+#sqlnet.kerberos5_realms=/tmp/mykrb.realms
+
+#sqlnet.kerberos5_keytab
+#
+# Syntax: Any valid pathname.
+# Default: /etc/v5srvtab
+#
+# The Kerberos secret key file.
+#
+#sqlnet.kerberos5_keytab=/tmp/myv5srvtab
+
+#sqlnet.authentication_kerberos5_service
+#
+# Syntax: Any string.
+# Default: A default is not provided.
+#
+# The Kerberos service name.
+#
+#sqlnet.authentication_kerberos5_service=acme
+
+##
+## Parameters used with Radius adapter
+##
+ 
+# Need to specify the location of the Radius server
+#sqlnet.radius_authentication = localhost
+
+# Need to specify the port address of the Radius server
+#sqlnet.radius_authentication_port = 1654
+
+# If your radius server support accounting, you can enable it
+#sqlnet.radius_accounting = off
+
+# Turn on/off challenge response
+#sqlnet.radius_challenge_response = off
+
+# Keyword to request a challenge from Radius server.  
+# If you use activcard, enter activcard
+
+# If you use something else, enter challenge
+#sqlnet.radius_challenge_keyword = challenge
+
+# Enter the name of the client interface you want to use for challenge response
+#sqlnet.radius_authentication_interface = DefaultRadiusInterface
+
+# Where is the secret file locate
+#sqlnet.radius_secret = $ORACLE_HOME/security/radius.key
+ 
+
+# - Oracle Advanced Security Network Security -------------------------
+
+#sqlnet.crypto_checksum_client 
+#sqlnet.crypto_checksum_server 
+#sqlnet.encryption_client 
+#sqlnet.encryption_server 
+#
+# These four parameters are used to specify whether a service (e.g. 
+# crypto-checksumming or encryption) should be active: 
+#
+# Each of the above parameters defaults to ACCEPTED.
+#
+# Each of the above parameters can have one of four possible values: 
+# 
+# value		meaning 
+#
+# ACCEPTED	The service will be active if the other side of the 
+#		connection specifies "REQUESTED" or REQUIRED" and 
+#		there is a compatible algorithm available on the other 
+#		side; it will be inactive otherwise. 
+#
+# REJECTED	The service must not be active, and the connection 
+#		will fail if the other side specifies "REQUIRED". 
+#
+# REQUESTED	The service will be active if the other side specifies 
+#		"ACCEPTED", "REQUESTED", or "REQUIRED" and there is a 
+#		compatible algorithm available on the other side; it 
+#		will be inactive otherwise. 
+#
+# REQUIRED	The service must be active, and the connection will 
+#		fail if the other side specifies "REJECTED" or if there 
+#		is no compatible algorithm on the other side. 
+#
+#sqlnet.crypto_checksum_types_client 
+#sqlnet.crypto_checksum_types_server 
+#sqlnet.encryption_types_client 
+#sqlnet.encryption_types_server 
+#
+# These parameters control which algorithms will be made available for 
+# each service on each end of a connection: 
+#
+# The value of each of these parameters can be either a parenthesized 
+# list of algorithm names separated by commas or a single algorithm 
+# name.
+#
+# Encryption types can be: AES256, RC4_256, AES192, 3DES168, AES128,
+#                          RC4_128,3DES112, RC4_56, DES, RC4_40, DES40
+#
+# Encryption defaults to all the algorithms.
+#
+# Crypto checksum types can be: SHA1, MD5
+#
+# Crypto checksum defaults to all the algorithms.
+#
+#sqlnet.crypto_checksum_server = required 
+#sqlnet.encryption_server = required
+#
+#
+#ssl_server_dn_match
+#
+# Systax: ON/OFF
+# Default: OFF
+#
+# The ssl_server_dn_match parameter determines SSL behavior when the
+# server's distinguished name does not match the service name. When
+# set to ON, the names must match for a connection to be established.
+# Leaving the parameter on OFF allows connection to servers where
+# the names do not match. However, this may potentially allow servers
+# to fake their identity.
+#
+#
+#ssl_client_authentication
+#
+# Syntax: TRUE/FALSE
+# Default: TRUE
+#
+# The ssl_client_authentication parameter controls whether the client 
+# is authenticated using SSL. This parameter should be set to FALSE if
+# using a cipher suite that contains Diffie-Hellman anonymous 
+# authentication (DH_anon) or if using other non-SSL authentication
+# methods.
+#
+#ssl_cipher_suites
+#
+# Syntax: (SSL_RSA_WITH_3DES_EDE_CBC_SHA, SSL_RSA_WITH_RC4_128_SHA,
+#          SSL_RSA_WITH_RC4_128_MD5, SSL_RSA_WITH_DES_CBC_SHA,
+#          SSL_DH_anon_WITH_3DES_EDE_CBC_SHA, SSL_DH_anon_WITH_RC4_128_MD5,
+#          SSL_DH_anon_WITH_DES_CBC_SHA, SSL_RSA_EXPORT_WITH_RC4_40_MD5,
+#          SSL_RSA_EXPORT_WITH_DES40_CBC_SHA, 
+#          SSL_DH_anon_EXPORT_WITH_RC4_40_MD5, 
+#          SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA)
+# Default: All cipher suites enabled
+#
+# ssl_cipher_suites defines a list of cipher suites used to negotiate
+# an SSL connection in order of priority. The cipher suites selected for 
+# a server must be compatible with those required by the client.
+#
+#ssl_version
+#
+# Syntax: 0/2.0/3.0
+# Default: 0 (impiles 3.0)
+#
+# The ssl_version parameter defines the version of SSL that must
+# run on the systems with which the client communicates.
+#
+# - SSL ---------------------------------------------------------------------
+
+#my_wallet
+#
+# Syntax: A properly formatted NLNV list.
+# Default: Platform specific.  Unix: $HOME/oracle/oss
+#
+# The method for retrieving and storing my identity.  
+#
+#my_wallet
+#   =(source
+#       =(method=file)
+#        (method_data=/dve/asriniva/oss/wallet)
+#     ) 
+
+# - Sqlnet(v2.x) and Net3.0 Client ------------------------------------------
+
+#
+# In the following descriptions, the term "client program" could mean 
+# either sqlplus, svrmgrl or any other OCI programs written by users
+# 
+###########################
+#trace_level_client = ADMIN
+###########################
+#
+#Possible values: {OFF,USER,ADMIN,0-16}
+#Default:         OFF (0)
+#
+#Purpose: Indicates the level at which the client program 
+#         is to be traced. 
+# Available Values:
+#       0 or OFF - No Trace output
+#	4 or USER - User trace information
+# 	10 or ADMIN - Administration trace information
+#	16 or SUPPORT - Worldwide Customer Support trace information
+#
+#Supported since:  v2.0
+#
+###############################################
+#trace_directory_client = /oracle/network/trace
+###############################################
+#
+#Possible values: Any valid directory path with write permission
+#Default: $ORACLE_HOME/network/trace  ($ORACLE_HOME=/oracle at customer 
+#         site)
+#
+#Purpose: Indicates the name of the directory to which trace files from 
+#         the client execution are written.
+#
+#Supported since: v2.0
+#
+###################################################
+#trace_file_client =  /oracle/network/trace/cli.trc
+###################################################
+#
+#Possible values: Any valid file name 
+#Default:	  $ORACLE_HOME/network/trace/cli.trc ($ORACLE_HOME = 
+#		  /oracle at customer site)
+#
+#Purpose: Indicates the name of the file to which the execution trace 
+#         of the client is written to. 
+#
+#Supported since: v2.0
+#
+###########################
+#trace_unique_client = ON
+###########################
+#
+#Possible values: {ON, OFF}
+#Default: OFF
+#
+#Purpose: Used to make each client trace file have a unique name to 
+#	  prevent each trace file from being overwritten by successive 
+#	  runs of the client program
+#
+#Supported since: v2.0
+#
+###########################################
+#log_directory_client = /oracle/network/log
+###########################################
+#
+#Possible values: Any valid directory pathname
+#Default: $ORACLE_HOME/network/log  ($ORACLE_HOME = /oracle at customer
+#	  site)
+#
+#Purpose: Indicates the name of the directory to which the client log file
+#	  is written to.
+#
+#
+#Supported since: v2.0
+#
+################
+#log_file_client = /oracle/network/log/sqlnet.log
+################
+#
+#Possible values: This is a default value, u cannot change this
+#Default: $ORACLE_HOME/network/log/sqlnet.log  ($ORACLE_HOME=/oracle in 
+#         customer site)
+#
+#Purpose: Indicates the name of the log file from a client program
+#
+#Supported since: v2.0
+#
+#############################################
+#log_directory_server = /oracle/network/trace
+#############################################
+#
+#Possible values: Any valid diretcory path with write permission
+#Default: $ORACLE_HOME/network/trace ( $ORACLE_HOME=/oracle at customer 
+#	  site)
+#
+#Purpose: Indicates the name of the directory to which log files from the 
+# 	  server are written
+#
+#Supported since:  v2.0
+#
+###############################################
+#trace_directory_server = /oracle/network/trace
+###############################################
+#
+#Possible values: Any valid directory path with write permission
+#Default: $ORACLE_HOME/network_trace ( $ORACLE_HOME=/oracle at customer 
+#	  site)
+#
+#Purpose: Indicates the name of the directory to which trace files from 
+#         the server are written 
+#
+#Supported since:  v2.0
+#
+#######################################################
+#trace_file_server = /orace/network/trace/svr_<pid>.trc
+#######################################################
+#
+#Possible values: Any valid filename
+#Default: $ORACLE_HOME/network/trace/svr_<pid>.trc where <pid? stands for 
+#         the process id of the server on UNIX systems 
+#
+#Purpose: Indicates the name of the file to which the execution trace of 
+#         the server program is written to. 
+#
+#Supported since: v2.0
+#
+###########################
+#trace_level_server = ADMIN
+###########################
+#
+#Possible values: {OFF,USER,ADMIN,0-16}
+#Default:         OFF (0)
+#
+#Purpose: Indicates the level at which the server program
+#         is to be traced.
+# Available Values:
+#       0 or OFF - No Trace output
+#       4 or USER - User trace information
+#       10 or ADMIN - Administration trace information
+#       16 or SUPPORT - Worldwide Customer Support trace information
+#
+#Supported since: v2.0
+#
+##########################
+#use_dedicated_server = ON
+##########################
+#
+#Possible values: {OFF,ON}
+#Default: 	  OFF
+#
+#Purpose: Forces the listener to spawn a dedicated server process for 
+#	  sessions from this client program. 
+#
+#Supported since: v2.0
+#
+################
+#use_cman = TRUE
+################
+#
+#Possible values: {TRUE, FALSE}
+#Default:	  FALSE
+#
+#Purpose: 
+#
+#Supported since: v3.0
+#
+################################################
+#tnsping.trace_directory = /oracle/network/trace
+################################################
+#
+#Possible values: Any valid directory pathname
+#Default: $ORACLE_HOME/network/trace ($ORACLE_HOME=/oracle at customer 
+#	  site)
+#
+#Purpose: Indicates the directory to which the execution trace from
+#	  the tnsping program is to be written to.
+#
+#Supported since: v2.0
+#
+############################
+#tnsping.trace_level = ADMIN    
+############################
+#
+#Possible values: {OFF,USER,ADMIN,0-16}
+#Default:         OFF (0)
+#
+#Purpose: Indicates the level at which the server program
+#         is to be traced.
+# Available Values:
+#       0 or OFF - No Trace output
+#       4 or USER - User trace information
+#       10 or ADMIN - Administration trace information
+#       16 or SUPPORT - Worldwide Customer Support trace information
+#
+#
+#Supported since: v2.0
+#
+########################
+#sqlnet.expire_time = 10
+########################
+#
+#Possible values: 0-any valid positive integer! (in minutes)
+#Default: 0 minutes 
+#Recommended value: 10 minutes
+#
+#Purpose: Indicates the time interval to send a probe to verify the 
+#	  client session is alive (this is used to reclaim watseful 
+#	  resources on a dead client)
+#
+#Supported since: v2.1
+#
+#######################################
+#sqlnet.client_registration = <unique_id>
+#######################################
+#
+#Possible values: 
+#Default:     OFF 
+#
+#Purpose: Sets a unique identifier for the client machine. This 
+#	  identifier is then passed to the listener with any connection 
+#	  request and will be included in the Audit Trail. The identifier 
+#	  can be any alphanumeric string up to 128 characters long.
+#
+#Supported since: v2.3.2
+#
+######################
+#bequeath_detach = YES
+######################
+#
+#Possible values: {YES,NO}
+#Default:         NO
+#
+#Purpose: Turns off signal handling on UNIX systems. If signal handling 
+#	  were not turned off and if client programs written by users make 
+#	  use of signal handling they could interfere with Sqlnet/Net3. 
+#
+#Supported since: v2.3.3 
+#
+####################
+#automatic_ipc = OFF
+####################
+#
+#Possible values: {ON,OFF}
+#Default: OFF
+#
+#Purpose: Force a session to use or not to use IPC addresses on the 
+#	  client's node. 
+#
+#Supported since: v2.0
+#
+####################
+#disable_oob = ON
+####################
+#
+#Possible values: {ON,OFF}
+#Default: OFF
+#
+#Purpose: If the underlying transport protocol (TCP, DECnet,...) does
+#         not support Out-of-band breaks, then disable out-of-band
+#	  breaks
+#
+#Supported since: v2.0
+#
+####################
+#sqlnet.inbound_connect_timeout = 3
+########################
+#
+#Possible values: 0-any valid positive integer (in seconds)
+#Default: 0
+#Recommended value: 3 seconds (note: this is highly application dependent)
+#
+#Purpose: Indicates the time interval within which database authentication
+#         for a client must be completed. If the client fails to complete
+#         authentication within the given time period, then the database
+#         server will drop the client connection. This can be used to
+#         counter Denial of Service attacks in which malicious clients may
+#         cause numerous servers to be spawn without fully establishing DB
+#         sessions.
+#
+#         A value of 0 turns off the timeout feature. If a spurious
+#         timeout error occurs (e.g. due to a slow network/system),
+#         reconfigure this parameter to a larger value.
+#
+#Supported since: v9.2
+#
+
+# ORACLE NETWORK V11.0
+
+#######################
+#diag_adr_enabled = OFF
+#######################
+#
+#Possible values: {OFF,ON}
+#Default:         ON
+#
+#Purpose: Indicates whether Automatic Diagnostic Repository (ADR) tracing is
+#         to be enabled.
+#
+# Available Values:
+#       OFF - Use pre-11g file tracing
+#       ON  - Use ADR tracing
+#
+#Supported since:  11.0
+#
+#################################
+#adr_base = /oracle/network/trace
+#################################
+#
+#Possible values: Any valid directory path with write permission
+#Default: $ORACLE_HOME ($ORACLE_HOME=/oracle at customer site)
+#
+#Purpose: This is the ADR base directory into which tracing, logging, and
+#         DDE first failure incidents are stored.
+#
+#Supported since:  11.0
+#
+#######################
+#diag_dde_enabled = OFF
+#######################
+#
+#Possible values: {OFF,ON}
+#Default:         ON
+#
+#Purpose: Indicates whether Diagnostic Data Extractor (DDE) first failure is
+#         to be enabled.
+#
+# Available Values:
+#       OFF - No DDE incident dumping
+#       ON  - Enable DDE incident dumping
+#
+#Supported since:  11.0
+#
+#######################
+#diag_bucket_size = 8192
+#######################
+#
+#Possible values: 8192 to UB4MAXVAL
+#Default: 0
+#
+#Purpose: Unified Trace Service (UTS) in-memory default bucket size (in bytes)
+#
+#Supported since:  11.0
+#
+#######################
+#sdp.pf_inet_sdp = 27
+#######################
+#
+#Possible values: positive integer
+#Default: 27
+#
+#Purpose: Use parameter SDP.PF_INET_SDP to specify the protocol family or
+#         address family constant for the SDP protocol on your system.
+#
+#Supported since:  11.0
+#

@@ -1,0 +1,123 @@
+# copyright (c) 1997 by the Oracle Corporation
+# 
+# NAME
+#   listener.ora
+# FUNCTION
+#   Network Listener startup parameter file example
+# NOTES
+#   This file contains all the parameters for listener.ora,
+#   and could be used to configure the listener by uncommenting
+#   and changing values.  Multiple listeners can be configured
+#   in one listener.ora, so listener.ora parameters take the form
+#   of SID_LIST_<lsnr>, where <lsnr> is the name of the listener
+#   this parameter refers to.  All parameters and values are
+#   case-insensitive.
+
+# <lsnr>
+#   This parameter specifies both the name of the listener, and
+#   it listening address(es). Other parameters for this listener
+#   us this name in place of <lsnr>.  When not specified,
+#   the name for <lsnr> defaults to "LISTENER", with the default
+#   address value as shown below.
+#
+# LISTENER =
+#  (ADDRESS_LIST=
+#	(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+#	(ADDRESS=(PROTOCOL=ipc)(KEY=PNPKEY)))	
+
+# SID_LIST_<lsnr>
+#   List of services the listener knows about and can connect 
+#   clients to.  There is no default.  See the Net8 Administrator's
+#   Guide for more information.
+#
+# SID_LIST_LISTENER=
+#   (SID_LIST=
+#	(SID_DESC=
+#			#BEQUEATH CONFIG
+#          (GLOBAL_DBNAME=salesdb.mycompany)
+#          (SID_NAME=sid1)			
+#          (ORACLE_HOME=/private/app/oracle/product/8.0.3)
+#			#PRESPAWN CONFIG
+#         (PRESPAWN_MAX=20)
+#	  (PRESPAWN_LIST=
+#           (PRESPAWN_DESC=(PROTOCOL=tcp)(POOL_SIZE=2)(TIMEOUT=1))
+#         )
+#        )
+#       )
+	
+# PASSWORDS_<lsnr>
+#   Specifies a password to authenticate stopping the listener.
+#   Both encrypted and plain-text values can be set.  Encrypted passwords
+#   can be set and stored using lsnrctl.  
+#     LSNRCTL> change_password
+#       Will prompt for old and new passwords, and use encryption both
+#       to match the old password and to set the new one.
+#     LSNRCTL> set password
+#	Will prompt for the new password, for authentication with 
+#       the listener. The password must be set before running the next
+#       command.
+#     LSNRCTL> save_config
+#       Will save the changed password to listener.ora. These last two
+#       steps are not necessary if SAVE_CONFIG_ON_STOP_<lsnr> is ON.
+#       See below.
+#
+# Default: NONE
+#
+# PASSWORDS_LISTENER = 20A22647832FB454      # "foobar"
+
+# SAVE_CONFIG_ON_STOP_<lsnr>
+#   Tells the listener to save configuration changes to listener.ora when
+#   it shuts down.  Changed parameter values will be written to the file,
+#   while preserving formatting and comments.
+# Default: OFF
+# Values: ON/OFF
+#
+# SAVE_CONFIG_ON_STOP_LISTENER = ON
+
+# USE_PLUG_AND_PLAY_<lsnr>
+#   Tells the listener to contact an Onames server and register itself
+#   and its services with Onames.
+# Values: ON/OFF
+# Default: OFF
+#
+# USE_PLUG_AND_PLAY_LISTENER = ON
+
+# LOG_FILE_<lsnr>
+#   Sets the name of the listener's log file.  The .log extension
+#   is added automatically.
+# Default=<lsnr>
+#
+# LOG_FILE_LISTENER = lsnr
+
+# LOG_DIRECTORY_<lsnr>
+#   Sets the directory for the listener's log file.
+# Default: <oracle_home>/network/log
+#
+# LOG_DIRECTORY_LISTENER = /private/app/oracle/product/8.0.3/network/log
+
+# TRACE_LEVEL_<lsnr>
+#   Specifies desired tracing level.
+# Default: OFF
+# Values: OFF/USER/ADMIN/SUPPORT/0-16
+#
+# TRACE_LEVEL_LISTENER = SUPPORT
+
+# TRACE_FILE_<lsnr>
+#   Sets the name of the listener's trace file. The .trc extension
+#   is added automatically.
+# Default: <lsnr>
+#
+# TRACE_FILE_LISTENER = lsnr
+
+# TRACE_DIRECTORY_<lsnr>
+#   Sets the directory for the listener's trace file.
+# Default: <oracle_home>/network/trace
+#
+# TRACE_DIRECTORY_LISTENER=/private/app/oracle/product/8.0.3/network/trace
+# CONNECT_TIMEOUT_<lsnr>
+#   Sets the number of seconds that the listener waits to get a 
+#   valid database query after it has been started.
+# Default: 10
+#
+# CONNECT_TIMEOUT_LISTENER=10
+
