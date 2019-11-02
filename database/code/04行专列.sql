@@ -87,6 +87,6 @@ select ss01.name, ss01.score 语文, ss02.score 数学, ss03.score 英语
     on ss01.name = ss03.name;
 
 --union all
-select ss01.name,ss01.score 语文,0 数学,0 英语 from student_score ss01 where ss01.subject='语文' union all
+select t.name,sum(t.语文),sum(t.数学),sum(t.英语) from (select ss01.name,ss01.score 语文,0 数学,0 英语 from student_score ss01 where ss01.subject='语文' union all
 select ss02.name,0 语文,ss02.score 数学,0 英语 from student_score ss02 where ss02.subject='数学' union all
-select ss03.name,0 语文,0 数学,ss03.score 英语 from student_score ss03 where ss03.subject='英语' 
+select ss03.name,0 语文,0 数学,ss03.score 英语 from student_score ss03 where ss03.subject='英语') t group by t.name
