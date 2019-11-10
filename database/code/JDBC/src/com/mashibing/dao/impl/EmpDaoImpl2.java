@@ -17,22 +17,27 @@ public class EmpDaoImpl2 implements EmpDao {
     @Override
     public void insert(Emp emp) {
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         try {
             connection = DBUtil.getConnection();
             //设置事务是否自动提交，true表示自动提交，false表示不是自动提交
 //            connection.setAutoCommit(true);
-            statement = connection.createStatement();
-            //拼接sql语句
-            String sql = "insert into emp values(" + emp.getEmpno() + ",'" + emp.getEname() + "','" + emp.getJob() + "',"
-                    + emp.getMrg() + ",to_date('" + emp.getHiredate() + "','YYYY-MM-DD')," + emp.getSal() + ","
-                    + emp.getComm() + "," + emp.getDeptno() + ")";
-            System.out.println(sql);
+            String sql = "insert into emp values(?,?,?,?,?,?,?,?)";
+            statement = connection.prepareStatement(sql);
+            //向问号中添加值
+            statement.setInt(1,emp.getEmpno());
+            statement.setString(2,emp.getEname());
+            statement.setString(3,emp.getJob());
+            statement.setInt(4,emp.getMrg());
+            statement.setDate(5,new java.sql.Date(new SimpleDateFormat("yyyy-MM-DD").parse(emp.getHiredate()).getTime()));
+            statement.setDouble(6,emp.getSal());
+            statement.setDouble(7,emp.getComm());
+            statement.setInt(8,emp.getDeptno());
             //返回值表示受影响的行数
-            int i = statement.executeUpdate(sql);
+            int i = statement.executeUpdate();
             System.out.println("受影响的行数是：" + i);
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             DBUtil.closeConnection(connection, statement);
@@ -42,17 +47,18 @@ public class EmpDaoImpl2 implements EmpDao {
     @Override
     public void delete(Emp emp) {
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement statement = null;
         try {
             connection = DBUtil.getConnection();
             //设置事务是否自动提交，true表示自动提交，false表示不是自动提交
 //            connection.setAutoCommit(true);
-            statement = connection.createStatement();
+            String sql = "delete from emp where empno = ?" ;
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1,emp.getEmpno());
             //拼接sql语句
-            String sql = "delete from emp where empno = " + emp.getEmpno();
             System.out.println(sql);
             //返回值表示受影响的行数
-            int i = statement.executeUpdate(sql);
+            int i = statement.executeUpdate();
             System.out.println("受影响的行数是：" + i);
 
         } catch (SQLException e) {
@@ -152,11 +158,11 @@ public class EmpDaoImpl2 implements EmpDao {
         EmpDao empDao = new EmpDaoImpl2();
         Emp emp = new Emp(3333, "sisi", "SALES", 1111, "2019-11-09", 1500.0, 500.0, 10);
 //        empDao.insert(emp);
-//        empDao.delete(emp);
+        empDao.delete(emp);
 //        empDao.update(emp);
 //        Emp emp2 = empDao.getEmpByEmpno(7369);
         //sql注入
-        Emp emp2 = empDao.getEmpByEname("'SMITH' or 1 = 1");
-        System.out.println(emp2);
+//        Emp emp2 = empDao.getEmpByEname("'SMITH' or 1 = 1");
+//        System.out.println(emp2);
     }
 }
