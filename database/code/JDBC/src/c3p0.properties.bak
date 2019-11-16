@@ -1,0 +1,5 @@
+#JDBC具备自己的规范，在JDBC4之前是必须要填写驱动名称的，但是之后版本不需要填写
+c3p0.driverClass=com.mysql.jdbc.Driver
+c3p0.jdbcUrl=jdbc:mysql://localhost:3306/demo
+c3p0.user=root
+c3p0.password=123456

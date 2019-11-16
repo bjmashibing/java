@@ -9,5 +9,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="classes12" level="application" />
     <orderEntry type="library" name="mysql-connector-java-5.1.38" level="application" />
+    <orderEntry type="library" name="commons-dbutils-1.7" level="application" />
+    <orderEntry type="library" name="commons-dbcp2-2.7.0" level="application" />
+    <orderEntry type="library" name="c3p0-0.9.5.4" level="application" />
   </component>
 </module>
