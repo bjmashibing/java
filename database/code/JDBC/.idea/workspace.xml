@@ -15,65 +15,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="pool.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/pool.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="112">
-                <caret line="4" column="7" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="C3P0Test.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/c3p0/C3P0Test.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="92">
-              <caret line="11" column="40" lean-forward="true" selection-start-line="15" selection-start-column="25" selection-end-line="15" selection-end-column="46" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="C3p0Test2.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/c3p0/C3p0Test2.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="22" column="27" lean-forward="true" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="C3p0Test3.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/c3p0/C3p0Test3.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="5" column="28" lean-forward="true" selection-start-line="5" selection-start-column="28" selection-end-line="5" selection-end-column="28" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="c3p0-config.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/c3p0-config.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="4" column="66" selection-start-line="4" selection-start-column="66" selection-end-line="4" selection-end-column="66" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -117,6 +59,10 @@
         <option value="$PROJECT_DIR$/src/c3p0-config.xml" />
         <option value="$PROJECT_DIR$/src/com/mashibing/pool/c3p0/C3p0Test2.java" />
         <option value="$PROJECT_DIR$/src/com/mashibing/pool/c3p0/C3p0Test3.java" />
+        <option value="$PROJECT_DIR$/src/com/mashibing/pool/druid/DruidTest.java" />
+        <option value="$PROJECT_DIR$/src/com/mashibing/pool/druid/druid.properties" />
+        <option value="$PROJECT_DIR$/src/com/mashibing/pool/HikariCP/HikariCPTest.java" />
+        <option value="$PROJECT_DIR$/src/com/mashibing/pool/HikariCP/HikariCP.properties" />
       </list>
     </option>
   </component>
@@ -177,12 +123,37 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="com" type="462c0819:PsiDirectoryNode" />
               <item name="mashibing" type="462c0819:PsiDirectoryNode" />
-              <item name="pool" type="462c0819:PsiDirectoryNode" />
-              <item name="c3p0" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="JDBC" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+            <path>
+              <item name="JDBC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="mysql-connector-java-5.1.38" type="70bed36:NamedLibraryElementNode" />
+            </path>
+            <path>
+              <item name="JDBC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="mysql-connector-java-5.1.38" type="70bed36:NamedLibraryElementNode" />
+              <item name="mysql-connector-java-5.1.38.jar" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JDBC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="mysql-connector-java-5.1.38" type="70bed36:NamedLibraryElementNode" />
+              <item name="mysql-connector-java-5.1.38.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JDBC" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="mysql-connector-java-5.1.38" type="70bed36:NamedLibraryElementNode" />
+              <item name="mysql-connector-java-5.1.38.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="mysql" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -196,7 +167,7 @@
     <property name="SearchEverywhereHistoryKey" value="Driver&#9;FILE&#9;jar://C:/Program Files/Java/jdk1.8.0_172/src.zip!/java/sql/Driver.java" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="E:/lian/oracle/数据库连接池/c3p0/mchange-commons-java-0.2.15.jar!/" />
+    <property name="last_opened_file_path" value="E:/lian/oracle/数据库连接池/hikariCP/slf4j-api-2.0.0-alpha1.jar!/" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Global Libraries" />
@@ -222,7 +193,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.C3P0Test">
+  <component name="RunManager" selected="Application.HikariCPTest">
     <configuration name="C3P0Test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.mashibing.pool.c3p0.C3P0Test" />
       <module name="JDBC" />
@@ -256,24 +227,24 @@
         </pattern>
       </extension>
     </configuration>
-    <configuration name="DBCPTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.mashibing.pool.dbcp.DBCPTest" />
+    <configuration name="DruidTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.mashibing.pool.druid.DruidTest" />
       <module name="JDBC" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.mashibing.pool.dbcp.*" />
+          <option name="PATTERN" value="com.mashibing.pool.druid.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
     </configuration>
-    <configuration name="DBUtilTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.mashibing.apacheDBUtil.DBUtilTest" />
+    <configuration name="HikariCPTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.mashibing.pool.HikariCP.HikariCPTest" />
       <module name="JDBC" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.mashibing.apacheDBUtil.*" />
+          <option name="PATTERN" value="com.mashibing.pool.HikariCP.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -320,19 +291,19 @@
       <listeners />
     </configuration>
     <list>
-      <item itemvalue="Application.DBUtilTest" />
-      <item itemvalue="Application.DBCPTest" />
       <item itemvalue="Application.C3P0Test" />
       <item itemvalue="Application.C3p0Test2" />
       <item itemvalue="Application.C3p0Test3" />
+      <item itemvalue="Application.DruidTest" />
+      <item itemvalue="Application.HikariCPTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.HikariCPTest" />
+        <item itemvalue="Application.DruidTest" />
         <item itemvalue="Application.C3P0Test" />
         <item itemvalue="Application.C3p0Test3" />
         <item itemvalue="Application.C3p0Test2" />
-        <item itemvalue="Application.DBCPTest" />
-        <item itemvalue="Application.DBUtilTest" />
       </list>
     </recent_temporary>
   </component>
@@ -353,12 +324,12 @@
       <workItem from="1573368128807" duration="12094000" />
       <workItem from="1573543571918" duration="8310000" />
       <workItem from="1573572761873" duration="169000" />
-      <workItem from="1573886476040" duration="7668000" />
+      <workItem from="1573886476040" duration="11687000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36163000" />
+    <option name="totallyTimeSpent" value="40182000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
@@ -382,10 +353,10 @@
       <window_info anchor="right" id="Palette&#9;" order="4" />
       <window_info id="Image Layers" order="3" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42165244" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.35327634" />
       <window_info anchor="bottom" id="Version Control" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info content_ui="combo" id="Project" order="6" sideWeight="0.49788135" weight="0.25670242" />
+      <window_info active="true" content_ui="combo" id="Project" order="6" sideWeight="0.49788135" visible="true" weight="0.25670242" />
       <window_info id="JRebel" order="4" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="6" />
       <window_info id="Favorites" order="5" side_tool="true" />
@@ -450,41 +421,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://D:/jar/mysql-connector-java-5.1.38.jar!/com/mysql/jdbc/Driver.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="10" column="19" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_172/src.zip!/java/sql/Driver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="57" selection-start-line="57" selection-end-line="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://E:/oracle/product/11.2.0/dbhome_1/oui/jlib/classes12.jar!/oracle/jdbc/driver/OracleDriver.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="64" column="31" lean-forward="true" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://E:/oracle/product/11.2.0/dbhome_1/oui/jlib/classes12.jar!/oracle/jdbc/driver/OracleConnection.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="925">
-          <caret line="378" column="49" selection-start-line="378" selection-start-column="34" selection-end-line="378" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_172/src.zip!/java/sql/Statement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="64" column="14" selection-start-line="64" selection-start-column="14" selection-end-line="64" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://E:/oracle/product/11.2.0/dbhome_1/oui/jlib/classes12.jar!/oracle/jdbc/driver/OracleResultSetImpl.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
@@ -689,20 +625,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/mashibing/util/DBUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="6" column="72" lean-forward="true" selection-start-line="6" selection-start-column="38" selection-end-line="6" selection-end-column="72" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/mashibing/util/MySQLDBUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="12" column="48" selection-start-line="12" selection-start-column="48" selection-end-line="12" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://E:/lian/oracle/数据库连接池/工具类/commons-dbutils-1.7/commons-dbutils-1.7.jar!/org/apache/commons/dbutils/QueryRunner.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="193">
@@ -840,6 +762,62 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://E:/lian/oracle/数据库连接池/druid/druid-1.1.9.jar!/com/alibaba/druid/pool/DruidDataSource.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1428">
+          <caret line="91" column="60" selection-start-line="91" selection-start-column="38" selection-end-line="91" selection-end-column="60" />
+          <folding>
+            <element signature="e#6487#6488#0" expanded="true" />
+            <element signature="e#6514#6515#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/druid/DruidTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/druid/druid.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="896">
+          <caret line="32" column="16" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/HikariCP/HikariCP.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="3" column="28" lean-forward="true" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/pool/HikariCP/HikariCPTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="25" column="12" selection-start-line="25" selection-start-column="12" selection-end-line="30" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/util/MySQLDBUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="12" column="48" selection-start-line="12" selection-start-column="48" selection-end-line="12" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/mashibing/util/DBUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="6" column="72" lean-forward="true" selection-start-line="6" selection-start-column="38" selection-end-line="6" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>
@@ -869,7 +847,7 @@
       </state>
       <state key="GlobalLibrariesConfigurable.UI">
         <settings>
-          <last-edited>c3p0-0.9.5.4</last-edited>
+          <last-edited>slf4j-api-2.0.0-alpha1</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
