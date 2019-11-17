@@ -1,0 +1,37 @@
+
+              Apache Commons DbUtils
+                     Version 1.7
+                    RELEASE NOTES
+
+The Apache Commons DbUtils team is pleased to announce the release of Apache Commons DbUtils 1.7
+
+The Apache Commons DbUtils package is a set of Java utility classes for easing JDBC development.
+
+Bugfixes and separate column & property handlers using SPI
+
+Changes in this version include:
+
+New features:
+o DBUTILS-121:  Add getWriteMethod to BeanProcessor to allow subclasses to influence which write method is used 
+o DBUTILS-50:  Support CallableStatement "out" parameters Thanks to Dan Fabulich. 
+o DBUTILS-124:  Implement column and property handlers using Java's service interfaces. 
+
+Fixed Bugs:
+o DBUTILS-82:  Change method contracts to allow extended class types when returning a bean populated from a query Thanks to Kenshi Toriumi. 
+o DBUTILS-89:  Add method in BeanProcessor to populate an existing bean Thanks to Adam Dyga. 
+o DBUTILS-70:  Add ability to configure statements used in QueryRunner Thanks to Michael Akerman. 
+
+Changes:
+o DBUTILS-117:  Error handling possible getParameterMetaData() results
+        - allow for null return
+        - handle SQLFeatureNotSupportedException Thanks to Vadim Smirnov. 
+o DBUTILS-119:  Correct errors in BeanMapHandler JavaDoc Thanks to Michael Akerman. 
+o PR/1:  Created some Unit Tests to increase code coverage. Thanks to Michael Hausegger. 
+
+
+For complete information on Apache Commons DbUtils, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DbUtils website:
+
+https://commons.apache.org/proper/commons-dbutils/
+
+

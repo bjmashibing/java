@@ -1,0 +1,4 @@
+org.apache.commons.dbcp2
+org.apache.commons.dbcp2.cpdsadapter
+org.apache.commons.dbcp2.datasources
+org.apache.commons.dbcp2.managed
