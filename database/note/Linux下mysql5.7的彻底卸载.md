@@ -6,7 +6,7 @@
 rpm -qa | grep -i mysql
 ```
 
-![1570605325400](C:\Users\seanzhou\Desktop\连老师公开课\typora-user-images\1570605325400.png)
+![1570605325400](E:\lian\oracle\typora-user-images\1570605325400.png)
 
 ### 2、删除上图安装的软件
 
@@ -20,7 +20,7 @@ rpm -ev mysql-community-libs-5.7.27-1.el6.x86_64 --nodeps
 find / -name mysql
 ```
 
-![1570605553095](C:\Users\seanzhou\Desktop\连老师公开课\typora-user-images\1570605553095.png)
+![1570605553095](E:\lian\oracle\typora-user-images\1570605553095.png)
 
 ### 4、删除全部文件
 
