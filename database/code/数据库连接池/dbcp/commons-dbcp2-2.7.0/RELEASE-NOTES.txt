@@ -1,0 +1,303 @@
+              Apache Apache Commons DBCP
+                 Version 2.7.0
+                 RELEASE NOTES
+                 7 July 2019
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.7.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements.
+
+Changes in this version include:
+
+New features:
+o DBCP-539:  ManagedDataSource#close() should declare used exceptions. Thanks to Jacques Le Roux.
+o DBCP-547:  Add a ConnectionFactory class name setting for BasicDataSource.createConnectionFactory() #33. Thanks to leechoongyon, Gary Gregory.
+o            Add missing Javadocs. Thanks to Gary Gregory.
+
+Fixed Bugs:
+o DBCP-538:  Wrong JMX base name derived in BasicDataSource#updateJmxName. Thanks to Ragnar Haugan, Gary Gregory.
+o DBCP-546:  Avoid NPE when calling DriverAdapterCPDS.toString(). Thanks to Sergey Chupov.
+o DBCP-550:  java.util.IllegalFormatException while building a message for a SQLFeatureNotSupportedException in Jdbc41Bridge.getObject(ResultSet,String,Class). Thanks to Gary Gregory.
+o            Fix Javadoc link in README.md #21. Thanks to LichKing-lee.
+
+Changes:
+o DBCP-540:  Close ObjectOutputStream before calling toByteArray() on underlying ByteArrayOutputStream #28. Thanks to emopers.
+o DBCP-541:  Upgrade to JUnit Jupiter #19. Thanks to Allon Murienik.
+o DBCP-542:  Fix tests on Java 11. Thanks to Zheng Feng, Gary Gregory.
+o DBCP-543:  Update Apache Commons Pool from 2.6.1 to 2.6.2. Thanks to Gary Gregory.
+o DBCP-529:  Add 'jmxName' property to web configuration parameters listing. Thanks to Yuri.
+o DBCP-548:  Update Apache Commons Pool from 2.6.2 to 2.7.0. Thanks to Gary Gregory.
+o DBCP-549:  Make org.apache.commons.dbcp2.AbandonedTrace.removeTrace(AbandonedTrace) null-safe. Thanks to Gary Gregory.
+o DBCP-551:  org.apache.commons.dbcp2.DelegatingStatement.close() should try to close ALL of its result sets even when an exception occurs. Thanks to Gary Gregory.
+o DBCP-552:  org.apache.commons.dbcp2.DelegatingConnection.passivate() should close ALL of its resources even when an exception occurs. Thanks to Gary Gregory.
+o DBCP-553:  org.apache.commons.dbcp2.PoolablePreparedStatement.passivate() should close ALL of its resources even when an exception occurs. Thanks to Gary Gregory.
+o DBCP-554:  org.apache.commons.dbcp2.PoolableCallableStatement.passivate() should close ALL of its resources even when an exception occurs. Thanks to Gary Gregory.
+o            Update tests from org.mockito:mockito-core 2.28.2 to 3.0.0. Thanks to Gary Gregory.
+o            Update tests from H2 1.4.198 to 1.4.199. Thanks to Gary Gregory.
+o            Update tests from com.h2database:h2 1.4.197 to 1.4.199. Thanks to Gary Gregory.
+o            Update tests from org.jboss.narayana.jta:narayana-jta 5.9.2.Final to 5.9.5.Final. Thanks to Gary Gregory.
+o            Update tests from org.jboss.logging:jboss-logging 3.3.2.Final to 3.4.0.Final. Thanks to Gary Gregory.
+o            Update tests from org.mockito:mockito-core 2.24.0 to 2.28.2. Thanks to Gary Gregory.
+o            Update tests from org.mockito:mockito-core 2.28.2 to 3.0.0. Thanks to Gary Gregory.
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download page: https://commons.apache.org/dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+              Apache Apache Commons DBCP
+                 Version 2.6.0
+                 RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.6.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements.
+
+Changes in this version include:
+
+New features:
+o DBCP-534:  Allow for manual connection eviction. Thanks to Peter Wicks.
+o DBCP-514:  Allow DBCP to register with a TransactionSynchronizationRegistry for XA cases. Thanks to Tom Jenkinson, Gary Gregory.
+o DBCP-519:  Add some toString() methods for debugging (never printing passwords.) Thanks to Gary Gregory.
+o DBCP-527:  Add getters to some classes. Thanks to Gary Gregory.
+o DBCP-528:  org.apache.commons.dbcp2.DriverManagerConnectionFactory should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+
+Fixed Bugs:
+o DBCP-518:  Allow DBCP to work with old Java 6/JDBC drivers without throwing AbstractMethodError. Thanks to Gary Gregory.
+
+Changes:
+o DBCP-517:  Make defensive copies of char[] passwords. Thanks to Gary Gregory.
+o DBCP-515:  Do not try to register synchronization when the transaction is no longer active. Thanks to Tom Jenkinson, Gary Gregory.
+o DBCP-516:  Do not double returnObject back to the pool if there is a transaction context with a shared connection. Thanks to Tom Jenkinson, Gary Gregory.
+o DBCP-520:  BasicManagedDataSource needs to pass the TSR with creating DataSourceXAConnectionFactory. Thanks to Zheng Feng.
+o DBCP-537:  Update Apache Commons Pool from 2.6.0 to 2.6.1. Thanks to Gary Gregory.
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download page: https://commons.apache.org/dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+              Apache Apache Commons DBCP
+                 Version 2.5.0
+                 RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.5.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements and requires Java 8 to support JDBC 4.2.
+
+Changes in this version include:
+
+New features:
+o DBCP-506:  Support JDBC 4.2. Thanks to Gary Gregory.
+o DBCP-479:  Support default schema in configuration. Thanks to Guillaume Husta, Gary Gregory.
+
+Fixed Bugs:
+o DBCP-508:  Prepared statement keys should take a Connection's schema into account. Thanks to Gary Gregory.
+o DBCP-512:  Avoid exceptions when closing a connection in mutli-threaded use case. Thanks to Gary Gregory.
+
+Changes:
+o DBCP-505:  Update Java requirement from version 7 to 8. Thanks to Gary Gregory.
+o DBCP-427:  Examines 'SQLException's thrown by underlying connections or statements for fatal (disconnection) errors. Thanks to Vladimir Konkov, Phil Steitz, Gary Gregory.
+o DBCP-507:  Change default for fail-fast connections from false to true. Thanks to Vladimir Konkov, Phil Steitz, Gary Gregory.
+o DBCP-504:  Increase test coverage. Thanks to Bruno P. Kinoshita.
+o DBCP-510:  Update Apache Commons Pool from 2.5.0 to 2.6.0. Thanks to Gary Gregory.
+
+Note that Clirr incorrectly reports one binary incompatible change because it is not aware of Java 8 and default methods:
+[ERROR] 7012: org.apache.commons.dbcp2.BasicDataSourceMXBean: Method 'public java.lang.String getDefaultSchema()' has been added to an interface
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+Download page: https://commons.apache.org/dbcp/download_dbcp.cgi
+
+              Apache Apache Commons DBCP
+                 Version 2.4.0
+                 RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.4.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements, which you can download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
+
+Changes in this version include:
+
+
+Fixed Bugs:
+o DBCP-484:  Connection leak during XATransaction in high load. Thanks to Emanuel Freitas.
+o DBCP-496:  Add support for pooling CallableStatements to the org.apache.commons.dbcp2.cpdsadapter package. Thanks to Gary Gregory.
+
+Changes:
+o DBCP-492:  Drop Ant build. Thanks to Gary Gregory.
+o DBCP-491:  Ensure DBCP ConnectionListener can deal with transaction managers which invoke rollback in a separate thread. Thanks to Zheng Feng, Gary Gregory.
+o DBCP-494:  org.apache.commons.dbcp2.PStmtKey should make copies of given arrays in constructors. Thanks to Gary Gregory.
+o DBCP-495:  Remove duplicate code in org.apache.commons.dbcp2.cpdsadapter.PStmtKeyCPDS. Thanks to Gary Gregory.
+o DBCP-497:  Deprecate use of PStmtKeyCPDS in favor of PStmtKey. Thanks to Gary Gregory.
+o DBCP-498:  org.apache.commons.dbcp2.DataSourceConnectionFactory should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+o DBCP-499:  org.apache.commons.dbcp2.managed.DataSourceXAConnectionFactory should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+o DBCP-500:  org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+o DBCP-501:  org.apache.commons.dbcp2.datasources.CPDSConnectionFactory should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+o DBCP-502:  org.apache.commons.dbcp2.datasources internals should use a char[] instead of a String to store passwords. Thanks to Gary Gregory.
+o DBCP-503:  org.apache.commons.dbcp2.datasources.InstanceKeyDataSourceFactory.closeAll() does not close all. Thanks to Gary Gregory.
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+              Apache Apache Commons DBCP
+                  Version 2.3.0
+                  RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.3.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements.
+
+Changes in this version include:
+
+Fixed Bugs:
+o DBCP-476:  AbandonedTrace.getTrace() contains race condition Thanks to Gary Evesson, Richard Cordova.
+o DBCP-482:  Avoid javax.management.InstanceNotFoundException on shutdown when a bean is not registered. Thanks to Dennis Lloyd, Gary Gregory.
+
+Changes:
+o DBCP-483:  Make constant public: org.apache.commons.dbcp2.PoolingDriver.URL_PREFIX. Thanks to Gary Gregory.
+o DBCP-486:  DriverAdapterCPDS.setUser(), setPassword(), and getPooledConnection() with null arguments throw NullPointerExceptions when connection properties are set. Thanks to Gary Gregory.
+o DBCP-487:  Add API org.apache.commons.dbcp2.datasources.PerUserPoolDataSource.clear(). Thanks to Gary Gregory.
+o DBCP-488:  NPE for org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS.setConnectionProperties(null). Thanks to Gary Gregory.
+o DBCP-490:  The method org.apache.commons.dbcp2.PoolingDriver.getConnectionPool(String) does not tell you which pool name is not registered when it throws an exception. Thanks to Gary Gregory.
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+              Apache Apache Commons DBCP
+                  Version 2.2.0
+                  RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.2.0.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a minor release, including bug fixes and enhancements.
+
+Changes in this version include:
+
+New features:
+o DBCP-451:  Add constructor DriverManagerConnectionFactory(String).
+o DBCP-462:  Refactoring to prepare for a future patch to enable pooling of all
+             prepared and callable statements in PoolingConnection. Thanks to Keiichi Fujino.
+o DBCP-458:  Make it simpler to extend BasicDataSource to allow sub-classes to
+             provide custom GenericObjectPool implementations. Thanks to Adrian Tarau.
+o DBCP-474:  Enable pooling of all prepared and callable statements
+             inPoolingConnection. Thanks to Keiichi Fujino.
+
+Fixed Bugs:
+o DBCP-481:  Update Apache Commons Pool from 2.4.2 to 2.5.0. Thanks to Gary Gregory.
+o DBCP-454:  OSGi declarations contain multiple import headers for javax.transaction. Thanks to Philipp Marx, Matt Sicker.
+o DBCP-478:  Wrong parameter name in site documentation for BasicDataSource Configuration Parameters. Thanks to nicola mele.
+o DBCP-452:  Add jmxName to properties set by BasicDataSourceFactory.  This
+             enables container-managed pools created from JNDI Resource
+             definitions to enable JMX by supplying a valid root JMX name.
+o DBCP-446:  NullPointerException thrown when calling ManagedConnection.isClosed(). Thanks to Gary Gregory, feng yang, Euclides M, Phil Steitz.
+o DBCP-444:  InvalidateConnection can result in closed connection returned by getConnection.
+o DBCP-449:  Complete the fix for DBCP-418, enabling PoolableConnection class to load in environments
+             (such as GAE) where the JMX ManagementFactory is not available. Thanks to Grzegorz D..
+o DBCP-455:  Ensure that the cacheState setting is used when statement pooling is
+             disabled. Thanks to Kyohei Nakamura.
+o DBCP-453:  Ensure that setSoftMinEvictableIdleTimeMillis is used when working with
+             BasicDataSource. Thanks to Philipp Marx.
+o DBCP-456:  Correct the name of the configuration attribute
+             softMinEvictableIdleTimeMillis. Thanks to Kyohei Nakamura.
+o DBCP-472:  Avoid potential infinite loops when checking if an SQLException is fatal
+             for a connection or not.
+o DBCP-468:  Expand the fail-fast for fatal connection errors feature to include
+             managed connections.
+o DBCP-463:  Correct a typo in the method name
+             PoolableConnectionFactory#setMaxOpenPreparedStatements. The old method
+             remains but is deprecated so not to break clients currently using the
+             incorrect name.
+o DBCP-459:  Ensure that a thread's interrupt status is visible to the caller if the
+             thread is interrupted during a call to
+             PoolingDataSource.getConnection().
+o DBCP-457:  When using a BasicDataSource, pass changes related to the handling of
+             abandoned connections to the underlying pool so that the pool
+             configuration may be updated dynamically.
+
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
+
+-----------------------------------------------------------------------------
+
+              Apache Apache Commons DBCP
+                  Version 2.1.1
+                  RELEASE NOTES
+
+The Apache Commons DBCP team is pleased to announce the release of Apache Apache Commons DBCP 2.1.1.
+
+Apache Commons DBCP software implements Database Connection Pooling.
+
+This is a patch release, including bug fixes only.
+
+Changes in this version include:
+
+Fixed Bugs:
+o DBCP-441:  Added BasicDataSource abandonedUsageTracking property missing from BasicDataSourceFactory.
+o DBCP-442:  SharedPoolDataSource getConnection fails when testOnBorrow is set with
+             a null validation query.
+o DBCP-438:  Nested connections in a transaction (local) throws null pointer. Thanks to Raihan Kibria.
+o DBCP-437:  BasicDataSource does not set disconnectionSql properties on its PoolableConnectionFactory.
+
+Changes:
+o            Updated pool version to 2.4.2.  The fix for POOL-300 may cause DBCP
+             users to see more reports of abandoned connections (if removal and logging
+             are configured).  Prior to the fix for POOL-300, the PrintWriter used to log
+             abandoned connection stack traces was not being flushed on each log event.
+
+
+For complete information on Apache Commons DBCP, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Apache Commons DBCP website:
+
+https://commons.apache.org/dbcp/
+
+Download from https://commons.apache.org/proper/commons-dbcp/download_dbcp.cgi
