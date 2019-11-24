@@ -91,6 +91,8 @@ yum install mysql-community-server -y
 ### 9、启动mysql服务并设置开机启动
 
 ```shell
+#启动之前需要生成临时密码，需要用到证书，可能证书过期，需要进行更新操作
+yum update -y
 #启动mysql服务
 service mysqld start
 #设置mysql开机启动
