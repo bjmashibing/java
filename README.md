@@ -19,7 +19,7 @@
 ```
 javase : java基础语法部分
 database : 数据库部分
-javaweb : java web部分
+web 前端 : java web部分
 ```
 
 ​		每个具体阶段的目录又按照如下目录存放资料，大家需要哪部分下载即可。
