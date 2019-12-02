@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        *{
+            margin:0;
+            padding: 0;
+        }
+        .box{
+             /*相对定位：相对的是自己起始位置  */
+             position: relative;
+             width:200px;
+             height: 200px;
+             left:40%;
+         /*     border:1px solid black; */
+             /* 调用动画 */
+             animation:donghua 5s linear 0s infinite;
+        }
+        .ye1{
+            /* 绝对定位：参照定位父元素进行偏移*/
+            position: absolute;
+            width:100px;
+            height: 100px;
+            background:green;
+            left:0px;
+            top:0px;
+            /* 圆角设置:分别左上、右上、右下、左下 */
+            border-radius:0px 90px 0px 90px;
+        }
+        .ye2{
+             /* 绝对定位：参照定位父元素进行偏移*/
+             position: absolute;
+             width:100px;
+             height: 100px;
+             background:green;
+             left:100px;
+             border-radius:90px 0px 90px 0px;
+        }
+        .ye3{
+             position: absolute;
+             width:100px;
+             height: 100px;
+             background:green;
+             left:0px;
+             top:100px;
+             border-radius:90px 0px 90px 0px;
+        }
+        .ye4{
+             position: absolute;
+             width:100px;
+             height:100px;
+             background:green;
+             left:100px;
+             top:100px;
+            border-radius:0px 90px 0px 90px;
+        }
+
+        /* 声明一个animation动画 */
+        @-webkit-keyframes donghua{
+               from{
+                   /* 旋转属性：可以让元素进行旋转（旋转单位是deg）*/
+                   transform:rotate(0deg);
+               }
+
+               to{
+                  transform:rotate(360deg);
+               }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+          <div class="ye1"></div>
+          <div class="ye2"></div>
+          <div class="ye3"></div>
+          <div class="ye4"></div>
+    </div>
+</body>
+</html>

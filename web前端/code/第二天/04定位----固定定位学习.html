@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        /* 想让页面没有默认样式：带有空格 */
+        /* 清除全部默认样式 */
+        *{
+            margin:0;
+            padding:0;
+        }
+        div{
+             width:400px;
+             height: 200px;
+        }
+        body{
+            height: 10000px;
+        }
+        .box{
+            /* 固定定位：固定定位元素不占起始位置 */
+            position: fixed;
+            left:500px;
+            top:200px;
+            background:red;
+        }
+        .box1{
+            background:green;
+        }
+        .box2{
+            background:purple;
+        }
+    </style>
+</head>
+<body>
+    <div class="box"></div>
+    <div class="box1"></div>
+    <div class="box2"></div>
+</body>
+</html>

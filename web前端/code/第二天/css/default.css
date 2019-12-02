@@ -1,0 +1,10 @@
+.box{
+    width:280px;
+    height: 280px;
+    background:red;
+}
+#cur{
+    font-size: 20px;
+    color:green;
+    text-align:center;
+}

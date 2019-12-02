@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        /* 子绝父相*/
+        *{
+            margin:0;
+            padding: 0;
+        }
+        .box{
+             position: relative;
+             width:600px;
+             height: 400px;
+             background:red;
+             border:1px solid black;
+             left:200px;
+        }
+        .cur{
+             position: absolute;
+             left:0px;
+             top:0px;
+             width:300px;
+             height:400px;
+             background:cyan;
+        }
+        .cur1{
+            position: absolute;
+             width:50%;
+             height:50%;
+             left:300px;
+             top:0px;
+             background:purple;
+        }
+        .cur2{
+            position: absolute;
+            width:50%;
+            height:50%;
+            background:yellow;
+            left:300px;
+            top:200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="cur"></div>
+        <div class="cur1"></div>
+        <div class="cur2"></div>
+    </div>
+</body>
+</html>

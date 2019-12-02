@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        *{
+            margin:0;
+            padding: 0;
+        }
+        .outer{
+             position: relative;
+             /* 父元素 */
+             width:400px;
+             height: 400px;
+             background:red;
+             margin:200px;
+        }
+        .inner{
+             position: absolute;
+             left:10px;
+             top:20px;
+             width:200px;
+             height: 200px;
+             background:green;
+        }
+    </style>
+</head>
+<body>
+        <div class="outer">
+            <div class="inner"></div>
+        </div>
+</body>
+</html>
