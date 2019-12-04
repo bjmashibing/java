@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style type="text/css">
+        *{
+            margin:0;
+            padding: 0;
+        }
+        .box{
+             position: relative;
+             /* 当前这个div宽度是按照父元素宽度进行百分比*/
+             width:100%;
+             height:50px;
+             background:#01204f;
+        }
+        ul{
+             position: absolute;
+             left:20%;
+             width:80%;
+             height: 50px;
+             /* 将列表默认样式清除（将前面黑色圆球干掉） */
+             list-style: none;
+        }
+        li{
+            float:left;
+            width:60px;
+            height: 50px;
+            color:white;
+            /* 行高 */
+            line-height:50px;
+            /* 小手 */
+            cursor:pointer;
+            /* 文字居中 */
+            text-align:center;
+        }
+        li:hover{
+             background:red;
+        }
+    </style>
+</head>
+<body>
+     <div class="box">
+           <ul>
+                <li>首页</li>
+                <li>国内</li>
+                <li>国际</li>
+                <li>军事</li>
+                <li>财经</li>
+                <li>娱乐</li>
+                <li>体育</li>
+                <li>互联网</li>
+                <li>科技</li>
+                <li>游戏</li>
+                <li>女人</li>
+                <li>汽车</li>
+                <li>房产</li>
+           </ul>
+     </div>
+</body>
+</html>
