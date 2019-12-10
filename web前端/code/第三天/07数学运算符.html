@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //数学运算符------数字参与
+    //如果是数字和数字进行数学运算符：
+    //先算乘除、后算加减、如果有小括号先算小括号里面的
+    // console.log(66 + 22);
+    // console.log(66 - 33);
+    // console.log(22 * 22);
+    // console.log(6 / 3);
+    // console.log(99 % 3); // 0
+</script>
+<script>
+    //数学运算符----布尔类型数值
+    //布尔类型数据也可以参与数学运算符，但是系统自动隐式转寒为数字参与
+    // console.log(Number(true));
+    // console.log(Number(false));
+    // console.log(true + 99);
+    // console.log(false * 100);
+    // console.log(true + false);
+</script>
+
+<script>
+    //在JS当中未定义类型数据undefined也可以参数学运算符：
+    //但是要隐式转换为数字参与
+    //undefined未定义类型数据参与数学运算符的时候会隐式转换为数字NaN
+    /************************************************************/
+    //NaN起始也是数字类型数值：值不够这个数值比较特殊，一般在计算数学运算符的时候算不出结果的时候
+    //返回数字NaN
+    // console.log(0 / 0);
+    // console.log(typeof NaN);
+    // console.log(NaN + 33);
+    // console.log(NaN * 33);
+    // console.log(NaN + NaN);
+    // console.log(undefined + 33);
+    // console.log(undefined / 33);
+    // console.log(NaN * 0);
+</script>
+<script>
+    //Null类型数值参与数学运算符
+    // console.log(Number(null));
+    // console.log(null * 99);
+    // console.log(0 + NaN);
+    // console.log(null + NaN);
+</script>
+<script>
+    //字符串也可以参与数学运算符：
+    //加号运算符比较特殊：
+    //加号运算符：如果遇见字符串不是数学当中加号，
+    //前端人管他叫做连字符：将数据从左到右拼接在一起转换为字符串
+    //不会进行数学的加法
+    console.log("12" + 44);
+    console.log("张三喜欢李四" + 666);
+    console.log("12" - 44);
+    console.log("12" * 44);
+    console.log("12" / 44);
+    console.log("12" % 44);
+</script>
