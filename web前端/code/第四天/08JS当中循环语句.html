@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //for循环
+    for (var i = 0; i < 10; i++) {
+        // console.log(i);
+        document.write("<h1>我爱你祖国</h1>");
+    }
+    // console.log(i);
+    // console.log(i);
+</script>
+<script>
+    //计算数字1~100之间的数字累加和
+    //声明变量：保存每一次循环计算结果
+    var sum = 0;
+    for (var i = 1; i <= 100; i++) {
+        sum += i;
+    }
+    // console.log(sum);
+</script>
+<script>
+    //在控制台中输出三位数字水仙花数字
+    //水仙花数字：个、十、百立方和等于这个数字本身即为水仙花数字
+    for (var i = 100; i < 1000; i++) {
+        //分别获取当前这次循环数字个、十、百
+        var ge = i % 10,
+            shi = parseInt(i / 10) % 10;
+        bai = parseInt(i / 100);
+        //计算数字累加和
+        var result = Math.pow(ge, 3) + Math.pow(shi, 3) + Math.pow(bai, 3);
+        if (i == result) {
+            console.log(i + "水仙花数字")
+        }
+    }
+
+
+    console.log(123 / 10);
+</script>
