@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //在JS当中数组使用[]进行表示
+    //JS当中数组是引用类型数据
+    console.log([]);
+    console.log(typeof []);
+    //数组目的：可以一次性存储很多有序数据
+    console.log([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+</script>
+<script>
+    //为了在JS当中使用数组方便
+    //经常将右侧数组赋值给左侧变量（通过变量名字可以访问存储数组）
+
+    //存储数据
+    var arr = ["我爱你祖国", 12306, true, NaN, [2, 3, 4]];
+
+    //为了读取数据:通过枚举法 + 下角标（索引值）获取数组里面存储数据
+    console.log(arr[0]);
+    console.log(arr[3]);
+    console.log(arr[4]);
+    //修改数组里面数据
+    arr[0] = "我爱你母亲";
+    arr[1] = 110;
+    arr[4][0] = 66666;
+    console.log(arr);
+    //新增数据
+    arr[5] = "我是后来的";
+    arr[6] = "稍等我也来了";
+    arr[9999] = "我是老嘎达";
+    console.log(arr);
+    console.log(arr[100]);
+</script>
