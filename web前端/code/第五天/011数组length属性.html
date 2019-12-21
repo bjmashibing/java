@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //length属性：可以获取数组里面元素总个数
+    var arr = ["吃饭", "睡觉", "打豆豆", "喝酒", "烫头"];
+    //数组里面一共是五个元素
+    console.log(arr.length);
+    //数组里面元素是从零开始的
+    //数组的length属性常用语遍历数组
+    for (var i = 0; i < arr.length; i++) {
+        //获取数组里面元素
+        console.log(arr[i]);
+    }
+</script>
+<script>
+    //数组常见算法题：
+    //比如：计算数组里面元素累加和问题
+    var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    var sum = 0;
+    for (var i = 0; i < arr.length; i++) {
+        sum += arr[i];
+    }
+    //计算完毕获取结果
+    console.log(sum);
+</script>
+<script>
+    //获取数组里面最大元素
+    var arr = [66, 3, 2, 99, 26, 21, 19, 88];
+    //获取最大数字
+    var max = arr[0];
+    for (var i = 0; i < arr.length; i++) {
+        //后者元素大于前者进行重新赋值
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    console.log(max);
+</script>

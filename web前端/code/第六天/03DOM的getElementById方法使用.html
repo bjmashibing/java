@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" id="box">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <ul id="box1">
+            <li>吃饭</li>
+            <li id="box2">睡觉</li>
+            <li>打豆豆</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    //getElementById:是DOM方法，可以通过标签ID属性值获取任意节点
+    var meta = document.getElementById("box");
+    console.log(meta);
+    //获取ul标签
+    var ul = document.getElementById("box1");
+    console.log(ul);
+    //获取li标签
+    var li = document.getElementById("box2");
+    console.log(li);
+</script>

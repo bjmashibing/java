@@ -1,0 +1,35 @@
+<!-- 下面这行代码：是文档声明方式，不是标签（H5） -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <img src="./img/1.jpg" alt="" id="box">
+    <div class="cur" id="ha">我是一个粉刷匠</div>
+</body>
+
+</html>
+<script>
+    //获取img标签
+    var img = document.getElementById("box");
+    //获取标签属性值
+    console.log(img.src);
+    //重新修改图片src属性值
+    img.src = "./img/2.jpg";
+    //获取div标签
+    var div = document.getElementById("ha");
+    //获取div的class、id属性值
+    console.log(div.id);
+    console.log(div.className);
+    //从新设置class属性值
+    div.className = "rewrite";
+    div.id = "gagaga";
+    //修改文本
+    div.innerHTML = "粉霜本领强";
+</script>
