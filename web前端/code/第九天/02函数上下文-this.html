@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!--利用JQ时候切记需要通过script标签进行引包  -->
+    <script src="./js/jQuery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            width: 500px;
+            height: 100px;
+            border: 1px solid black;
+            margin: 100px auto;
+        }
+
+        p {
+            float: left;
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <p>1</p>
+        <p>2</p>
+        <p>3</p>
+        <p>4</p>
+    </div>
+</body>
+
+</html>
+<script>
+    //单击某一个p标签，当前被单击的这个p标签背景颜色为天蓝色
+    //给全部P标签绑定单击事件
+    $("p").click(function () {
+        //单击某一个p，当前被单击的这个p标签背景颜色为天蓝色
+        $(this).css({
+            "background": "skyblue"
+        })
+    });
+</script>

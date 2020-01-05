@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/jQuery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            /* 定位元素才有left|top|bottom|right */
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div>中国</div>
+</body>
+
+</html>
+<script>
+    $("div").animate({
+        "left": 1000,
+        "top": 100,
+        "width": 150,
+        "height": 50,
+        "background": "cyan",
+        "color": "white",
+        "border": "20px solid red"
+    }, 5000, function () {
+        //让div遍椭圆
+        $(this).css({
+            "borderRadius": "50%",
+            "textAlign": "center"
+        })
+    });
+</script>
