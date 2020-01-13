@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div style="width:100px;height: 100px;color:blueviolet;border: 1px solid black;" id="cur">12306</div>
+</body>
+
+</html>
+<script>
+    //获取div标签
+    var div = document.getElementById("cur");
+    //获取已有样式
+    console.log(div.style.width);
+    console.log(div.style.height);
+    console.log(div.style.color);
+    console.log(div.style.border);
+    //设置元素样式
+    div.style.width = "250px";
+    div.style.color = "red";
+    //如果样式中中间带有横杠变驼峰写法
+    div.style.fontSize = "30px";
+    div.style.textAlign = "center";
+    div.style.background = "cyan";
+</script>

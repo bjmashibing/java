@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>   
+<script>
+    //构造函数两个特征：
+    //函数名字首个英文字母需要大写的
+    //函数务必使用关键字new调用的
+    function Dog(name,sex,age){
+      //构造函数独有四步走
+      //第一步：在函数体中神秘创建了一个空的狭义对象
+      //第二步：函数的上下文指向当前的空的下一对象
+      //第三步：通过点语法动态给狭义对象添加属性、方法
+       this.name = name;
+       this.sex  = sex;
+       this.age = age;
+      //第四步：虽然没有关键字new，但是系统会将当前这个狭义对象返回
+      for(var i = 0 ; i < 10 ;i++){};
+      if(true){};
+    }
+    //调用函数
+    var erha =  new Dog("二哈","公",3);
+    var taidi  =  new Dog("泰迪","母",6);
+   //因为这是两个不同对象，因为在堆空间当中内存地址不同
+   console.log(erha,taidi);
+</script>

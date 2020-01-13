@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //局部变量：函数形参、在函数体中声明变量（只能在函数体中使用）
+    //声明部分
+    function fun(a, b) {
+        //形参a、形参b称之为局部变量
+        console.log(a);
+        console.log(b);
+        //在函数体中声明变量（局部变量）
+        var c = "么么哒";
+    }
+    //调用
+    fun(true, "我是祖国的老花骨朵");
+    console.log(c);
+</script>

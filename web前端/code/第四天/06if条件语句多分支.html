@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //用户输入分数
+    var score = prompt("请你输入一个分数");
+    if (score < 60) {
+        //条件：分数小于60
+        alert("兄弟不好意思,来年补考");
+    } else if (score < 70) {
+        //出现else:暗含条件分数一定是大于等于60
+        //完整条件大于等于60 且小于70
+        alert("兄弟恭喜你及格");
+    } else if (score < 80) {
+        //暗含条件：分数大于等于70
+        //完整条件：大于等于70 且小于80
+        alert("良好");
+    } else {
+        //暗含条件：分数大于等于80
+        alert("优秀");
+    }
+</script>

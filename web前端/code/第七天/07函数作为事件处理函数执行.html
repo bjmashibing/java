@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+       div{
+            width:400px;
+            height: 200px;
+            background-color: black;
+       }
+    </style>
+</head>
+<body>
+     <div id="box"></div>
+</body>
+</html>  
+<script>
+  //获取div标签
+  var div = document.getElementById("box");
+  //绑定单击事件
+  div.onclick = function(){
+     //函数体中上下文
+     this.style.background = "red";
+  }
+</script>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            border: 1px solid black;
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas>
+        <ul>123</ul>
+        <li>1213223</li>
+    </canvas>
+</body>
+
+</html>
+<script>
+    //获取canvas标签
+    var canvas = document.querySelector("canvas");
+    //画布当中任何操作必须通过2D上下文进行操作
+    var ctx = canvas.getContext("2d");
+    //一定要注意：画布当中任何操作都是通过ctx属性、方法进行操作
+    //设置矩形填充颜色
+    ctx.fillStyle = "cyan";
+    //绘制矩形
+    ctx.fillRect(100, 100, 100, 100);
+
+    //绘制圆
+    //通过绘制路径形式绘制圆
+    ctx.beginPath();
+    //用户在描述绘制图形
+    ctx.arc(200, 200, 50, 0, Math.PI * 2, false);
+    //设置填充颜色
+    ctx.fillStyle = "red";
+    //开始填充
+    ctx.fill();
+    //边框设置
+    ctx.lineWidth = 20;
+    ctx.strokeStyle = "pink";
+
+    //开始绘制
+    ctx.stroke();
+</script>
