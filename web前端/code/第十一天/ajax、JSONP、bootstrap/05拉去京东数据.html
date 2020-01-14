@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <select></select>
+</body>
+
+</html>
+<script>
+    //获取下拉框
+    var select = document.querySelector("select");
+    //声明一个同名函数
+    function jQuery4494404(arr) {
+        //遍历数组
+        for (var i = 0; i < arr.length; i++) {
+            //创建节点
+            var op = document.createElement("option");
+            op.innerHTML = arr[i].name;
+            select.appendChild(op);
+        }
+    }
+</script>
+<!-- 将京东服务器调用部分引入 -->
+<script src="https://fts.jd.com/area/get?fid=72&callback=jQuery4494404&_=1578732186910"></script>
