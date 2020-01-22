@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>我是计数器小案例{{count}}</h1>
+        <button v-on:click="add">单击我+1</button>
+        <button @click="minus">单击我-1</button>
+        <p @mouseenter="haha">我绑定鼠标移上</p>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            count: 1
+        },
+        //事件处理函数地方
+        methods: {
+            //加上1事件处理函数
+            add() {
+                this.count++;
+                //设置上限
+                this.count = this.count >= 10 ? 10 : this.count;
+            },
+            minus() {
+                this.count--;
+                this.count = this.count <= -6 ? -1000000 : this.count;
+            },
+            haha() {
+                alert("鼠标在我上面");
+            }
+        },
+    })
+</script>

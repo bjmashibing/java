@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>我是默认文本</h1>
+    <button>单击我悄悄发起上行请求----GET</button>
+</body>
+
+</html>
+<script>
+    //获取标签
+    var h1 = document.querySelector("h1");
+    var btn = document.querySelector("button");
+    //单击按钮发起上行请求
+    btn.onclick = function () {
+        //悄悄发起上行请求
+        if (window.XMLHttpRequest) {
+            //高级浏览器写法
+            var xhr = new XMLHttpRequest();
+        } else {
+            //IE低版本写法
+            var xhr = new ActiveXObject("msxml2.0xmlhttp");
+        }
+        //设置请求方式
+        xhr.open("get", "./data.txt", true);
+        //发送请求
+        xhr.send();
+        //监听就绪状态
+        xhr.onreadystatechange = function () {
+            if (xhr.status == 200 && xhr.readyState == 4) {
+                //在页面没有重新加载情况下实现页面局部跟新
+                h1.innerHTML = xhr.responseText;
+            }
+        }
+
+    }
+</script>
