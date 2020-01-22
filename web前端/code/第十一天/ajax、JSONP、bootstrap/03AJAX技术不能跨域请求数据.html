@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/jQuery.min.js"></script>
+</head>
+
+<body>
+    <h1>我是来源于127.0.0.1服务器页面</h1>
+    <button>拉去127.0.0.2服务器上面数据</button>
+</body>
+
+</html>
+<script>
+    //AJAX技术不能跨域请求数据
+    $("button").click(function () {
+        //请求第二个服务器上面数据
+        $.get("http://127.0.0.2/案例/data.txt", function () {
+
+        })
+    });
+</script>

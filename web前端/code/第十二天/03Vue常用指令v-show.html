@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <ul>
+            <li>吃饭</li>
+            <li v-show='3 > 8'>睡觉</li>
+            <li>打豆豆</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建实例
+    var vm = new Vue({
+        el: "#app"
+    })
+</script>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 使用JQ务必引包 -->
+    <script src="./js/jQuery.min.js"></script>
+</head>
+
+<body>
+    <h1>今天课程重点就是AJAX技术</h1>
+    <button>单击我向服务器端----悄悄发起上行请求（GET）</button>
+    <button>单击我向服务器端----悄悄的发起上行请求（POST）</button>
+    <button>单击我向服务器端发起请求</button>
+</body>
+
+</html>
+<script>
+    //给按钮绑定单击事件
+    $("button:eq(0)").click(function () {
+        //向服务器端悄悄发起上行请求----GET,拉去服务器数据
+        //第一个参数向向服务器端请求path
+        //第二个参数:客户端向服务器端额外传递一些数据(可有可无)
+        //第三个参数：当服务器响应数据成功的时候会立即执行一次
+        $.get("./data.txt", {
+            "name": "小明",
+            'ps': 123
+        }, function (data) {
+            //data:就是服务器端响应数据
+            //修改H1标题
+            $("h1").html(data);
+        });
+    });
+    //第二个按钮发起POST请求
+    $("button:eq(1)").click(function () {
+        //向服务器端去悄悄的发起上行请求----POST，拉去服务器数据
+        $.post("./data.txt", function (data) {
+            //在页面没有重新加载情况下实现页面局部跟新
+            $("h1").html(data);
+        });
+
+    });
+
+    //第三个按钮单击事件
+    $("button:eq(2)").click(function () {
+        //向服务器端发起POST请求
+        //当前这个方法可以发起GET、POST，请求参数配置务必是一个JSON数据格式
+        $.ajax({
+            // 请求网址
+            "url": "./data.txt",
+            //请求方式
+            "type": "post",
+            //给服务器额外传递数据
+            "data": {
+                "a": 1
+            },
+            //回调函数：可以接受服务器数据
+            "success": function (data) {
+                //当服务器响应成功的时候会立即执行一次
+                $("h1").html(data);
+
+            }
+
+        });
+
+    });
+</script>
