@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <button @click="add('军事')">军事</button>
+        <button @click="add('新闻')">新闻</button>
+        <button @click="add('直播')">直播</button>
+        <ul v-show="'军事'==info">
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+            <li>军事军事</li>
+        </ul>
+        <ul v-show="'新闻'==info">
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+            <li>新闻新闻</li>
+        </ul>
+        <ul v-show="'直播'==info">
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+            <li>直播直播</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建实例
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            info: "直播"
+        },
+        //书写标签事件处理函数地方
+        methods: {
+            //事件处理函数add
+            add(a) {
+                //修改Vue实例属性值即可
+                this.info = a;
+            }
+        },
+    })
+</script>

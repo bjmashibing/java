@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <p><input type="text" v-model="hobby"><button @click="add">单击我添加爱好</button></p>
+        <ul>
+            <li v-for="item in arr">{{item}}</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建实例
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            arr: ['吃饭', '睡觉', '打豆豆'],
+            hobby: ''
+        },
+        methods: {
+            add() {
+                //向数组尾出添加元素
+                vm.arr.push(this.hobby);
+                //文本制空
+                vm.hobby = '';
+            }
+        },
+    })
+</script>

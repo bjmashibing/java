@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>测试</title>
+</head>
+
+<body>
+  <script src="./lib/solarlunar.min.js"></script>
+  <script>
+    console.log(solarlunar.solar2lunar(2015, 10, 2))
+    console.log(solarlunar.solar2lunar(2015, 10, 8))
+    console.log(solarlunar.lunar2solar(2015, 10, 2))
+    console.log(solarlunar.lunar2solar(2015, 8, 26))
+    console.log(solarlunar.solar2lunar(2033, 12, 23))
+    console.log(solarlunar.solar2lunar(2017, 12, 14)) // 10.27
+    console.log(solarlunar.solar2lunar(1949, 8, 14)) // 7.20
+    console.log(solarlunar.solar2lunar(1949, 9, 14)) // 闰月 7.20
+    console.log(solarlunar.solar2lunar(1949, 10, 14)) // 8.23
+  </script>
+</body>
+
+</html>
