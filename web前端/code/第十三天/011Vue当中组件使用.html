@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        p {
+            float: left;
+            width: 100px;
+            height: 100px;
+            background-color: cyan;
+            margin-right: 10px;
+        }
+    </style>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <!-- 模板 -->
+    <div id="app">
+        <!-- 用标签形式使用组件 -->
+        <jch></jch>
+        <gen></gen>
+        <say-call></say-call>
+        <go></go>
+    </div>
+    <hr>
+    <!--下面这里是组件模板 -->
+    <template id="erha">
+        <div>
+            <p @click="add">{{msg}}</p>
+        </div>
+    </template>
+    <template id="gen">
+        <div>
+            <ul>
+                <go></go>
+                <li v-for="item in arr">{{item}}</li>
+            </ul>
+        </div>
+    </template>
+    <template id="memeda">
+        <div>
+            <go></go>
+            <h1>我是么么打</h1>
+        </div>
+    </template>
+    <template id="go">
+        <div>
+            <a href="http://www.sina.com">新浪</a>
+        </div>
+    </template>
+</body>
+
+
+</html>
+<script>
+    //全局组件
+    Vue.component("go", {
+        template: "#go"
+    })
+    //创建Vue实例
+    var vm = new Vue({
+        //挂载点
+        el: "#app",
+        //根组件数据
+        data: {},
+        methods: {},
+        watch: {},
+        //局部组件需要注册
+        components: {
+            //组件名字
+            jch: {
+                //jch组件模板
+                template: "#erha",
+                //jch组件数据
+                data() {
+                    console.log(123);
+                    //组件数据务必要有返回值
+                    return {
+                        msg: 1
+                    }
+                },
+                //事件处理函数地方
+                methods: {
+                    //jch组件事件处理函数地方
+                    add() {
+                        this.msg++;
+                    }
+                }
+            },
+            gen: {
+                // gen组件的模板
+                template: "#gen",
+                data() {
+                    return {
+                        arr: [1, 2, 3, 4, 5]
+                    }
+                }
+            },
+            // 组件名字不能是以后标签名字
+            div: {
+                template: "#gen"
+            },
+            sayCall: {
+                template: "#memeda"
+            }
+
+        }
+    });
+    //Vue当中组件分为两种：
+    //局部组件务必需要在compoents里面进行注册
+    //使用的时候当中一个自定义标签即可
+    //注意组件名字不能瞎写：不能是以后标签名字
+</script>
