@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        {{url}}
+        <h1>请你输入想搜索的内容: <input type="text" v-model="url"></h1>
+        <ul>
+            <li v-for="item in arr">{{item}}</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        //挂载点设置
+        el: "#app",
+        data: {
+            url: "",
+            arr: []
+        },
+        //监听url属性值变化
+        watch: {
+            //函数名字务必和监听属性名字一直
+            url(a) {
+                //这个函数在监听的属性值发生变化的时候回立即执行一次
+                //会将最新的数值给我们作为实参注入
+                //请求网址拼接
+                var path = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=" + a + "&cb=a";
+                //JSONP跨域拉去数据
+                //实现原理：
+                //利用script标签src属性
+                //利用函数声明+调用放在两个不同服务器上面
+                //动态创建script
+                var script = document.createElement("script");
+                //设置script标签的src属性值
+                script.src = path;
+                //标签上树将请求发出去
+                document.body.appendChild(script);
+            }
+        },
+    });
+
+
+
+    //声明一个同名函数
+    function a(obj) {
+        console.log(obj);
+        //修改vue实例的arr属性值
+        vm.arr = obj.s;
+    }
+</script>
+
+<!-- JSONP跨域原理：利用script标签src属性（天生就跨域） -->
