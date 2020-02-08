@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/jQuery.min.js"></script>
+</head>
+
+<body>
+    <p>
+        <input type="text" value="我是一个输入文本地方">
+    </p>
+    <div>我是一个粉霜将，粉霜本领强</div>
+</body>
+
+</html>
+<script>
+    //操作表单元素文本：利用的val方法
+    //获取表单元素文本
+    console.log($("input").val());
+    //重新设置表单元素文本
+    $("input").val("我修改了表单元素文本");
+    /**************************************************************************/
+    //操作非表单元素文本：利用的html方法
+    //获取非表单元素文本
+    console.log($("div").html());
+    $("div").html("修改非表单元素文本啦么么打~~~~")
+</script>

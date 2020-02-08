@@ -1,0 +1,28 @@
+os:
+  - linux
+language: node_js
+env:
+  - CXX=g++-4.8
+node_js:
+  - "iojs-3"
+  - "4.0.0"
+  - "5.7.0"
+  - "6.0.0"
+  - "6.9.1"
+  - "7.1.0"
+  - "10.0.0"
+  - "12.0.0"
+  - "13"
+notifications:
+  recipients:
+    - i@yanyiwu.com
+  email:
+    on_success: change
+    on_failure: always
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+after_script: NODE_ENV=test istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage

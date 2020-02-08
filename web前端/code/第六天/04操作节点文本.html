@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        我是表单元素:<input type="text" value="最近天气好冷呀" id="cur">
+    </div>
+    <a href="http://www.baidu.com" id="box">跳转到百度</a>
+    <p id="memeda">欢迎大家来贾老师课程~~快速了解web</p>
+</body>
+
+</html>
+<script>
+    //如果操作表单元素文本：需要使用标签的value属性
+    //操作文本：即为可以在JS当中获取已有文本、但让也可以重新设置文本
+    //第一步：获取表单元素
+    var input = document.getElementById("cur");
+    //获取表单元素文本
+    console.log(input.value);
+    //从新设置表单元素文本
+    input.value = "我是通过JS动态修改表单元素文本";
+
+
+    //非表单元素：就不是input即可
+    //非表单元素操作文本：需要通过innerHTML属性
+    var a = document.getElementById("box");
+    //获取非表单元素文本
+    console.log(a.innerHTML);
+    //重新设置非表单元素文本
+    a.innerHTML = "贾老师你好帅";
+
+    //获取P标签
+    var p = document.getElementById("memeda");
+    //获取文本
+    console.log(p.innerHTML);
+    //动态修改
+    p.innerHTML = "最近有的同学老不来上课";
+</script>

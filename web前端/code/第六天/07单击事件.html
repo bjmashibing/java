@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #box {
+            width: 600px;
+            height: 100px;
+            margin: 100px auto;
+            background: red;
+            color: white;
+            text-align: center;
+            line-height: 100px;
+        }
+
+        #box1 {
+            /* 定位元素 */
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: cyan;
+            left: 0px;
+        }
+
+        #box2 {
+            width: 300px;
+            height: 100px;
+            background: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">文字</div>
+    <div id="box1"></div>
+    <div id="box2"></div>
+</body>
+
+</html>
+<script>
+    //给第一个div标签绑定单击事件
+    var div = document.getElementById("box");
+    var div1 = document.getElementById("box1");
+    var div2 = document.getElementById("box2");
+    //全局变量：存储一下起始字号大小
+    var f = 16;
+    var w = 600;
+    //绑定单击事件
+    div.onclick = function () {
+        //字号加上1
+        f++;
+        w += 5;
+        div.style.fontSize = f + "px";
+        div.style.width = w + "px";
+    }
+    //第二个div
+    var l = 0;
+    div1.onclick = function () {
+        l += 10;
+        div1.style.left = l + "px";
+    }
+    //第三个div
+    div2.onclick = function () {
+        //随机三个数字
+        var R = parseInt(Math.random() * 255);
+        var G = parseInt(Math.random() * 255);
+        var B = parseInt(Math.random() * 255);
+        //随机颜色
+        div2.style.background = `rgb(${R},${G},${B})`;
+    }
+</script>

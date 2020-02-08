@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            position: absolute;
+            width: 50px;
+            height: 100px;
+            background: url('./img/1.png');
+            /* 背景图定位 */
+            background-position: 0px -200px;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //将来我需要10000士兵行走
+    function Bing() {
+        //控制背景图发生变化属性
+        this.x = 0;
+        //top属性值
+        this.t = parseInt(Math.random() * 500);
+        //修改left属性值
+        this.l = 0;
+        //控制小兵是否行走
+        this.isMove = false;
+        //经历四步走
+        this.init();
+        //将每隔一秒创建实例添加到数组进行同一管理
+        arr.push(this);
+        //控制是否行走
+        this.bind();
+    }
+    Bing.prototype.init = function () {
+        //在JS当中创建div标签
+        this.dom = document.createElement("div");
+        this.dom.style.top = this.t + "px";
+        //标签上树
+        document.body.appendChild(this.dom);
+    }
+    //跟新脚步方法
+    Bing.prototype.update = function () {
+        if (this.isMove) return;
+        //控制背景图发生变化属性值
+        this.x++;
+        //修改控制left变化属性值
+        this.l += 10;
+        if (this.x > 3) this.x = 0;
+        //修改div背景图定位
+        this.dom.style.backgroundPosition = -this.x * 50 + "px -200px";
+        this.dom.style.left = this.l + "px";
+        //当达到一定条件删除标签
+        if (this.l > 500) {
+            //将数组里面实例移出
+            arr.splice(arr.indexOf(this), 1);
+            //节点移出
+            document.body.removeChild(this.dom);
+        }
+    }
+    Bing.prototype.bind = function () {
+        var self = this;
+        this.dom.onclick = function () {
+            self.isMove = !self.isMove;
+        }
+    }
+    //向每隔一秒创建一个士兵
+    var time = 0;
+    //创建数组接受全部实例
+    var arr = [];
+    //开启定时器一直运动
+    setInterval(function () {
+        time++;
+        if (time % 10 == 0) new Bing;
+        //让每一个士兵向右侧行走---遍历数组
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].update();
+        }
+    }, 100);
+</script>

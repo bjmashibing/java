@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引入JQ函数库：前端人也称之为引爆 -->
+    <script src="./js/jQuery.min.js"></script>
+</head>
+
+<body>
+    <ul>
+        <li>吃饭</li>
+        <li>睡觉</li>
+        <li>打豆豆</li>
+    </ul>
+    <div id="box">
+        我爱你祖国
+    </div>
+    <p class="cur">
+        我是祖国的花骨朵
+    </p>
+</body>
+
+</html>
+<script>
+    //Q函数经常用来操作节点数上标签
+    //支持我们曾经学习过选择器：标签选择器、ID选择器、class选择器
+    //注意1:当程序当中引入JQ，这个函数库对外暴露了一个$函数,
+    //它是JQ函数库一个核心函数,经常用来匹配标签
+    //标签选择器
+    console.log($("li"));
+    //id选择器
+    console.log($("#box"));
+    //类选择器
+    console.log($(".cur"));
+    //如果向设置匹配标签的行内样式可以连续打点css函数
+    $("p").css({
+        "color": "red",
+        "fontSize": 30,
+        "background": "cyan",
+        "textAlign": "center"
+    })
+</script>

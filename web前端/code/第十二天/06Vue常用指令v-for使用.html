@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>非常常用的指令v-for</h1>
+        <h1>循环语句遍历数字</h1>
+        <h2 v-for="item in 2">我是二级标题{{item}}</h2>
+        <h1>循环语句遍历数组</h1>
+        <ul>
+            <li v-for="(item , index) in arr">{{item}}----{{index}}</li>
+        </ul>
+        <table>
+            <tr v-for="row in 9">
+                <td v-for="col in 9">小明</td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            arr: ['吃饭', '睡觉', '打豆豆']
+        }
+    })
+</script>

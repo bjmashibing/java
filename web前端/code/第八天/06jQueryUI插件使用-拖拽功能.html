@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引入JQ -->
+    <script src="./js/jQuery.min.js"></script>
+    <!-- 引入插件 -->
+    <script src="./js/jquery-ui.min.js"></script>
+</head>
+
+<body>
+    <div>
+        <p>我是你的孩子~~~要拖拽</p>
+    </div>
+    <ul>
+        <li>吃饭</li>
+        <li>睡觉</li>
+        <li>打豆豆</li>
+        <li>么么打</li>
+    </ul>
+</body>
+
+</html>
+<script>
+    //拖拽
+    $("div").draggable();
+    //排序拖拽
+    $("ul").sortable();
+</script>

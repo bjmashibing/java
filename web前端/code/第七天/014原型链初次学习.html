@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+<script>
+      //任意构造函数 天生都有一个 prototype属性 ，指向一个空的狭义对象
+      //创建出来的时候天生拥有一个__proto__属性，可以向上面的狭义对象借用方法使用
+      function Dog(name,age,sex){
+         //经历四步走
+         this.name = name;
+         this.age = age;
+         this.sex  = sex;
+      }   
+      Dog.prototype.yaoren = function(){
+          console.log("我可以咬人");
+      }
+      //创建二哈实例
+      var erha = new Dog("二哈",18,"公");  
+      var taidi = new Dog("太低",6,"母");
+      console.log(erha); 
+      console.log(taidi);
+      erha.yaoren();
+      erha.yaoren();
+      taidi.yaoren();
+</script>
+
+

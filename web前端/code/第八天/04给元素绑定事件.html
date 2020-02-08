@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/jQuery.min.js"></script>
+</head>
+
+<body>
+    <div>我是中国人我很自豪</div>
+</body>
+
+</html>
+<script>
+    var f = 16;
+    //JQ对于元素绑定事件都封装成函数
+    $("div").click(function () {
+        f++;
+        //修改div的字号大小
+        $(this).css({
+            "fontSize": f
+        })
+    });
+</script>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>我是实例属性值{{msg}}</h1>
+        <input type="text" v-model="msg">
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            msg: "我是实例数据"
+        }
+    });
+</script>
