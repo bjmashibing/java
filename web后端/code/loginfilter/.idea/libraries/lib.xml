@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://C:/apache-tomcat-7.0.56/lib/jsp-api.jar!/" />
+      <root url="jar://C:/apache-tomcat-7.0.56/lib/servlet-api.jar!/" />
+      <root url="file://C:/apache-tomcat-7.0.56/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://C:/apache-tomcat-7.0.56/lib" recursive="false" />
+  </library>
+</component>
