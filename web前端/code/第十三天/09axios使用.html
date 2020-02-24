@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+    <script src="./js/axios.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>{{msg}}</h1>
+        <button @click="fetchData">单击我发起GET</button>
+        <button @click="psotData">单击我法七POST</button>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        //挂载点
+        el: "#app",
+        data: {
+            msg: "默认文本"
+        },
+        methods: {
+            //通过GET请求拉去服务器数据
+            fetchData() {
+                //发起GET请求，拉去服务器新闻数据
+                axios.get("./data.txt").then((obj) => {
+                    this.msg = obj.data;
+                });
+            },
+            psotData() {
+                //发起POST请求，拉去服务器数据
+                // axios.post("./data.txt").then((obj) => {
+                //     this.msg = obj.data;
+                // })
+
+                $.post("./data.txt", (data) => {
+                    this.msg = data;
+                });
+            }
+        },
+    })
+</script>

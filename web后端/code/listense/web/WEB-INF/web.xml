@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <servlet>
+        <servlet-name>ListenseServlet</servlet-name>
+        <servlet-class>com.mashibing.servlet.ListenseServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ListenseServlet</servlet-name>
+        <url-pattern>/listense</url-pattern>
+    </servlet-mapping>
+    <listener>
+        <listener-class>com.mashibing.listense.MyListense</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.mashibing.listense.MyListense2</listener-class>
+    </listener>
+</web-app>
