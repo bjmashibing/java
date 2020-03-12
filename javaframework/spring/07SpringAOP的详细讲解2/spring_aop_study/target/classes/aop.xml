@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+    <bean id="logUtil" class="com.mashibing.util.LogUtil"></bean>
+    <bean id="securityUtil" class="com.mashibing.util.SecurityUtil"></bean>
+    <bean id="myCalculator" class="com.mashibing.service.MyCalculator"></bean>
+    <!--配置aop-->
+    <aop:config>
+        <aop:pointcut id="globalPoint" expression="execution( Integer com.mashibing.service.MyCalculator.*(..))"/>
+        <!--声明切面-->
+        <aop:aspect ref="logUtil">
+            <!--将通用的表达式给抽取出来-->
+            <aop:pointcut id="myPoint" expression="execution( Integer com.mashibing.service.MyCalculator.*(..))"/>
+            <!--定义通知在哪些方法上使用-->
+            <aop:before method="start" pointcut-ref="myPoint"></aop:before>
+            <aop:after method="logFinally" pointcut-ref="myPoint"></aop:after>
+            <aop:after-returning method="stop" pointcut-ref="myPoint" returning="result"></aop:after-returning>
+            <aop:after-throwing method="logException" pointcut-ref="myPoint" throwing="e"></aop:after-throwing>
+            <aop:around method="around" pointcut-ref="myPoint"></aop:around>
+        </aop:aspect>
+        <aop:aspect ref="securityUtil">
+            <aop:before method="start" pointcut-ref="globalPoint"></aop:before>
+            <aop:after method="logFinally" pointcut-ref="globalPoint"></aop:after>
+            <aop:after-returning method="stop" pointcut-ref="globalPoint" returning="result"></aop:after-returning>
+            <aop:after-throwing method="logException" pointcut-ref="globalPoint" throwing="e"></aop:after-throwing>
+            <aop:around method="around" pointcut-ref="globalPoint"></aop:around>
+        </aop:aspect>
+    </aop:config>
+</beans>
