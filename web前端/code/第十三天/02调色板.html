@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <!-- 模板 -->
+    <div id="app">
+        <!-- 颜色变化元素 -->
+        <div :style="{width:'400px',height:'100px',background:`rgb(${R},${G},${B})`}"></div>
+        <!-- 三个范围条 -->
+        <p>
+            R: <input type="range" min="0" max="255" value="0" v-model="R"><span>{{R}}</span>
+        </p>
+        <p>
+            G: <input type="range" min="0" max="255" value="0" v-model="G"><span>{{G}}</span>
+        </p>
+        <p>
+            B: <input type="range" min="0" max="255" value="0" v-model="B"><span>{{B}}</span>
+        </p>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        //配置对象
+        // 挂载点设置[设置Vue可以管理区域]
+        el: "#app",
+        data: {
+            R: 0,
+            G: 0,
+            B: 0
+        }
+    })
+</script>

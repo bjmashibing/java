@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="com.mashibing"></context:component-scan>
+    <!--使用默认的servlet-handler来处理静态资源，原来请求不到原因在于所有的请求都交由DispatcherServlet来处理
+    但是DispatcherServlet中没有对应静态资源的处理逻辑，所以访问不到，添加默认之后就可以了，但是会发现此时动态请求无法完成
+    所以需要配合另外一个标签类配合使用-->
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="suffix" value=".jsp"></property>
+        <property name="prefix" value="/WEB-INF/page/"></property>
+    </bean>
+<!--    <bean class="com.mashibing.viewResolver.MyViewResolver">-->
+<!--        <property name="order" value="1"></property>-->
+<!--    </bean>-->
+
+    <bean id="myConverter" class="com.mashibing.converter.MyConverter"></bean>
+    <!--添加自定义的类型转换器到ConversionServiceFactoryBean中-->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <ref bean="myConverter"></ref>
+            </set>
+        </property>
+    </bean>
+</beans>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--bean标签表示要创建的bean对象
+        id:bean的唯一标识，为了跟其他的bean区分
+        class:表示要创建的bean的完全限定名
+    -->
+    <bean id="person" class="com.mashibing.bean.Person">
+        <!--给属性赋值使用property标签
+        name:表示属性的名称
+        value：表示具体的属性值
+        -->
+        <property name="id" value="1"></property>
+        <property name="name" value="zhangsan"></property>
+        <property name="age" value="20"></property>
+        <property name="gender" value="男"></property>
+     </bean>
+</beans>

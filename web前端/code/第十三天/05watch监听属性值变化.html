@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+</head>
+
+<body>
+    <!-- 模板 -->
+    <div id="app">
+        <h1>{{msg}}</h1>
+        <input type="text" v-model="msg">
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        // 挂载点设置
+        el: "#app",
+        data: {
+            msg: ""
+        },
+        // 监听实例属性值变化地方
+        watch: {
+            //watch可以监听实例属性值变化
+            //watch这里书写函数名字务必和监听属性名字要统一
+            msg() {
+                console.log("你发生变化了");
+            }
+        },
+    })
+</script>

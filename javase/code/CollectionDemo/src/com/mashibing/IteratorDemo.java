@@ -39,13 +39,13 @@ public class IteratorDemo {
         list.add(2);
         list.add(3);
         list.add(4);
-//        for(int i=0;i<list.size();i++){
-//            System.out.println(list.get(i));
-//        }
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i));
+        }
 
         //迭代器
-//        Iterator iterator = list.iterator();
-        ListIterator iterator = list.listIterator();
+        Iterator iterator = list.iterator();
+//        ListIterator iterator = list.listIterator();
         while(iterator.hasNext()){
             Object o = iterator.next();
             if(o.equals(1)){
@@ -53,10 +53,10 @@ public class IteratorDemo {
             }
             System.out.println(o);
         }
-        System.out.println("-------------");
-        while (iterator.hasPrevious()){
-            System.out.println(iterator.previous());
-        }
+//        System.out.println("-------------");
+//        while (iterator.hasPrevious()){
+//            System.out.println(iterator.previous());
+//        }
 //        for(Object i : list){
 //            System.out.println(i);
 //        }
