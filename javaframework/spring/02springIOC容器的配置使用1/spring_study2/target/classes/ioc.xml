@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+<!--
+    &lt;!&ndash;
+    在进行框架配置的时候，可以使用xml文件，也可以使用注解的方式
+    很多同学觉得xml的方式比较麻烦，但是xml的配置方式还是要学习的，因为在项目开发过程中
+    很多情况下是xml和注解一起工作，而且xml配置的方式比较完整
+    &ndash;&gt;
+
+
+    &lt;!&ndash;根据属性值设置的时候，name的名称取决于set方法后面的参数首字符小写的名称&ndash;&gt;
+    <bean id="person" class="com.mashibing.bean.Person">
+        <property name="id" value="1"></property>
+        <property name="name" value="zhangsan"></property>
+        <property name="age" value="20"></property>
+        <property name="gender" value="男"></property>
+&lt;!&ndash;        <property name="date" value="2020/02/08"></property>&ndash;&gt;
+    </bean>
+
+    &lt;!&ndash;使用构造器方法赋值的时候，参数的name属性是由什么来决定的？由构造方法的参数名称决定的&ndash;&gt;
+    &lt;!&ndash;
+    name:表示参数列表的名称
+    value:表示实际的具体值
+    type:表示值的类型
+    index:表示值的下标，从0开始
+    &ndash;&gt;
+    <bean id="person2" class="com.mashibing.bean.Person">
+        <constructor-arg name="id" value="2"></constructor-arg>
+        <constructor-arg name="name" value="lisi"></constructor-arg>
+        <constructor-arg name="age" value="22"></constructor-arg>
+        <constructor-arg name="gender" value="男"></constructor-arg>
+    </bean>
+
+    &lt;!&ndash;当通过构造器方法赋值的时候，可以把name属性省略不写，但是要注意必须要保证参数值跟构造器的参数列表的顺序一致
+    如果非要不一致的话，可以通过index的下标方式来标注，从0开始
+    &ndash;&gt;
+    <bean id="person3" class="com.mashibing.bean.Person">
+        <constructor-arg  value="2"></constructor-arg>
+        <constructor-arg  value="男" index="3"></constructor-arg>
+        <constructor-arg  value="22"></constructor-arg>
+        <constructor-arg  value="lisi" index="1"></constructor-arg>
+    </bean>
+
+    &lt;!&ndash;
+    当有多个相同参数的构造方法存在的时候，默认情况下是覆盖的过程，后面的构造方法会覆盖前面的构造方法
+    如果非要赋值给另外一个构造方法的话，可以使用type的参数来进行指定
+    &ndash;&gt;
+    <bean id="person4" class="com.mashibing.bean.Person">
+        <constructor-arg  value="4"></constructor-arg>
+        <constructor-arg  value="wangwu" ></constructor-arg>
+        <constructor-arg  value="22" type="java.lang.Integer"></constructor-arg>
+    </bean>
+    &lt;!&ndash;
+    总结：
+         在日常工作中，一般都是用name,value的方式，很少有人去使用index或者type的方式，但是要注意各种情况出现的问题
+    &ndash;&gt;
+
+    &lt;!&ndash;
+    使用p命名空间来给属性赋值
+    &ndash;&gt;
+    <bean id="person5" class="com.mashibing.bean.Person" p:id="5" p:name="wangwu" p:age="25" p:gender="女">
+    </bean>
+
+    &lt;!&ndash;给复杂类型进行赋值操作&ndash;&gt;
+    <bean id="person6" class="com.mashibing.bean.Person">
+        <property name="id" value="6"></property>
+        <property name="name" value="zhangsan6"></property>
+        <property name="age" value="26"></property>
+        <property name="gender" value="男6"></property>
+        &lt;!&ndash;给数组赋值,使用array标签&ndash;&gt;
+&lt;!&ndash;        <property name="hobbies" value="book,girl,movie"></property>&ndash;&gt;
+        <property name="hobbies">
+            <array>
+                <value>book</value>
+                <value>girl</value>
+                <value>movie</value>
+            </array>
+        </property>
+        &lt;!&ndash;给引用类型赋值,可以使用ref引入外部bean&ndash;&gt;
+        <property name="address" ref="address"></property>
+        &lt;!&ndash;给list赋值&ndash;&gt;
+&lt;!&ndash;        <property name="lists" value="1,2,3"></property>&ndash;&gt;
+        <property name="lists">
+            <list>
+                &lt;!&ndash;使用内部bean,无法从IOC容器中直接获取对象的值&ndash;&gt;
+                <bean id="address2" class="com.mashibing.bean.Address">
+                    <property name="province" value="北京"></property>
+                </bean>
+                <bean class="com.mashibing.bean.Address">
+                    <property name="province" value="上海"></property>
+                </bean>
+                &lt;!&ndash;使用外部bean，可以随意从IOC容器获取对象的值&ndash;&gt;
+                <ref bean="address"></ref>
+            </list>
+        </property>
+            &lt;!&ndash;给set属性赋值&ndash;&gt;
+        <property name="sets">
+            <set>
+                <value>zhangsan</value>
+                <value>zhangsan</value>
+                <value>lisi</value>
+            </set>
+        </property>
+        &lt;!&ndash;给map赋值&ndash;&gt;
+        <property name="maps">
+            <map>
+                <entry key="a" value="aaa"></entry>
+                <entry key="address" value-ref="address"></entry>
+                <entry key="address2">
+                    <bean class="com.mashibing.bean.Address">
+                        <property name="province" value="广东省"></property>
+                    </bean>
+                </entry>
+                <entry>
+                    <key>
+                        <value>heihei</value>
+                    </key>
+                    <value>haha</value>
+                </entry>
+                <entry key="list">
+                    <list>
+                        <value>11</value>
+                        <value>22</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+        &lt;!&ndash;给properties赋值&ndash;&gt;
+        <property name="properties">
+            <props>
+                <prop key="111">aaa</prop>
+                <prop key="222">bbb</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="address" class="com.mashibing.bean.Address">
+        <property name="province" value="河北省"></property>
+        <property name="city" value="邯郸"></property>
+        <property name="town" value="武安"></property>
+    </bean>
+
+    &lt;!&ndash;bean之间的继承关系&ndash;&gt;
+    &lt;!&ndash;可以使用abstract标签定义抽象bean，无法进行实例化&ndash;&gt;
+    <bean id="parent" class="com.mashibing.bean.Person" abstract="false">
+        <property name="id" value="1"></property>
+        <property name="name" value="zhangsan"></property>
+        <property name="age" value="20"></property>
+        <property name="gender" value="男"></property>
+    </bean>
+    &lt;!&ndash;可以通过parent属性来获取父bean中的某些属性值&ndash;&gt;
+    <bean id="son" class="com.mashibing.bean.Person" parent="parent">
+        <property name="name" value="haha"></property>
+    </bean>-->
+
+    <!--创建bean的时候依赖关系
+    当bean对象被创建的时候，是按照xml配置文件定义的顺序创建的，谁在前，谁就先被创建
+    如果需要干扰创建的顺序，可以使用depends-on属性
+
+    -->
+    <bean id="address" class="com.mashibing.bean.Address" depends-on="person"></bean>
+    <bean id="person" class="com.mashibing.bean.Person"></bean>
+</beans>

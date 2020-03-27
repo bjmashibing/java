@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/jQuery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            width: 600px;
+            border: 1px solid black;
+            margin: 0px auto;
+            list-style: none;
+        }
+
+        li {
+            border-bottom: 1px dashed red;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        p {
+            background-color: black;
+            color: white;
+            display: none;
+        }
+
+        .open {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li>
+            <h4>万众一心加油干 越是艰险越向前 共谱时代华章</h4>
+            <p class="open">
+                　历史的发展，总有一些关键的时间节点。习近平主席强调，
+                “2020年是具有里程碑意义的一年。我们将全面建成小康社会
+                ，实现第一个百年奋斗目标。”这既是决胜期，也是攻坚期。以必胜的信心、昂扬的斗志、扎实的工作，确保全面建成小康社会圆满收官，乘势而上开启全面建设社会主义现代化国家新征程
+                ，向第二个百年奋斗目标进军，这是历史赋予我们的光荣使命和时代重任。
+            </p>
+        </li>
+        <li>
+            <h4>万众一心加油干 越是艰险越向前 共谱时代华章</h4>
+            <p>
+                　历史的发展，总有一些关键的时间节点。习近平主席强调，
+                “2020年是具有里程碑意义的一年。我们将全面建成小康社会
+                ，实现第一个百年奋斗目标。”这既是决胜期，也是攻坚期。以必胜的信心、昂扬的斗志、扎实的工作，确保全面建成小康社会圆满收官，乘势而上开启全面建设社会主义现代化国家新征程
+                ，向第二个百年奋斗目标进军，这是历史赋予我们的光荣使命和时代重任。
+            </p>
+        </li>
+        <li>
+            <h4>万众一心加油干 越是艰险越向前 共谱时代华章</h4>
+            <p>
+                　历史的发展，总有一些关键的时间节点。习近平主席强调，
+                “2020年是具有里程碑意义的一年。我们将全面建成小康社会
+                ，实现第一个百年奋斗目标。”这既是决胜期，也是攻坚期。以必胜的信心、昂扬的斗志、扎实的工作，确保全面建成小康社会圆满收官，乘势而上开启全面建设社会主义现代化国家新征程
+                ，向第二个百年奋斗目标进军，这是历史赋予我们的光荣使命和时代重任。
+            </p>
+        </li>
+        <li>
+            <h4>万众一心加油干 越是艰险越向前 共谱时代华章</h4>
+            <p>
+                　历史的发展，总有一些关键的时间节点。习近平主席强调，
+                “2020年是具有里程碑意义的一年。我们将全面建成小康社会
+                ，实现第一个百年奋斗目标。”这既是决胜期，也是攻坚期。以必胜的信心、昂扬的斗志、扎实的工作，确保全面建成小康社会圆满收官，乘势而上开启全面建设社会主义现代化国家新征程
+                ，向第二个百年奋斗目标进军，这是历史赋予我们的光荣使命和时代重任。
+            </p>
+        </li>
+    </ul>
+</body>
+
+</html>
+<script>
+    //jQuery函数库核心理念 写的少但是做的多
+    $("h4").click(function () {
+        //链式语法执行顺序:从左到右
+        $(this).siblings().slideDown(2000).parent().siblings().children("p").slideUp(2000);
+    })
+</script>

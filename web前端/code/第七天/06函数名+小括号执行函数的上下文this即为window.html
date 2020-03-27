@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>   
+<script>
+  //先认识BOM【browser object model】浏览器对象模型
+  //在模拟浏览器
+  //函数名+小括号执行，函数上下文即为BOM【内置window对象】
+  function fun (){
+      //这个this即为函数上下文
+      console.log(this);
+  }
+  //如果是函数名+小括号调用函数上下文为window【所谓BOM对象】
+  fun();
+
+</script>

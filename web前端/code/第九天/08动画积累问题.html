@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/jQuery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="btn1">去北京</button>
+    <button class="btn2">去东京</button>
+    <div></div>
+</body>
+
+</html>
+<script>
+    //第一个按钮
+    $(".btn1").click(function () {
+        $("div").stop(true).animate({
+            "left": 1000
+        }, 2000);
+    });
+    //第二个按钮
+    $(".btn2").click(function () {
+        $("div").stop(true).animate({
+            "left": 0
+        }, 2000)
+    })
+</script>

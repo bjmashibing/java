@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 引包 -->
+    <script src="./js/vue.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cur {
+            animation: donghua 2s linear 0s infinite;
+        }
+
+        @-webkit-keyframes donghua {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 模板 -->
+    <div id="app" class="cur">
+        <!-- 多行文本框 -->
+        <textarea cols="30" rows="10" v-model="info"></textarea><span>{{info.length}}/140字</span>
+        <p>
+            <button :disabled='info.length==0||info.length>140'>发布</button>
+            <button @click="clear">清除</button>
+        </p>
+    </div>
+</body>
+
+</html>
+<script>
+    //创建Vue实例
+    var vm = new Vue({
+        // 配置对象
+        el: "#app",
+        data: {
+            info: ''
+        },
+        methods: {
+            //事件处理函数
+            clear() {
+                this.info = '';
+            }
+        },
+    })
+</script>

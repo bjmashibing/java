@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    //当前变量i全局变量（可以在JS行为层中任意地方使用）
+    for (var i = 0; i < 10; i++) {
+        console.log(i);
+    }
+    console.log("循环语句结束" + i);
+
+    //当前变量str：既不是形参、也不是函数体中声明变量[全局变量]
+    if (true) {
+        var str = "我是全局还是局部呀";
+    }
+    console.log(str);
+    //判断下面变量是全局还是局部
+    var a = 100;
+    /*****************************************************************************/
+    function fun(haha, hehe) {
+        console.log(haha, hehe);
+
+        //判断这个变量是全局还是局部
+        for (var num = 1; num < 5; num++) {
+            console.log(num);
+        }
+    }
+    //调用函数
+    fun(1, 2);
+    // console.log(haha);
+</script>

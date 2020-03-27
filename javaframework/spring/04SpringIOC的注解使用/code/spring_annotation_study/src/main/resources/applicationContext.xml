@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--在之前的操作中我们都是使用bean标签的方式向IOC容器中注册bean，下面使用注解的方式
+        当使用注解的时候，可以在当前类的上面添加某些注解标识
+        @Component：组件，理论上可以在任意的类上进行添加，在扫描的时候都会完成bean的注册
+        @Controller：放置在控制层，用来接受用户的请求
+        @Service：放置在业务逻辑层，
+        @Repository：放置在数据访问层
+
+        这四个注解写在类上面的时候都可以完成注册bean的功能,但是这些规定并不是spring识别的标识
+        在spring程序运行过程中，不会对这四个注解做任何区分，看起来是一样的，都会完成bean的注册功能
+        在实际的开发过程中，最好能分清楚，提高代码的可读性。
+        所以，最偷懒的方式是，给所有需要注册的bean类上添加@Component注解
+
+        在使用注解的时候，还需要告诉spring应该从哪个包开始扫描,一般在定义的时候都写上相同包的路径
+        需要导入context命名空间
+
+        在使用注解的时候没有定义id和class，那么如何根据id来进行识别
+        默认是把当前类的名称的首字母小写之后作为id，如果需要改变名称，那么需要在注解添加参数值value来完成修改名字的目的。
+
+        @Scope注解可以声明当前类是单例还是多例
+    -->
+<!--    <bean id="personController" class="com.mashibing.controller.PersonController" ></bean>-->
+
+
+    <context:component-scan base-package="com.mashibing" >
+        <!--当定义好注解的扫描路径之后，可以做更细粒度的控制，可以选择扫描哪个注解，也可以选择不扫描哪个注解
+        include-filter:表示要包含扫描的注解,一般不会定义此规则，但是如果引入的第三方包中包含注解，此时就需要使用此标签来进行标识。
+        exclude-filter:表示要排除扫描的注解，使用较多
+
+        type:规则的类型
+        expression：表达式
+
+        assignable:可以指定对应的类的名称。但是表达式必须是完全限定名
+        annotation:按照注解来进行排序，但是表达式中必须是注解的完全限定名
+        regex:使用正则表达式的方式，一般不用
+        aspectj:使用切面的方式，一般不用
+        custom:使用自定义的方式，可以自己定义自己的筛选规则，一般不用
+
+        -->
+<!--        <context:exclude-filter type="assignable" expression="com.mashibing.controller.PersonController"/>-->
+<!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
+        <context:include-filter type="assignable" expression="com.mashibing.service.PersonService"/>
+    </context:component-scan>
+
+<!--    <bean id="personController" class="com.mashibing.controller.PersonController" autowire=""></bean>-->
+</beans>

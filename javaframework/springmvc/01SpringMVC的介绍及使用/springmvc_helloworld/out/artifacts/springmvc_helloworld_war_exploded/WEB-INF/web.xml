@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <!--配置前端控制器DispatcherServlet-->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--
+        设置初始化参数，指定默认的springmvc的配置文件
+        可以选择将springmvc的配置文件添加到/WEB-INF/的目录下。默认是从此目录查找配置文件
+        但是需要注意的是，配置文件的名称必须是  (DispatcherServlet的servlet-name)-servlet.xml
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springmvc.xml</param-value>
+        </init-param>
+    </servlet>
+
+    <!--
+    添加前端控制器对应的mapping映射:
+    映射所有的请求，因此最好写成/  /*(区别？)
+    /:用来匹配所有请求，但是/不会拦截jsp页面
+    /*:用来匹配所有的请求，会拦截jsp页面
+
+    此时如果创建一个html页面之后，是无法请求到的，原因是：
+    每个项目的web.xml文件会继承tomcat下的web.xml文件，而在tomcat-web.xml文件中包含了一个DefaultServlet的处理类
+    用来处理静态资源，但是我们在编写自己的DispatcherServlet的时候使用了/的方式，此方式覆盖了父web,xml对于静态资源的处理
+    所以此时所有的静态资源的访问也需要由DispatcherServlet来进行处理，但是我们并没有设置对应的Controller，所以报404
+
+    为什么jsp能处理呢？
+    在父web.xml文件中包含了一个JSPServlet的处理类，会有tomcat进行处理，而不是我们定义的DispatcherServlet
+    -->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>default</servlet-name>
+        <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
+</web-app>
