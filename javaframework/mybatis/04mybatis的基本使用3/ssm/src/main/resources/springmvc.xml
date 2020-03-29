@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--定义扫描的包
+    use-default-filters:默认的扫描会包含@Controller,@Service,@Component,@Repository,我们再进行配置的时候需要扫描这么多组件
+    只扫描@Controller这个注解
+    -->
+    <context:component-scan base-package="com.mashibing" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!--请求静态资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--请求动态资源-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+    <!--设置视图管理器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/page/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+</beans>
