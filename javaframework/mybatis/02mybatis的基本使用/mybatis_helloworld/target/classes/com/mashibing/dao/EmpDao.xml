@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.EmpDao">
+    <!--在mybatis中，会包含非常多的查询操作，因此查询的参数比较麻烦
+    id:用来设置当前sql语句匹配的dao接口的方法，必须要跟方法的名字统一
+    resultType:表示返回的结果的类型,一般使用的并不多，此类型只能返回单一的对象，而我们在查询的时候特别是关联查询的时候，需要自定义结果集
+           当返回的结果是一个集合的时候，并不需要resultmap，只需要使用resulttype指定集合中的元素类型即可
+    resultMap:当进行关联查询的时候，在返回结果的对象中还包含另一个对象的引用时，此时需要自定义结果集合，使用resultmap
+    -->
+    <!--参数的获取值的方式：
+    每次在向sql语句中设置结果值的时候，可以使用#{}，还可以使用${}这样的方式，那么哪种比较好？
+        #{}：select * from emp where empno = ?
+        ${}: select * from emp where empno = 7369
+        通过sql语句可以得出结论：
+            #{}的处理方式是使用了参数预编译的方式，不会引起sql注入的问题
+            ${}的处理方式是直接拼接sql语句，得到对应的sql语句，会有sql注入的危险
+            因此，我们推荐大家使用#{}的方式
+            但是要注意，${}也是有自己的使用场景的？
+                当需要传入动态的表名，列名的时候就需要使用${},就是最直接的拼接字符串的行为
+    -->
+    <!--当查询语句中包含多个参数的时候，我们应该如何获取需要的参数
+    1、如果是单个参数，
+        基本数据类型：那么可以使用#{}随便获取
+        引用数据类型:使用#{}获取值的是必须要使用对象的属性名
+    2、如果是多个参数：
+        我们在获取参数值的时候，就不能简单的通过#{}来获取了,只能通过arg0,arg1,param1,param2...这样的方式来获取参数的值
+        原因在于，mybatis在传入多个参数的时候，会讲这些参数的结果封装到map结构中，在map中key值就是(arg0,arg1,...)
+        (param1,param2...),这种方式非常不友好，没有办法根据属性名来获取具体的参数值
+        如果想要使用参数的话，可以进行如下的设置：
+        public List<Emp> selectEmpByEmpnoAndSal2(@Param("empno") Integer empno, @Param("sal") Double sal);
+            这样的方式其实是根据@Param来进行参数的获取
+    3、自定义map结构
+    -->
+    <select id="selectEmpByEmpnoAndSal3" resultType="com.mashibing.bean.Emp">
+        select * from emp where empno = #{empno} and sal >#{sal}
+    </select>
+    <select id="selectEmpByEmpnoAndSal2" resultType="com.mashibing.bean.Emp">
+        select * from emp where empno = #{empno} and sal >#{sal}
+    </select>
+
+    <select id="selectEmpByEmpnoAndSal" resultType="com.mashibing.bean.Emp">
+        select * from emp where empno = #{aaa} and sal >#{ccc}
+    </select>
+
+    <select id="selectEmpByEmpno" resultType="com.mashibing.bean.Emp">
+        select * from emp where empno = #{empno} and sal >#{sal}
+    </select>
+    <!--当返回值是map结构的时候，会把查询结构的字段值作为key，结果作为value-->
+    <select id="selectEmpByEmpnoReturnMap" resultType="map">
+        select * from emp where empno = #{empno}
+    </select>
+
+<!--当需要返回的结果是一个map的集合的时候，同时map中包含多个对象，那么此时必须要在dao的方法上添加@MapKey注解，来标识到底是哪一个属性值作为key-->
+    <select id="selectAll2" resultType="Emp">
+        select * from emp
+    </select>
+    <select id="selectAll" resultType="Emp">
+        select * from emp
+    </select>
+
+    <!--insert delete update分别用来标识不同类型的sql语句
+    id:用来标识跟dao接口中匹配的方法，必须与方法的名字一一对应上
+    flushCache：用来标识当前sql语句的结果是否进入二级缓存
+    statementType：用来选择执行sql语句的方式
+            statement：最基本的jdbc的操作，用来表示一个sql语句，不能防止sql注入
+            PREPARED: preareStatement：采用预编译的方式，能够防止sql注入，设置参数的时候需要该对象来进行设置
+            CALLABLE：调用存储过程
+    useGeneratedKeys：放完成插入操作的时候，可以将自增生成的主键值返回到具体的对象
+           keyProperty：指定返回的主键要赋值到哪个属性中
+            在编写sql语句的过程中，无论你是否配置了驼峰标识的识别settting，都需要在sql语句中写具体的表的属性名，不能写对象名称
+    -->
+    <insert id="save" >
+        insert into emp(empno,ename) values(#{empno},#{ename})
+    </insert>
+    <update id="update">
+        update emp set sal=#{sal} where empno = #{empno}
+    </update>
+    <delete id="delete">
+        delete from emp where empno = #{empno}
+    </delete>
+    <!--===============================================================================-->
+    <!--如果需要定义一个自定义结果集，那么该如何进行处理resultMap-->
+
+</mapper>

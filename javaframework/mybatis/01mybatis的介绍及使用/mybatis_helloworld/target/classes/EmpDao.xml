@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.EmpDao">
+    <select id="selectEmpByEmpno" resultType="Emp" databaseId="mysql">
+        select * from emp where empno = #{empno}
+    </select>
+    <insert id="save" >
+        insert into emp(empno,ename) values(#{empno},#{ename})
+    </insert>
+    <update id="update">
+        update emp set sal=#{sal} where empno = #{empno}
+    </update>
+    <delete id="delete">
+        delete from emp where empno = #{empno}
+    </delete>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--在使用mybatis的时候，有些情况下需要我们封装结果集，一般情况下mybatis会帮我们自动封装（字段名跟属性值必须一一对应），但是如果字段的值和类中的值
+不匹配的时候，怎么处理？
+    1、可以在sql语句中添加别名字段，来保证赋值成功，但是太麻烦了，而且不可重用
+    2、resultMap：
+-->
+
+<mapper namespace="com.mashibing.dao.DogDao">
+    <!--自定义结果集
+    id:表示当前结果集的唯一标识
+    type:表示当前结果集的类型
+    -->
+    <resultMap id="myDog" type="com.mashibing.bean.Dog">
+        <!--
+        id:表示指定对应的主键
+        property:实体类中对应的属性值
+        column：表中字段的名称
+        -->
+        <id property="id" column="id"></id>
+        <!--除主键外的其他字段映射-->
+        <result property="name" column="dname"></result>
+        <result property="age" column="dage"></result>
+        <result property="gender" column="dgender"></result>
+        <
+    </resultMap>
+
+    <select id="selectDogById" resultMap="myDog">
+        select * from dog where id = #{id}
+    </select>
+</mapper>
