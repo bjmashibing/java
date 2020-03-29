@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--在填写标签的时候一定要注意相关配置的顺序-->
+<configuration>
+    <!--
+    当需要引入外部的配置文件的时候，可以使用这样的方式
+    类似于<context:property-placeholder location>
+    resource:表示从当前项目的类路径中进行加载，如果用的是idea指的是resource资源目录下的配置文件
+    url:可以从当前文件系统的磁盘目录查找配置，也可以从网络上的资源进行引入
+    -->
+    <properties resource="db.properties" ></properties>
+    <!--可以影响mybatis运行时的行为，包含N多个属性，需要什么引入什么-->
+    <settings>
+        <!--开启驼峰标识验证-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--配置懒加载开关-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+    <!--typeAliases:表示在引入实体类的名称时候，可以使用别名，而不需要写完全限定名-->
+    <typeAliases>
+        <!--每一个具体的类都需要单独来写，如果有100个类呢？-->
+<!--        <typeAlias type="com.mashibing.bean.Emp" alias="aaa"></typeAlias>-->
+        <!--可以指定具体的包来保证实体类不需要写完全限定名-->
+        <package name="com.mashibing.bean"/>
+    </typeAliases>
+
+    <!--设置定义自己的类型处理器，mybatis中默认内置了很多类型处理器，一般不需要自己来实现-->
+<!--    <typeHandlers>-->
+<!--        <typeHandler handler="" ></typeHandler>-->
+<!--        <package name=""/>-->
+<!--    </typeHandlers>-->
+<!--当需要自定义对象工厂的时候实现此标签，完成结果集到java对象实例化的过程-->
+<!--    <objectFactory type=""></objectFactory>-->
+
+    <!--在项目开发过程中，会包含开发环境，测试环境，生产环境，有可能会使用不同的数据源进行连接操作，
+    在此配置文件中可以指定多个环境
+    default:表示选择哪个环境作为运行时环境
+    -->
+    <environments default="development">
+        <!--配置具体的环境属性
+        id:表示当前环境的名称
+        -->
+        <environment id="development">
+            <!--事务管理器，每一种数据源都需要配置具体的事务管理器
+            type:表示事务管理器的类型
+            jdbc:使用jdbc原生的事务控制
+            managed:什么都没做
+            -->
+            <transactionManager type="JDBC"/>
+            <!--配置具体的数据源的类型
+            type:表示数据源的类型
+            pooled:使用数据库连接池
+            unpooled：每次都打开和关闭一个链接
+            -->
+            <dataSource type="POOLED">
+                <!--链接数据的时候需要添加的必备的参数，一般是四个，如果是连接池的话，可以设置连接最大个数等相关信息-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+<!--提供了不同的数据库厂商的标识，当有数据库移植的需求的时候，可以根据不同的数据库来执行不同的sql语句
+用来扩展数据库的移植性
+-->
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="MySQL" value="mysql"/>
+        <property name="SQL Server" value="sqlserver"/>
+        <property name="Oracle" value="oracle"/>
+    </databaseIdProvider>
+    <!--是来将mapper映射文件引入到配置文件中，方便程序启动的时候进行加载
+    每次在进行填写的时候需要注意，写完xml映射之后一定要添加到mybatis-config文件中
+
+    resource:从项目的类路径下加载对应的映射文件
+    url:从本地磁盘目录或者网络中引入映射文件
+    class:可以直接引入类的完全限定名，可以使用注解的方式进行使用,
+            如果不想以注解的方式引入呢？
+                如果想要class的方式引入配置文件，可以将xml文件添加到具体的类的同级目录下
+              1、      如果是maven的项目的话，需要添加如下配置，因为maven默认只会编译java文件，需要把xml文件也添加到指定目录中
+                    <build>
+                        <resources>
+                            <resource>
+                                <directory>src/main/java</directory>
+                                <includes>
+                                    <include>**/*.xml</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                    </build>
+              2、在resource资源目录下，创建跟dao层一样的同级目录即可，将配置文件放到指定的目录
+    -->
+    <mappers>
+<!--        <mapper resource="EmpDao.xml" />-->
+<!--        <mapper resource="UserDao.xml"/>-->
+<!--        <mapper class="com.mashibing.dao.UserDaoAnnotation"></mapper>-->
+<!--        <mapper class="com.mashibing.dao.UserDao"></mapper>-->
+        <!--如果需要引入多个配置文件，可以直接定义包的名称
+        resource目录下配置的映射文件必须要具体相同的目录
+        -->
+        <package name="com.mashibing.dao"/>
+    </mappers>
+</configuration>
