@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       https://www.springframework.org/schema/tx/spring-tx.xsd
+
+">
+
+    <context:component-scan base-package="com.mashibing"></context:component-scan>
+
+    <context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="driverClassName" value="${jdbc.driverName}"></property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--事务的配置-->
+    <!--声明一个事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* com.mashibing.service.*.*(..))"/>
+        <!--事务建议-->
+        <aop:advisor advice-ref="myAdvice" pointcut-ref="txPointcut"></aop:advisor>
+    </aop:config>
+    <tx:advice id="myAdvice" transaction-manager="transactionManager">
+        <!--配置事务的属性-->
+        <tx:attributes>
+            <!--配置在哪些方法上添加事务-->
+            <tx:method name="*" propagation="REQUIRED" read-only="true" isolation="DEFAULT"/>
+            <tx:method name="updatePrice" propagation="REQUIRED"></tx:method>
+            <tx:method name="update*" propagation="REQUIRED"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+</beans>

@@ -29,7 +29,7 @@ public class CookieProjectServlet extends HttpServlet {
         if(cookies!=null){
             for (Cookie  c: cookies) {
                 String key = c.getName();
-                if("uid"!=null){
+                if("uid".equals(key)){
                     String value =  c.getValue();
                     User u = userService.getUserById(Integer.valueOf(value));
                     //如果u不等于null，那么有值，直接跳转

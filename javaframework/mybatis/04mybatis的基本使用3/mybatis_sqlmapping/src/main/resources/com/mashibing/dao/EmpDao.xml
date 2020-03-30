@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.EmpDao">
+    <!--将每一个属性值都映射成对象中的数据，如果有实体类对象，就写成对象.属性的方式-->
+    <!--    <resultMap id="myEmp" type="com.mashibing.bean.Emp">-->
+    <!--        <id column="empno" property="empno"></id>-->
+    <!--        <result column="ename" property="ename"></result>-->
+    <!--        <result column="job" property="job"></result>-->
+    <!--        <result column="mgr" property="mgr"></result>-->
+    <!--        <result column="hiredate" property="hiredate"></result>-->
+    <!--        <result column="sal" property="sal"></result>-->
+    <!--        <result column="comm" property="comm"></result>-->
+    <!--        <result column="deptno" property="dept.deptno"></result>-->
+    <!--        <result column="dname" property="dept.dname"></result>-->
+    <!--        <result column="loc" property="dept.loc"></result>-->
+    <!--    </resultMap>-->
+<!--使用第二种方式-->
+    <resultMap id="myEmp" type="com.mashibing.bean.Emp">
+        <id column="empno" property="empno"></id>
+        <result column="ename" property="ename"></result>
+        <result column="job" property="job"></result>
+        <result column="mgr" property="mgr"></result>
+        <result column="hiredate" property="hiredate"></result>
+        <result column="sal" property="sal"></result>
+        <result column="comm" property="comm"></result>
+        <association property="dept" javaType="com.mashibing.bean.Dept">
+            <id property="deptno" column="deptno"></id>
+            <result property="dname" column="dname"></result>
+            <result property="loc" column="loc"></result>
+        </association>
+    </resultMap>
+    <select id="selectEmpByEmpno" resultMap="myEmp">
+        select * from emp left join dept on emp.deptno = dept.deptno where empno = #{empno}
+    </select>
+
+    <select id="selectEmpByStep" resultMap="empDept">
+        select * from emp where empno = #{empno}
+    </select>
+    <resultMap id="empDept" type="com.mashibing.bean.Emp">
+        <id column="empno" property="empno"></id>
+        <result column="ename" property="ename"></result>
+        <result column="job" property="job"></result>
+        <result column="mgr" property="mgr"></result>
+        <result column="hiredate" property="hiredate"></result>
+        <result column="sal" property="sal"></result>
+        <result column="comm" property="comm"></result>
+        <association property="dept" select="com.mashibing.dao.DeptDao.selectDeptByStep" column="deptno"></association>
+    </resultMap>
+
+    <select id="selectEmpByStep2" resultType="com.mashibing.bean.Emp">
+        select * from emp where deptno = #{deptno}
+    </select>
+
+    <!--
+    -->
+    <!--if动态sql-->
+ <!--   <select id="selectEmpByCondition" resultType="com.mashibing.bean.Emp">
+        select * from emp
+        <where>
+            <if test="empno!=null">
+                empno > #{empno}
+            </if>
+            <if test="ename!=null">
+                and ename=#{ename}
+            </if>
+        </where>
+
+    </select>-->
+<!--choose动态sql-->
+    <!--<select id="selectEmpByCondition" resultType="com.mashibing.bean.Emp">
+        select * from emp
+        <where>
+           <choose>
+               <when test="empno!=null">
+                   empno = #{empno}
+               </when>
+               <when test="ename!=null">
+                   ename=#{ename}
+               </when>
+               <otherwise>
+                   1=1
+               </otherwise>
+           </choose>
+        </where>
+
+    </select>-->
+
+
+    <!--
+    trim:截取字符串，可以自定义where的格式
+    prefix：为sql语句整体添加一个前缀
+    prefixOverrides:去除整体sql语句前面多余的字符串
+    suffixOverriede:去除整体sql语句后面多余的字符串
+    -->
+    <select id="selectEmpByCondition" resultType="com.mashibing.bean.Emp">
+        select * from emp
+        <trim prefix="where" prefixOverrides="and" suffixOverrides="and|or">
+                <if test="empno!=null">
+                    empno = #{empno} and
+                </if>
+                <if test="ename!=null">
+                    ename=#{ename} or
+                </if>
+        </trim>
+
+    </select>
+
+    <!--
+    foreach:遍历集合中的元素
+        collection:指定要遍历的集合
+        separator:分隔符
+        open:以什么开始
+        close：以什么结束
+        item:遍历过程中的每一个元素值
+        index:表示索引
+    -->
+    <select id="selectEmpByDeptnos" resultType="com.mashibing.bean.Emp">
+        select * from emp where deptno in
+        <foreach collection="deptnos" separator="," open="(" item="deptno" index="idx" close=")">
+            #{deptno}
+        </foreach>
+    </select>
+<update id="update">
+    update emp set ename=#{ename} where empno = #{empno}
+</update>
+
+    <!--
+    mybatis中的缓存机制：
+        如果没有缓存，那么每次查询的时候都需要从数据库中加载数据，这回造成io的性能问题，所以，在很多情况下
+        如果连续执行两条相同的sql语句，可以直接从缓存中获取，如果获取不到，那么再去查询数据库，这意味着查询完成的结果
+        需要放到缓存中。
+
+        缓存分类：
+            1、一级缓存：表示sqlSession级别的缓存，每次查询的时候会开启一个会话，此会话相当于一次连接，关闭之后自动失效
+            2、二级缓存：全局范围内的缓存，sqlsession关闭之后才会生效
+            3、第三方缓存：继承第三方的组件，来充当缓存的作用
+        ==================
+        一级缓存：表示将数据存储在sqlsession中，关闭之后自动失效，默认情况下是开启的
+            在同一个会话之内，如果执行了多个相同的sql语句，那么除了第一个之外，所有的数据都是从缓存中进行查询的
+
+            在某些情况下，一级缓存可能会失效？
+                1、在同一个方法中，可能会开启多个会话，此时需要注意，会话跟方法没有关系，不是一个方法就只能由一个会话，所以严格
+                    记住,缓存的数据是保存在sqlsession中的
+                2、当传递对象的时候，如果对象中的属性值不同，也不会走缓存
+                3、在同一个连接中，如果修改了数据，那么缓存会失效，不同连接之间是不受影响的
+                4、如果在一个会话过程中，手动清空了缓存，那么缓存也会失效
+        二级缓存：表示的是全局缓存，必须要等到sqlsession关闭之后才会生效
+            默认是不开启的，如果需要开启的话，需要进行如下设置
+                1、修改全局配置文件，在settings中添加配置
+                    <setting name="cacheEnabled" value="true"/>
+                2、指定在哪个映射文件中使用缓存的配置
+                    <cache></cache>
+                3、对应的java实体类必须要实现序列化的接口
+            在使用二级缓存的时候，可以包含多个属性值：
+                eviction：缓存淘汰机制：
+                        LRU： 最近最少使用
+                        FIFO:先进先出，按照添加缓存的顺序执行
+                        SOFT – 软引用：基于垃圾回收器状态和软引用规则移除对象。
+                        WEAK – 弱引用：更积极地基于垃圾收集器状态和弱引用规则移除对象。
+                flushInterval：设置多长时间进行缓存刷新
+                size:引用的条数，是一个正整数，缓存中可以存储多少个对象，一般不设置，如果设置的话不要太大，会导致内存溢出
+                readonly:只读属性：
+                        true:只读缓存，会给所有的调用的方法返回该对象的实例，不安全
+                        false:读写缓存，只是返回缓存对象的拷贝，比较安全
+
+                一级缓存跟二级缓存有没有可能同时存在数据？
+                        不会同时存在，因为二级缓存生效的时候，是在sqlsession关闭的时候
+                当查询数据的时候，我们是先查询一级缓存还是先查询二级缓存？
+                        先查询二级缓存，然后再查询一级缓存
+
+    -->
+
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+</mapper>
