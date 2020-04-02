@@ -1,0 +1,29 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!--总配置标签-->
+<generatorConfiguration>
+    <!--具体配置的上下文环境-->
+    <context id="simple" targetRuntime="MyBatis3DynamicSql">
+        <!--指向我们需要连接的数据库-->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.85.111:3306/demo?serverTimezone=UTC"
+                        userId="root" password="123456"/>
+
+        <!--生成对应的实体类
+        targetPackage:指定存放的包
+        targetProject：指定当前工程的目录
+        -->
+        <javaModelGenerator targetPackage="com.mashibing.bean" targetProject="src/main/java"/>
+
+        <!--生成对应的SQL映射文件-->
+<!--        <sqlMapGenerator targetPackage="com.mashibing.dao" targetProject="src/main/resources"/>-->
+
+        <!--生成对应的DAO接口-->
+        <javaClientGenerator  targetPackage="com.mashibing.dao" targetProject="src/main/java"/>
+
+        <!--指定需要反向生成的表-->
+        <table tableName="emp" />
+        <table tableName="dept" />
+    </context>
+</generatorConfiguration>
