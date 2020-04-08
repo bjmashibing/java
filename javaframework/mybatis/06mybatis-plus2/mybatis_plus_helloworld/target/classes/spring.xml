@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+https://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--引入外部配置文件-->
+    <context:property-placeholder location="classpath:db.properties"></context:property-placeholder>
+   <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${driverClassName}"></property>
+        <property name="url" value="${url}"></property>
+        <property name="username" value="${username}"></property>
+        <property name="password" value="${password}"></property>
+    </bean>
+    <!--添加事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--添加事务注解配置-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--整合spring和mybatis-->
+    <bean id="sqlSessionFactoryBean" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+
+        <!--
+        configLocation  configuration都都代表的是mybatis-config.xml文件中相关的配置
+        configLocation:指定具体的配置文件的位置
+        configuration：将mybatis-config.xml文件中的属性可以拿出来进行直接的配置
+        -->
+<!--        <property name="configLocation" value="classpath:mybatis-config.xml"></property>-->
+<!--        <property name="mapperLocations" value="classpath:com/mashibing/dao/*.xml"></property>-->
+        <property name="configuration" ref="configuration"></property>
+        <property name="globalConfig" ref="globalConfig"></property>
+        <property name="plugins">
+            <array>
+                <!--分页插件-->
+                <bean class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor"></bean>
+                <!--乐观锁插件-->
+<!--                <bean class="com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor"></bean>-->
+                <!--禁止全表更新和删除操作-->
+<!--                <bean class="com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor">-->
+<!--                    <property name="sqlParserList">-->
+<!--                        <list>-->
+<!--                            <bean class="com.baomidou.mybatisplus.extension.parsers.BlockAttackSqlParser"></bean>-->
+<!--                        </list>-->
+<!--                    </property>-->
+<!--                </bean>-->
+                <!--非法sql阻断-->
+<!--                <bean class="com.baomidou.mybatisplus.extension.plugins.IllegalSQLInterceptor"></bean>-->
+            </array>
+        </property>
+     </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.mashibing.dao"></property>
+    </bean>
+
+    <bean id="configuration" class="com.baomidou.mybatisplus.core.MybatisConfiguration">
+        <property name="mapUnderscoreToCamelCase" value="true"></property>
+        <property name="logImpl" value="org.apache.ibatis.logging.log4j.Log4jImpl"></property>
+    </bean>
+
+    <bean id="globalConfig" class="com.baomidou.mybatisplus.core.config.GlobalConfig">
+        <property name="banner" value="false"></property>
+        <property name="dbConfig" ref="dbConfig"></property>
+<!--        <property name="sqlInjector" ref="myInject"></property>-->
+        <property name="metaObjectHandler" ref="myMeta"></property>
+    </bean>
+    <bean id="myMeta" class="com.mashibing.fill.MyMetaObjectHandler"></bean>
+<bean id="myInject" class="com.mashibing.inject.MyInjector"></bean>
+    <bean id="dbConfig" class="com.baomidou.mybatisplus.core.config.GlobalConfig$DbConfig">
+        <property name="tablePrefix" value="tbl_"></property>
+    </bean>
+</beans>
