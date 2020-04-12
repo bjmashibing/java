@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.dao.DeptDao">
+
+    <resultMap id="myDept" type="com.mashibing.bean.Dept">
+        <id column="deptno" property="deptno"></id>
+        <result property="dname" column="dname"></result>
+        <result property="loc" column="loc"></result>
+        <collection property="emps" ofType="com.mashibing.bean.Emp">
+            <id column="empno" property="empno"></id>
+            <result column="ename" property="ename"></result>
+            <result column="job" property="job"></result>
+            <result column="mgr" property="mgr"></result>
+            <result column="hiredate" property="hiredate"></result>
+            <result column="sal" property="sal"></result>
+            <result column="comm" property="comm"></result>
+        </collection>
+    </resultMap>
+   <select id="selectDeptByDeptno" resultMap="myDept">
+       select * from dept left join emp on dept.deptno = emp.deptno where dept.deptno = #{deptno}
+   </select>
+</mapper>
