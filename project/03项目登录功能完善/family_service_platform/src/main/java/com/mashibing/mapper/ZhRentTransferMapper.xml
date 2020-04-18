@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhRentTransferMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhRentTransfer">
+        <id column="id" property="id" />
+        <result column="contract_id" property="contractId" />
+        <result column="transfer_out_id" property="transferOutId" />
+        <result column="transfer_out_name" property="transferOutName" />
+        <result column="transfer_in_id" property="transferInId" />
+        <result column="transfer_in_name" property="transferInName" />
+        <result column="change_name_money" property="changeNameMoney" />
+        <result column="transfer_desc" property="transferDesc" />
+        <result column="transfer_date" property="transferDate" />
+        <result column="operate_person" property="operatePerson" />
+        <result column="operate_date" property="operateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, contract_id, transfer_out_id, transfer_out_name, transfer_in_id, transfer_in_name, change_name_money, transfer_desc, transfer_date, operate_person, operate_date
+    </sql>
+
+</mapper>

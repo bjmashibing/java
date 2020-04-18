@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyEstateOutDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyEstateOutDetail">
+        <id column="id" property="id" />
+        <result column="charge_date" property="chargeDate" />
+        <result column="estate_id" property="estateId" />
+        <result column="output_main_project" property="outputMainProject" />
+        <result column="output_sub_project" property="outputSubProject" />
+        <result column="output_money" property="outputMoney" />
+        <result column="output_money_year" property="outputMoneyYear" />
+        <result column="output_money_main" property="outputMoneyMain" />
+        <result column="status" property="status" />
+        <result column="desc" property="desc" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="next_receive_person_id" property="nextReceivePersonId" />
+        <result column="next_receive_person_name" property="nextReceivePersonName" />
+        <result column="send_check_date" property="sendCheckDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, charge_date, estate_id, output_main_project, output_sub_project, output_money, output_money_year, output_money_main, status, desc, create_person, create_date, update_person, update_date, next_receive_person_id, next_receive_person_name, send_check_date
+    </sql>
+
+</mapper>
