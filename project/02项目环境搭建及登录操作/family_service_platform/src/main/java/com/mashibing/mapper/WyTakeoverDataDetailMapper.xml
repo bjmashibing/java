@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyTakeoverDataDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyTakeoverDataDetail">
+        <id column="id" property="id" />
+        <result column="takeover_id" property="takeoverId" />
+        <result column="data_name" property="dataName" />
+        <result column="data_copies" property="dataCopies" />
+        <result column="data_pages" property="dataPages" />
+        <result column="data_type" property="dataType" />
+        <result column="file_number" property="fileNumber" />
+        <result column="handover_person" property="handoverPerson" />
+        <result column="receive_person" property="receivePerson" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, takeover_id, data_name, data_copies, data_pages, data_type, file_number, handover_person, receive_person, receive_date, remark
+    </sql>
+
+</mapper>

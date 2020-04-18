@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyMoneySettingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyMoneySetting">
+        <id column="id" property="id" />
+        <result column="money_setting_code" property="moneySettingCode" />
+        <result column="money_setting_name" property="moneySettingName" />
+        <result column="receive_type" property="receiveType" />
+        <result column="price_unit" property="priceUnit" />
+        <result column="receive_cycle" property="receiveCycle" />
+        <result column="money_type" property="moneyType" />
+        <result column="is_update_price" property="isUpdatePrice" />
+        <result column="is_convenient_money" property="isConvenientMoney" />
+        <result column="min_used_number" property="minUsedNumber" />
+        <result column="is_step_receive" property="isStepReceive" />
+        <result column="step_condition_1" property="stepCondition1" />
+        <result column="step_price_1" property="stepPrice1" />
+        <result column="step_condition_21" property="stepCondition21" />
+        <result column="step_condition_22" property="stepCondition22" />
+        <result column="step_price_2" property="stepPrice2" />
+        <result column="step_condition_31" property="stepCondition31" />
+        <result column="step_condition_32" property="stepCondition32" />
+        <result column="step_price_3" property="stepPrice3" />
+        <result column="step_condition_41" property="stepCondition41" />
+        <result column="step_condition_42" property="stepCondition42" />
+        <result column="step_price_4" property="stepPrice4" />
+        <result column="step_condition_5" property="stepCondition5" />
+        <result column="step_price_5" property="stepPrice5" />
+        <result column="renew_message" property="renewMessage" />
+        <result column="receive_warn_stop_day" property="receiveWarnStopDay" />
+        <result column="max_warn_number" property="maxWarnNumber" />
+        <result column="ask_message" property="askMessage" />
+        <result column="no_receive_warn_stop_day" property="noReceiveWarnStopDay" />
+        <result column="associate_money_id" property="associateMoneyId" />
+        <result column="delay_rate" property="delayRate" />
+        <result column="delay_over_day" property="delayOverDay" />
+        <result column="company" property="company" />
+        <result column="receive_print_hidden" property="receivePrintHidden" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, money_setting_code, money_setting_name, receive_type, price_unit, receive_cycle, money_type, is_update_price, is_convenient_money, min_used_number, is_step_receive, step_condition_1, step_price_1, step_condition_21, step_condition_22, step_price_2, step_condition_31, step_condition_32, step_price_3, step_condition_41, step_condition_42, step_price_4, step_condition_5, step_price_5, renew_message, receive_warn_stop_day, max_warn_number, ask_message, no_receive_warn_stop_day, associate_money_id, delay_rate, delay_over_day, company, receive_print_hidden
+    </sql>
+
+</mapper>
