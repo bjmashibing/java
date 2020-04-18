@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhRentContractMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhRentContract">
+        <id column="id" property="id" />
+        <result column="contract_id" property="contractId" />
+        <result column="sign_date" property="signDate" />
+        <result column="start_date" property="startDate" />
+        <result column="stop_date" property="stopDate" />
+        <result column="rent_id" property="rentId" />
+        <result column="contact" property="contact" />
+        <result column="start_rent_date" property="startRentDate" />
+        <result column="stop_rent_date" property="stopRentDate" />
+        <result column="contract_rent_money" property="contractRentMoney" />
+        <result column="receive_area" property="receiveArea" />
+        <result column="contract_status" property="contractStatus" />
+        <result column="ensure_money" property="ensureMoney" />
+        <result column="ensure_money_desc" property="ensureMoneyDesc" />
+        <result column="contract_attach" property="contractAttach" />
+        <result column="rent_days" property="rentDays" />
+        <result column="admin_money" property="adminMoney" />
+        <result column="is_rent_money" property="isRentMoney" />
+        <result column="pay_method" property="payMethod" />
+        <result column="remark" property="remark" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="attract_person_id" property="attractPersonId" />
+        <result column="attract_person_name" property="attractPersonName" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, contract_id, sign_date, start_date, stop_date, rent_id, contact, start_rent_date, stop_rent_date, contract_rent_money, receive_area, contract_status, ensure_money, ensure_money_desc, contract_attach, rent_days, admin_money, is_rent_money, pay_method, remark, create_person, create_date, update_person, update_date, attract_person_id, attract_person_name, company
+    </sql>
+
+</mapper>

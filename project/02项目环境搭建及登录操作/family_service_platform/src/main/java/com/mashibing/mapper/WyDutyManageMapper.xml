@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyDutyManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyDutyManage">
+        <id column="id" property="id" />
+        <result column="duty_date" property="dutyDate" />
+        <result column="duty_person" property="dutyPerson" />
+        <result column="duty_type" property="dutyType" />
+        <result column="duty_place" property="dutyPlace" />
+        <result column="duty_record" property="dutyRecord" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, duty_date, duty_person, duty_type, duty_place, duty_record, remark, company
+    </sql>
+
+</mapper>

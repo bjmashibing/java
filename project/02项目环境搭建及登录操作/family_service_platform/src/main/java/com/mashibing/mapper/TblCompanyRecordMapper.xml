@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblCompanyRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblCompanyRecord">
+        <id column="id" property="id" />
+        <result column="company_name" property="companyName" />
+        <result column="company_add" property="companyAdd" />
+        <result column="company_type" property="companyType" />
+        <result column="compant_grade" property="compantGrade" />
+        <result column="parent_company" property="parentCompany" />
+        <result column="leader" property="leader" />
+        <result column="post_code" property="postCode" />
+        <result column="company_phone" property="companyPhone" />
+        <result column="fax_number" property="faxNumber" />
+        <result column="email" property="email" />
+        <result column="simple_desc" property="simpleDesc" />
+        <result column="remark" property="remark" />
+        <result column="input_person" property="inputPerson" />
+        <result column="input_time" property="inputTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, company_name, company_add, company_type, compant_grade, parent_company, leader, post_code, company_phone, fax_number, email, simple_desc, remark, input_person, input_time
+    </sql>
+
+</mapper>
