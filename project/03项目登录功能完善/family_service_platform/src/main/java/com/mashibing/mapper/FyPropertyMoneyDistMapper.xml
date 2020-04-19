@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyPropertyMoneyDistMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyPropertyMoneyDist">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="money_id" property="moneyId" />
+        <result column="is_public_money" property="isPublicMoney" />
+        <result column="current_read_number" property="currentReadNumber" />
+        <result column="last_charge_unit" property="lastChargeUnit" />
+        <result column="floor_factor" property="floorFactor" />
+        <result column="use_number_mult" property="useNumberMult" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, money_id, is_public_money, current_read_number, last_charge_unit, floor_factor, use_number_mult
+    </sql>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblAnswerDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblAnswerData">
+        <id column="id" property="id" />
+        <result column="subject_id" property="subjectId" />
+        <result column="answer_name" property="answerName" />
+        <result column="answer_type" property="answerType" />
+        <result column="input_record_person" property="inputRecordPerson" />
+        <result column="input_record_date" property="inputRecordDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, subject_id, answer_name, answer_type, input_record_person, input_record_date
+    </sql>
+
+</mapper>

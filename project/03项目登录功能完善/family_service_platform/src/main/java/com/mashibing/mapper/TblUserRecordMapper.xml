@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblUserRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblUserRecord">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_type" property="userType" />
+        <result column="user_role" property="userRole" />
+        <result column="user_gender" property="userGender" />
+        <result column="user_dept" property="userDept" />
+        <result column="user_job" property="userJob" />
+        <result column="user_status" property="userStatus" />
+        <result column="office_phone" property="officePhone" />
+        <result column="inner_phone" property="innerPhone" />
+        <result column="move_phone" property="movePhone" />
+        <result column="email" property="email" />
+        <result column="is_send_msg" property="isSendMsg" />
+        <result column="start_date" property="startDate" />
+        <result column="stop_date" property="stopDate" />
+        <result column="birthday" property="birthday" />
+        <result column="ip_rule" property="ipRule" />
+        <result column="user_hiredate" property="userHiredate" />
+        <result column="is_send_wchat" property="isSendWchat" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+        <result column="is_dept_admin" property="isDeptAdmin" />
+        <result column="last_login_date" property="lastLoginDate" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_name, user_password, user_type, user_role, user_gender, user_dept, user_job, user_status, office_phone, inner_phone, move_phone, email, is_send_msg, start_date, stop_date, birthday, ip_rule, user_hiredate, is_send_wchat, remark, company, is_dept_admin, last_login_date, create_person, create_date
+    </sql>
+
+    <resultMap id="loginResult" type="com.mashibing.bean.TblUserRecord">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_type" property="userType" />
+        <result column="user_gender" property="userGender" />
+        <result column="user_job" property="userJob" />
+        <result column="user_status" property="userStatus" />
+        <result column="office_phone" property="officePhone" />
+        <result column="inner_phone" property="innerPhone" />
+        <result column="move_phone" property="movePhone" />
+        <result column="email" property="email" />
+        <result column="is_send_msg" property="isSendMsg" />
+        <result column="start_date" property="startDate" />
+        <result column="stop_date" property="stopDate" />
+        <result column="birthday" property="birthday" />
+        <result column="ip_rule" property="ipRule" />
+        <result column="user_hiredate" property="userHiredate" />
+        <result column="is_send_wchat" property="isSendWchat" />
+        <result column="remark" property="remark" />
+        <result column="is_dept_admin" property="isDeptAdmin" />
+        <result column="last_login_date" property="lastLoginDate" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <association property="tblRole" javaType="com.mashibing.bean.TblRole">
+            <result property="rolePrivileges" column="role_privileges"></result>
+        </association>
+        <association property="tblDept" javaType="com.mashibing.bean.TblDept">
+            <result property="deptPrivileges" column="dept_privileges"></result>
+        </association>
+        <association property="tblCompany" javaType="com.mashibing.bean.TblCompany">
+            <result property="companySimpleName" column="company_simple_name"></result>
+        </association>
+    </resultMap>
+
+    <select id="login" resultMap="loginResult">
+        select a.*,b.dept_privileges,c.role_privileges,d.company_simple_name from tbl_user_record a
+        left join tbl_dept b on a.user_dept = b.id
+        left join tbl_role c on a.user_role = c.id
+        left join tbl_company d on a.company = d.id
+        where a.user_name = #{username} and a.user_password=#{password}
+    </select>
+
+</mapper>

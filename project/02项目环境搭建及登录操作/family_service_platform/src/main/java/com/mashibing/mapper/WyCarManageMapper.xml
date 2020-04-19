@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyCarManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyCarManage">
+        <id column="id" property="id" />
+        <result column="car_licnece" property="carLicnece" />
+        <result column="stop_car_licence" property="stopCarLicence" />
+        <result column="car_owner_name" property="carOwnerName" />
+        <result column="carport" property="carport" />
+        <result column="in_date" property="inDate" />
+        <result column="out_date" property="outDate" />
+        <result column="agent" property="agent" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, car_licnece, stop_car_licence, car_owner_name, carport, in_date, out_date, agent, remark, company
+    </sql>
+
+</mapper>

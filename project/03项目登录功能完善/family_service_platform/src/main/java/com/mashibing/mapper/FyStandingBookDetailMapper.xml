@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyStandingBookDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyStandingBookDetail">
+        <id column="id" property="id" />
+        <result column="standing_book_id" property="standingBookId" />
+        <result column="cell_id" property="cellId" />
+        <result column="customer_name" property="customerName" />
+        <result column="box_id" property="boxId" />
+        <result column="charge_unit" property="chargeUnit" />
+        <result column="price_unit" property="priceUnit" />
+        <result column="last_read_number" property="lastReadNumber" />
+        <result column="current_read_number" property="currentReadNumber" />
+        <result column="current_use_number" property="currentUseNumber" />
+        <result column="should_pay" property="shouldPay" />
+        <result column="last_pay_stop_date" property="lastPayStopDate" />
+        <result column="last_pay_start_date" property="lastPayStartDate" />
+        <result column="current_pay_stop_date" property="currentPayStopDate" />
+        <result column="current_pay_limit_date" property="currentPayLimitDate" />
+        <result column="cost_identify" property="costIdentify" />
+        <result column="receive_identify" property="receiveIdentify" />
+        <result column="receive_id" property="receiveId" />
+        <result column="refund_number" property="refundNumber" />
+        <result column="receive_cycle" property="receiveCycle" />
+        <result column="derate_money" property="derateMoney" />
+        <result column="should_receive" property="shouldReceive" />
+        <result column="invalid_number" property="invalidNumber" />
+        <result column="floor_factor" property="floorFactor" />
+        <result column="derate_delay_money" property="derateDelayMoney" />
+        <result column="pay_mult" property="payMult" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, standing_book_id, cell_id, customer_name, box_id, charge_unit, price_unit, last_read_number, current_read_number, current_use_number, should_pay, last_pay_stop_date, last_pay_start_date, current_pay_stop_date, current_pay_limit_date, cost_identify, receive_identify, receive_id, refund_number, receive_cycle, derate_money, should_receive, invalid_number, floor_factor, derate_delay_money, pay_mult
+    </sql>
+
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyReceiptMainMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyReceiptMain">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="customer_name" property="customerName" />
+        <result column="should_pay_total" property="shouldPayTotal" />
+        <result column="current_should_receive" property="currentShouldReceive" />
+        <result column="discount_money" property="discountMoney" />
+        <result column="receive_method" property="receiveMethod" />
+        <result column="is_customer" property="isCustomer" />
+        <result column="current_real_receive" property="currentRealReceive" />
+        <result column="temporary_money_id" property="temporaryMoneyId" />
+        <result column="estate_id" property="estateId" />
+        <result column="current_delay_money" property="currentDelayMoney" />
+        <result column="last_delay_money" property="lastDelayMoney" />
+        <result column="title" property="title" />
+        <result column="receive_type" property="receiveType" />
+        <result column="receipt_number" property="receiptNumber" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="receive_person" property="receivePerson" />
+        <result column="company" property="company" />
+        <result column="operate_date" property="operateDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="update_reason" property="updateReason" />
+        <result column="receipt_check_status" property="receiptCheckStatus" />
+        <result column="receipt_check_person" property="receiptCheckPerson" />
+        <result column="receipt_check_time" property="receiptCheckTime" />
+        <result column="receipt_check_advice" property="receiptCheckAdvice" />
+        <result column="money_check_status" property="moneyCheckStatus" />
+        <result column="money_check_person" property="moneyCheckPerson" />
+        <result column="money_check_time" property="moneyCheckTime" />
+        <result column="money_check_advice" property="moneyCheckAdvice" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, receive_date, customer_name, should_pay_total, current_should_receive, discount_money, receive_method, is_customer, current_real_receive, temporary_money_id, estate_id, current_delay_money, last_delay_money, title, receive_type, receipt_number, invoice_number, status, remark, receive_person, company, operate_date, update_person, update_date, update_reason, receipt_check_status, receipt_check_person, receipt_check_time, receipt_check_advice, money_check_status, money_check_person, money_check_time, money_check_advice
+    </sql>
+
+</mapper>
