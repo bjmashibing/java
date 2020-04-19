@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyPreReceiveMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyPreReceive">
+        <id column="id" property="id" />
+        <result column="voucher_number" property="voucherNumber" />
+        <result column="cell_id" property="cellId" />
+        <result column="summary" property="summary" />
+        <result column="money" property="money" />
+        <result column="handler_person" property="handlerPerson" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="input_person" property="inputPerson" />
+        <result column="company" property="company" />
+        <result column="receive_method" property="receiveMethod" />
+        <result column="data_source" property="dataSource" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, voucher_number, cell_id, summary, money, handler_person, receive_date, input_person, company, receive_method, data_source, update_person, update_date
+    </sql>
+
+</mapper>

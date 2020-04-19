@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhCustomer">
+        <id column="id" property="id" />
+        <result column="customer_code" property="customerCode" />
+        <result column="customer_pwd" property="customerPwd" />
+        <result column="customer_name" property="customerName" />
+        <result column="customer_birthday" property="customerBirthday" />
+        <result column="customer_gender" property="customerGender" />
+        <result column="open_bank" property="openBank" />
+        <result column="nationality" property="nationality" />
+        <result column="bank_account" property="bankAccount" />
+        <result column="education" property="education" />
+        <result column="certificate_number" property="certificateNumber" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="work_place" property="workPlace" />
+        <result column="customer_duty" property="customerDuty" />
+        <result column="police" property="police" />
+        <result column="nation" property="nation" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="native_place" property="nativePlace" />
+        <result column="address" property="address" />
+        <result column="post_code" property="postCode" />
+        <result column="urgency_user_name" property="urgencyUserName" />
+        <result column="urgency_user_phone" property="urgencyUserPhone" />
+        <result column="urgency_user_address" property="urgencyUserAddress" />
+        <result column="customer_status" property="customerStatus" />
+        <result column="customer_type" property="customerType" />
+        <result column="picture" property="picture" />
+        <result column="remark" property="remark" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="company" property="company" />
+        <result column="is_bank_withhold" property="isBankWithhold" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customer_code, customer_pwd, customer_name, customer_birthday, customer_gender, open_bank, nationality, bank_account, education, certificate_number, certificate_type, work_place, customer_duty, police, nation, phone_number, native_place, address, post_code, urgency_user_name, urgency_user_phone, urgency_user_address, customer_status, customer_type, picture, remark, create_person, create_date, update_person, update_date, company, is_bank_withhold
+    </sql>
+
+</mapper>

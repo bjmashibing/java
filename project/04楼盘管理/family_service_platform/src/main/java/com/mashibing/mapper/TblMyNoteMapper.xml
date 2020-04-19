@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblMyNoteMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblMyNote">
+        <id column="id" property="id" />
+        <result column="create_person_id" property="createPersonId" />
+        <result column="title" property="title" />
+        <result column="type" property="type" />
+        <result column="place" property="place" />
+        <result column="content" property="content" />
+        <result column="is_private" property="isPrivate" />
+        <result column="is_repeat" property="isRepeat" />
+        <result column="repeat" property="repeat" />
+        <result column="repeat_stop" property="repeatStop" />
+        <result column="is_remain" property="isRemain" />
+        <result column="remain_day" property="remainDay" />
+        <result column="start_date" property="startDate" />
+        <result column="stop_date" property="stopDate" />
+        <result column="order_person" property="orderPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_person_id, title, type, place, content, is_private, is_repeat, repeat, repeat_stop, is_remain, remain_day, start_date, stop_date, order_person, create_date
+    </sql>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyPropertyTakeoverSchemaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyPropertyTakeoverSchema">
+        <id column="id" property="id" />
+        <result column="takeover_title" property="takeoverTitle" />
+        <result column="estate_id" property="estateId" />
+        <result column="remark" property="remark" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, takeover_title, estate_id, remark, create_person, create_date
+    </sql>
+
+</mapper>

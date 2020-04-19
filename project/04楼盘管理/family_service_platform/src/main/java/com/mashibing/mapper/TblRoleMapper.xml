@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblRole">
+        <id column="id" property="id" />
+        <result column="role_name" property="roleName" />
+        <result column="role_type" property="roleType" />
+        <result column="role_privileges" property="rolePrivileges" />
+        <result column="role_remark" property="roleRemark" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_name, role_type, role_privileges, role_remark, create_person, create_date
+    </sql>
+
+</mapper>

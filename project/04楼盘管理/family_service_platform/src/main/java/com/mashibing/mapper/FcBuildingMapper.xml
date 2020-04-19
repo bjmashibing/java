@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FcBuildingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FcBuilding">
+        <id column="id" property="id" />
+        <result column="estate_code" property="estateCode" />
+        <result column="building_code" property="buildingCode" />
+        <result column="building_name" property="buildingName" />
+        <result column="building_function" property="buildingFunction" />
+        <result column="used_area" property="usedArea" />
+        <result column="build_area" property="buildArea" />
+        <result column="build_permission_id" property="buildPermissionId" />
+        <result column="sale_permission_id" property="salePermissionId" />
+        <result column="finish_date" property="finishDate" />
+        <result column="over_roof_date" property="overRoofDate" />
+        <result column="decorate" property="decorate" />
+        <result column="struct_type" property="structType" />
+        <result column="damage_grade" property="damageGrade" />
+        <result column="unit_count" property="unitCount" />
+        <result column="building_type" property="buildingType" />
+        <result column="clean_floor" property="cleanFloor" />
+        <result column="mop_floor" property="mopFloor" />
+        <result column="channel_area" property="channelArea" />
+        <result column="elevator" property="elevator" />
+        <result column="channel_door" property="channelDoor" />
+        <result column="evevator_door" property="evevatorDoor" />
+        <result column="water_well_door" property="waterWellDoor" />
+        <result column="electric_well_door" property="electricWellDoor" />
+        <result column="window_shades" property="windowShades" />
+        <result column="hydrant" property="hydrant" />
+        <result column="mirrors" property="mirrors" />
+        <result column="unit_door" property="unitDoor" />
+        <result column="harden_ground_area" property="hardenGroundArea" />
+        <result column="green_area" property="greenArea" />
+        <result column="no_green_area" property="noGreenArea" />
+        <result column="water_by_person" property="waterByPerson" />
+        <result column="is_elevator" property="isElevator" />
+        <result column="is_second_water_electric" property="isSecondWaterElectric" />
+        <result column="random_identify" property="randomIdentify" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, estate_code, building_code, building_name, building_function, used_area, build_area, build_permission_id, sale_permission_id, finish_date, over_roof_date, decorate, struct_type, damage_grade, unit_count, building_type, clean_floor, mop_floor, channel_area, elevator, channel_door, evevator_door, water_well_door, electric_well_door, window_shades, hydrant, mirrors, unit_door, harden_ground_area, green_area, no_green_area, water_by_person, is_elevator, is_second_water_electric, random_identify, remark
+    </sql>
+
+</mapper>
