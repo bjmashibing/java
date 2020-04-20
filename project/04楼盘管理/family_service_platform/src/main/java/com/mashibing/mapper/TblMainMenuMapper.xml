@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblMainMenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblMainMenu">
+        <id column="id" property="id" />
+        <result column="main_menu_name" property="mainMenuName" />
+        <result column="main_menu_url" property="mainMenuUrl" />
+        <result column="main_menu_icon" property="mainMenuIcon" />
+        <result column="main_menu_status" property="mainMenuStatus" />
+        <result column="main_menu_key" property="mainMenuKey" />
+        <result column="main_menu_order" property="mainMenuOrder" />
+        <result column="belong_product" property="belongProduct" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, main_menu_name, main_menu_url, main_menu_icon, main_menu_status, main_menu_key, main_menu_order, belong_product
+    </sql>
+
+</mapper>
