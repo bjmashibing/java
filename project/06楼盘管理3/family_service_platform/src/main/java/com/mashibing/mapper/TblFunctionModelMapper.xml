@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblFunctionModelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblFunctionModel">
+        <id column="id" property="id" />
+        <result column="model_name" property="modelName" />
+        <result column="model_type" property="modelType" />
+        <result column="model_parent" property="modelParent" />
+        <result column="model_status" property="modelStatus" />
+        <result column="model_url" property="modelUrl" />
+        <result column="model_analyse_ref" property="modelAnalyseRef" />
+        <result column="model_report_analyse" property="modelReportAnalyse" />
+        <result column="model_icon" property="modelIcon" />
+        <result column="model_property" property="modelProperty" />
+        <result column="model_desc" property="modelDesc" />
+        <result column="is_control" property="isControl" />
+        <result column="m_full" property="mFull" />
+        <result column="m_add" property="mAdd" />
+        <result column="m_mod" property="mMod" />
+        <result column="m_del" property="mDel" />
+        <result column="m_exp" property="mExp" />
+        <result column="m_aud" property="mAud" />
+        <result column="m_exe" property="mExe" />
+        <result column="m_que" property="mQue" />
+        <result column="d_person" property="dPerson" />
+        <result column="d_dept" property="dDept" />
+        <result column="d_company" property="dCompany" />
+        <result column="orderid" property="orderid" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, model_name, model_type, model_parent, model_status, model_url, model_analyse_ref, model_report_analyse, model_icon, model_property, model_desc, is_control, m_full, m_add, m_mod, m_del, m_exp, m_aud, m_exe, m_que, d_person, d_dept, d_company, orderid, create_person, create_date
+    </sql>
+
+</mapper>

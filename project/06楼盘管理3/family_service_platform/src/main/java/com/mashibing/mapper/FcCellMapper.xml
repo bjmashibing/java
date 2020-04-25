@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FcCellMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FcCell">
+        <id column="id" property="id" />
+        <result column="unit_code" property="unitCode" />
+        <result column="cell_code" property="cellCode" />
+        <result column="cell_name" property="cellName" />
+        <result column="cell_house_code" property="cellHouseCode" />
+        <result column="cell_toward_code" property="cellTowardCode" />
+        <result column="cell_function" property="cellFunction" />
+        <result column="cell_decorate_code" property="cellDecorateCode" />
+        <result column="cell_used_area" property="cellUsedArea" />
+        <result column="cell_build_area" property="cellBuildArea" />
+        <result column="carport_area" property="carportArea" />
+        <result column="car_area" property="carArea" />
+        <result column="loft_area" property="loftArea" />
+        <result column="store_area" property="storeArea" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="last_debt" property="lastDebt" />
+        <result column="property_type" property="propertyType" />
+        <result column="rent_money" property="rentMoney" />
+        <result column="length" property="length" />
+        <result column="width" property="width" />
+        <result column="stall_use" property="stallUse" />
+        <result column="stall_area" property="stallArea" />
+        <result column="is_sale" property="isSale" />
+        <result column="is_rent" property="isRent" />
+        <result column="sale_contract_id" property="saleContractId" />
+        <result column="rent_contract_id" property="rentContractId" />
+        <result column="remark" property="remark" />
+        <result column="factor" property="factor" />
+        <result column="cell_property" property="cellProperty" />
+        <result column="store_id" property="storeId" />
+        <result column="car_licence_id" property="carLicenceId" />
+        <result column="car_space_id" property="carSpaceId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, unit_code, cell_code, cell_name, cell_house_code, cell_toward_code, cell_function, cell_decorate_code, cell_used_area, cell_build_area, carport_area, car_area, loft_area, store_area, floor_number, last_debt, property_type, rent_money, length, width, stall_use, stall_area, is_sale, is_rent, sale_contract_id, rent_contract_id, remark, factor, cell_property, store_id, car_licence_id, car_space_id
+    </sql>
+
+</mapper>
