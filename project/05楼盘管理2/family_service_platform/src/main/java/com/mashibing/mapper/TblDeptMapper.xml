@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblDeptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblDept">
+        <id column="id" property="id" />
+        <result column="dept_code" property="deptCode" />
+        <result column="dept_name" property="deptName" />
+        <result column="dept_leader" property="deptLeader" />
+        <result column="dept_phone" property="deptPhone" />
+        <result column="dept_type" property="deptType" />
+        <result column="dept_fax" property="deptFax" />
+        <result column="dept_parent" property="deptParent" />
+        <result column="dept_line" property="deptLine" />
+        <result column="dept_privileges" property="deptPrivileges" />
+        <result column="dept_manage_privileges" property="deptManagePrivileges" />
+        <result column="organ_category" property="organCategory" />
+        <result column="dept_person_number" property="deptPersonNumber" />
+        <result column="input_person" property="inputPerson" />
+        <result column="input_time" property="inputTime" />
+        <result column="dept_remark" property="deptRemark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, dept_code, dept_name, dept_leader, dept_phone, dept_type, dept_fax, dept_parent, dept_line, dept_privileges, dept_manage_privileges, organ_category, dept_person_number, input_person, input_time, dept_remark
+    </sql>
+
+</mapper>
