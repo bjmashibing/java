@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhRentContractCellMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhRentContractCell">
+        <id column="id" property="id" />
+        <result column="contract_id" property="contractId" />
+        <result column="stall_message" property="stallMessage" />
+        <result column="operate_person" property="operatePerson" />
+        <result column="operate_date" property="operateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, contract_id, stall_message, operate_person, operate_date
+    </sql>
+
+</mapper>

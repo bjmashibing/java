@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblEnvirSettingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblEnvirSetting">
+        <id column="id" property="id" />
+        <result column="logo_name" property="logoName" />
+        <result column="product_name" property="productName" />
+        <result column="version" property="version" />
+        <result column="current_version" property="currentVersion" />
+        <result column="type" property="type" />
+        <result column="is_main" property="isMain" />
+        <result column="custom_text_one" property="customTextOne" />
+        <result column="custom_text_two" property="customTextTwo" />
+        <result column="custom_text_three" property="customTextThree" />
+        <result column="custom_text_four" property="customTextFour" />
+        <result column="set_time" property="setTime" />
+        <result column="product_id" property="productId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, logo_name, product_name, version, current_version, type, is_main, custom_text_one, custom_text_two, custom_text_three, custom_text_four, set_time, product_id
+    </sql>
+
+</mapper>

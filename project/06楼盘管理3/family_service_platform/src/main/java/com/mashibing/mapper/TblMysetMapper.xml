@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblMysetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblMyset">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="id_remain" property="idRemain" />
+        <result column="remain_interval" property="remainInterval" />
+        <result column="remain_window_open" property="remainWindowOpen" />
+        <result column="message_remain" property="messageRemain" />
+        <result column="default_main" property="defaultMain" />
+        <result column="email_all" property="emailAll" />
+        <result column="smtp_addr" property="smtpAddr" />
+        <result column="login_user" property="loginUser" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="mail_port" property="mailPort" />
+        <result column="send_person" property="sendPerson" />
+        <result column="page_count" property="pageCount" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, id_remain, remain_interval, remain_window_open, message_remain, default_main, email_all, smtp_addr, login_user, login_pwd, mail_port, send_person, page_count
+    </sql>
+
+</mapper>

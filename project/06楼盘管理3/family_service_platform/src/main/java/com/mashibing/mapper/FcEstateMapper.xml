@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FcEstateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FcEstate">
+        <id column="id" property="id" />
+        <result column="estate_code" property="estateCode" />
+        <result column="estate_name" property="estateName" />
+        <result column="estate_addr" property="estateAddr" />
+        <result column="cover_area" property="coverArea" />
+        <result column="build_area" property="buildArea" />
+        <result column="green_area" property="greenArea" />
+        <result column="road_area" property="roadArea" />
+        <result column="building_number" property="buildingNumber" />
+        <result column="building_leader" property="buildingLeader" />
+        <result column="company_name" property="companyName" />
+        <result column="company_behalf" property="companyBehalf" />
+        <result column="contact" property="contact" />
+        <result column="contact_phone" property="contactPhone" />
+        <result column="contact_addr" property="contactAddr" />
+        <result column="car_space_delay_rate" property="carSpaceDelayRate" />
+        <result column="car_space_over_day" property="carSpaceOverDay" />
+        <result column="estate_type" property="estateType" />
+        <result column="street_lamp_number" property="streetLampNumber" />
+        <result column="hfcNum" property="hfcNum" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, estate_code, estate_name, estate_addr, cover_area, build_area, green_area, road_area, building_number, building_leader, company_name, company_behalf, contact, contact_phone, contact_addr, car_space_delay_rate, car_space_over_day, estate_type, street_lamp_number, hfcNum, remark, company
+    </sql>
+
+</mapper>

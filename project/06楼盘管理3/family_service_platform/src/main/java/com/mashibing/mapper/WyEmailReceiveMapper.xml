@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyEmailReceiveMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyEmailReceive">
+        <id column="id" property="id" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="get_date" property="getDate" />
+        <result column="email_type" property="emailType" />
+        <result column="receive_unit" property="receiveUnit" />
+        <result column="number" property="number" />
+        <result column="get_person" property="getPerson" />
+        <result column="card_type" property="cardType" />
+        <result column="card" property="card" />
+        <result column="agent" property="agent" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, receive_date, get_date, email_type, receive_unit, number, get_person, card_type, card, agent, remark, company
+    </sql>
+
+</mapper>

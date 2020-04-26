@@ -968,11 +968,11 @@ public class MySecondInterceptor implements HandlerInterceptor {
 
 ​		2、过滤器依赖于servlet容器，而拦截器不依赖与Servlet容器
 
-​		3、连接器几乎对所有的请求都起作用和，而拦截器只能对action请求起作用
+​		3、过滤器几乎对所有的请求都起作用，而拦截器只能对action请求起作用
 
 ​		4、拦截器可以访问action的上下文，而过滤器不可以
 
-​		5、在action的生命周期中，拦截器可以多次调用，而过滤器只能在容器初始化的时候调用一次
+​		5、在controller的生命周期中，拦截器可以多次调用，而过滤器只能在web容器初始化的时候初始化一次，后续匹配的所有请求都会经过过滤器来进行过滤
 
 ![image-20200313190146352](image\拦截器跟过滤器的执行流程.png)
 

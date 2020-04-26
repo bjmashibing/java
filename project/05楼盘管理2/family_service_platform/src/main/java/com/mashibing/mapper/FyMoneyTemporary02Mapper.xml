@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyMoneyTemporary02Mapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyMoneyTemporary02">
+        <id column="id" property="id" />
+        <result column="money_id" property="moneyId" />
+        <result column="record_name" property="recordName" />
+        <result column="record_remark" property="recordRemark" />
+        <result column="cell_id" property="cellId" />
+        <result column="estate_name" property="estateName" />
+        <result column="building_name" property="buildingName" />
+        <result column="unit_name" property="unitName" />
+        <result column="cell_name" property="cellName" />
+        <result column="customer_name" property="customerName" />
+        <result column="charge_unit" property="chargeUnit" />
+        <result column="price_unit" property="priceUnit" />
+        <result column="should_pay" property="shouldPay" />
+        <result column="last_pay_stop_date" property="lastPayStopDate" />
+        <result column="current_pay_start_date" property="currentPayStartDate" />
+        <result column="current_pay_stop_date" property="currentPayStopDate" />
+        <result column="current_pay_limit_date" property="currentPayLimitDate" />
+        <result column="receive_cycle" property="receiveCycle" />
+        <result column="operate_person" property="operatePerson" />
+        <result column="operate_date" property="operateDate" />
+        <result column="floor_factor" property="floorFactor" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, money_id, record_name, record_remark, cell_id, estate_name, building_name, unit_name, cell_name, customer_name, charge_unit, price_unit, should_pay, last_pay_stop_date, current_pay_start_date, current_pay_stop_date, current_pay_limit_date, receive_cycle, operate_person, operate_date, floor_factor
+    </sql>
+
+</mapper>
