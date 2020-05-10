@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhCustomerAskFixMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhCustomerAskFix">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="proposer" property="proposer" />
+        <result column="proposer_date" property="proposerDate" />
+        <result column="ask_fix_content" property="askFixContent" />
+        <result column="check_person" property="checkPerson" />
+        <result column="fix_money" property="fixMoney" />
+        <result column="check_date" property="checkDate" />
+        <result column="check_advice" property="checkAdvice" />
+        <result column="leader_phone" property="leaderPhone" />
+        <result column="execute_company" property="executeCompany" />
+        <result column="execute_start_date" property="executeStartDate" />
+        <result column="leader" property="leader" />
+        <result column="checked_person" property="checkedPerson" />
+        <result column="execute_stop_date" property="executeStopDate" />
+        <result column="checked_date" property="checkedDate" />
+        <result column="checked_advice" property="checkedAdvice" />
+        <result column="remark" property="remark" />
+        <result column="status" property="status" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="identify" property="identify" />
+        <result column="confirm_person" property="confirmPerson" />
+        <result column="confirm_date" property="confirmDate" />
+        <result column="checked_attach" property="checkedAttach" />
+        <result column="refer_attach" property="referAttach" />
+        <result column="phone_number" property="phoneNumber" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, proposer, proposer_date, ask_fix_content, check_person, fix_money, check_date, check_advice, leader_phone, execute_company, execute_start_date, leader, checked_person, execute_stop_date, checked_date, checked_advice, remark, status, create_person, create_date, identify, confirm_person, confirm_date, checked_attach, refer_attach, phone_number
+    </sql>
+
+</mapper>

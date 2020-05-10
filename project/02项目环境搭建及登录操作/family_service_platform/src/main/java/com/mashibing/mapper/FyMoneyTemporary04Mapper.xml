@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyMoneyTemporary04Mapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyMoneyTemporary04">
+        <id column="id" property="id" />
+        <result column="money_setting_code" property="moneySettingCode" />
+        <result column="cell_id" property="cellId" />
+        <result column="estate_name" property="estateName" />
+        <result column="building_name" property="buildingName" />
+        <result column="unit_name" property="unitName" />
+        <result column="cell_name" property="cellName" />
+        <result column="customer_name" property="customerName" />
+        <result column="box_id" property="boxId" />
+        <result column="share_money" property="shareMoney" />
+        <result column="current_share_number" property="currentShareNumber" />
+        <result column="price_unit" property="priceUnit" />
+        <result column="current_pay_start_date" property="currentPayStartDate" />
+        <result column="current_pay_stop_date" property="currentPayStopDate" />
+        <result column="current_pay_limit_date" property="currentPayLimitDate" />
+        <result column="receive_cycle" property="receiveCycle" />
+        <result column="primary_identify" property="primaryIdentify" />
+        <result column="operate_person" property="operatePerson" />
+        <result column="operate_date" property="operateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, money_setting_code, cell_id, estate_name, building_name, unit_name, cell_name, customer_name, box_id, share_money, current_share_number, price_unit, current_pay_start_date, current_pay_stop_date, current_pay_limit_date, receive_cycle, primary_identify, operate_person, operate_date
+    </sql>
+
+</mapper>

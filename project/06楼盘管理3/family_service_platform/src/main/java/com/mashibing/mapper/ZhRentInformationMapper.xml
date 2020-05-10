@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhRentInformationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhRentInformation">
+        <id column="id" property="id" />
+        <result column="rent_code" property="rentCode" />
+        <result column="rent_name" property="rentName" />
+        <result column="member_of_right" property="memberOfRight" />
+        <result column="rent_type" property="rentType" />
+        <result column="contact" property="contact" />
+        <result column="gender" property="gender" />
+        <result column="home_number" property="homeNumber" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="addr" property="addr" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="main_sale" property="mainSale" />
+        <result column="certificate_number" property="certificateNumber" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="picture_url" property="pictureUrl" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="company" property="company" />
+        <result column="pwd" property="pwd" />
+        <result column="rent_attach" property="rentAttach" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, rent_code, rent_name, member_of_right, rent_type, contact, gender, home_number, phone_number, addr, certificate_type, main_sale, certificate_number, status, remark, picture_url, create_person, create_date, update_person, update_date, company, pwd, rent_attach
+    </sql>
+
+</mapper>

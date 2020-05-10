@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyRenewMsgRemindLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyRenewMsgRemindLog">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="money_id" property="moneyId" />
+        <result column="receive_phone" property="receivePhone" />
+        <result column="money_stop_date" property="moneyStopDate" />
+        <result column="remind_days" property="remindDays" />
+        <result column="cell_name" property="cellName" />
+        <result column="send_person_id" property="sendPersonId" />
+        <result column="send_person_name" property="sendPersonName" />
+        <result column="send_date" property="sendDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, money_id, receive_phone, money_stop_date, remind_days, cell_name, send_person_id, send_person_name, send_date
+    </sql>
+
+</mapper>

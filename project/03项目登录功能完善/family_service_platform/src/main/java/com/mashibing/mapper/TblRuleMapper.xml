@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblRuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblRule">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="use_range" property="useRange" />
+        <result column="category" property="category" />
+        <result column="article_number" property="articleNumber" />
+        <result column="level" property="level" />
+        <result column="secret_level" property="secretLevel" />
+        <result column="title_word" property="titleWord" />
+        <result column="publish_company" property="publishCompany" />
+        <result column="attach_name" property="attachName" />
+        <result column="attach_path" property="attachPath" />
+        <result column="status" property="status" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="check_person" property="checkPerson" />
+        <result column="check_date" property="checkDate" />
+        <result column="check_advice" property="checkAdvice" />
+        <result column="allow_user_code" property="allowUserCode" />
+        <result column="allow_user_name" property="allowUserName" />
+        <result column="rule_attach" property="ruleAttach" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, use_range, category, article_number, level, secret_level, title_word, publish_company, attach_name, attach_path, status, create_person, create_date, check_person, check_date, check_advice, allow_user_code, allow_user_name, rule_attach
+    </sql>
+
+</mapper>

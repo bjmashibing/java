@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyCarSpaceRentDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyCarSpaceRentDetail">
+        <id column="id" property="id" />
+        <result column="rent_id" property="rentId" />
+        <result column="pay_type" property="payType" />
+        <result column="pay_start_date" property="payStartDate" />
+        <result column="pay_stop_date" property="payStopDate" />
+        <result column="should_receive" property="shouldReceive" />
+        <result column="discount_money" property="discountMoney" />
+        <result column="delay_money" property="delayMoney" />
+        <result column="real_receive_money" property="realReceiveMoney" />
+        <result column="desc" property="desc" />
+        <result column="receive_id" property="receiveId" />
+        <result column="receive_person_name" property="receivePersonName" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="receive_status" property="receiveStatus" />
+        <result column="invalid_person_id" property="invalidPersonId" />
+        <result column="invalid_person_name" property="invalidPersonName" />
+        <result column="invalid_reason" property="invalidReason" />
+        <result column="invalid_date" property="invalidDate" />
+        <result column="receipt_check_status" property="receiptCheckStatus" />
+        <result column="receipt_check_person" property="receiptCheckPerson" />
+        <result column="receipt_check_time" property="receiptCheckTime" />
+        <result column="receipt_check_advice" property="receiptCheckAdvice" />
+        <result column="money_check_status" property="moneyCheckStatus" />
+        <result column="money_check_person" property="moneyCheckPerson" />
+        <result column="money_check_time" property="moneyCheckTime" />
+        <result column="money_check_advice" property="moneyCheckAdvice" />
+        <result column="invalid_check_status" property="invalidCheckStatus" />
+        <result column="invalid_check_person" property="invalidCheckPerson" />
+        <result column="invalid_check_time" property="invalidCheckTime" />
+        <result column="invalid_check_advice" property="invalidCheckAdvice" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, rent_id, pay_type, pay_start_date, pay_stop_date, should_receive, discount_money, delay_money, real_receive_money, desc, receive_id, receive_person_name, receive_date, invoice_number, receive_status, invalid_person_id, invalid_person_name, invalid_reason, invalid_date, receipt_check_status, receipt_check_person, receipt_check_time, receipt_check_advice, money_check_status, money_check_person, money_check_time, money_check_advice, invalid_check_status, invalid_check_person, invalid_check_time, invalid_check_advice
+    </sql>
+
+</mapper>

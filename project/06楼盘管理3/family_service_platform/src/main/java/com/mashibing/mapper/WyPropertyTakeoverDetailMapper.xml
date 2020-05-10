@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyPropertyTakeoverDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyPropertyTakeoverDetail">
+        <id column="id" property="id" />
+        <result column="takeover_id" property="takeoverId" />
+        <result column="project_name" property="projectName" />
+        <result column="checked" property="checked" />
+        <result column="checked_date" property="checkedDate" />
+        <result column="checked_result" property="checkedResult" />
+        <result column="finish_date" property="finishDate" />
+        <result column="finish_condition" property="finishCondition" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, takeover_id, project_name, checked, checked_date, checked_result, finish_date, finish_condition, remark
+    </sql>
+
+</mapper>

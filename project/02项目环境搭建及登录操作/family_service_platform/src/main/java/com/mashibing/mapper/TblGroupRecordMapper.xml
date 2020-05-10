@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblGroupRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblGroupRecord">
+        <result column="group_record_id" property="groupRecordId" />
+        <result column="group_name" property="groupName" />
+        <result column="group_type" property="groupType" />
+        <result column="group_desc" property="groupDesc" />
+        <result column="group_member_id" property="groupMemberId" />
+        <result column="group_member_name" property="groupMemberName" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        group_record_id, group_name, group_type, group_desc, group_member_id, group_member_name, create_person, create_date
+    </sql>
+
+</mapper>

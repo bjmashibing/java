@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FcCellAddbuildMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FcCellAddbuild">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="addbuild_area" property="addbuildArea" />
+        <result column="addbuild_time" property="addbuildTime" />
+        <result column="addbuild_state" property="addbuildState" />
+        <result column="addbuild_desc" property="addbuildDesc" />
+        <result column="addbuild_accessory" property="addbuildAccessory" />
+        <result column="operate_person" property="operatePerson" />
+        <result column="operate_date" property="operateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, addbuild_area, addbuild_time, addbuild_state, addbuild_desc, addbuild_accessory, operate_person, operate_date
+    </sql>
+
+</mapper>

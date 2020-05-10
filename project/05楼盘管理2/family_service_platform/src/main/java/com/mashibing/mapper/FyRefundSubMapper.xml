@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyRefundSubMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyRefundSub">
+        <id column="id" property="id" />
+        <result column="refund_id" property="refundId" />
+        <result column="money_setting_name" property="moneySettingName" />
+        <result column="charge_unit" property="chargeUnit" />
+        <result column="last_read_number" property="lastReadNumber" />
+        <result column="current_read_number" property="currentReadNumber" />
+        <result column="real_used" property="realUsed" />
+        <result column="money" property="money" />
+        <result column="delay_money" property="delayMoney" />
+        <result column="current_should_pay" property="currentShouldPay" />
+        <result column="over_day" property="overDay" />
+        <result column="money_start_date" property="moneyStartDate" />
+        <result column="money_stop_date" property="moneyStopDate" />
+        <result column="pay_limit_day" property="payLimitDay" />
+        <result column="input_person" property="inputPerson" />
+        <result column="standing_book_id" property="standingBookId" />
+        <result column="receive_cycle" property="receiveCycle" />
+        <result column="money_derate" property="moneyDerate" />
+        <result column="money_id" property="moneyId" />
+        <result column="delay_derate_money" property="delayDerateMoney" />
+        <result column="money_mult" property="moneyMult" />
+        <result column="floor_factor" property="floorFactor" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, refund_id, money_setting_name, charge_unit, last_read_number, current_read_number, real_used, money, delay_money, current_should_pay, over_day, money_start_date, money_stop_date, pay_limit_day, input_person, standing_book_id, receive_cycle, money_derate, money_id, delay_derate_money, money_mult, floor_factor
+    </sql>
+
+</mapper>

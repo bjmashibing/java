@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhCustomerEstateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhCustomerEstate">
+        <id column="id" property="id" />
+        <result column="customer_id" property="customerId" />
+        <result column="customer_name" property="customerName" />
+        <result column="cell_id" property="cellId" />
+        <result column="use_status" property="useStatus" />
+        <result column="live_date" property="liveDate" />
+        <result column="decorate_date" property="decorateDate" />
+        <result column="subscription_card_number" property="subscriptionCardNumber" />
+        <result column="house_code" property="houseCode" />
+        <result column="is_pay_decorate_money" property="isPayDecorateMoney" />
+        <result column="pre_pay_decorate_money" property="prePayDecorateMoney" />
+        <result column="remark" property="remark" />
+        <result column="orderid" property="orderid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customer_id, customer_name, cell_id, use_status, live_date, decorate_date, subscription_card_number, house_code, is_pay_decorate_money, pre_pay_decorate_money, remark, orderid
+    </sql>
+
+</mapper>

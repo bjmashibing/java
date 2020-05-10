@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhRentContractReturnMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhRentContractReturn">
+        <id column="id" property="id" />
+        <result column="contract_id" property="contractId" />
+        <result column="rent_id" property="rentId" />
+        <result column="rent_name" property="rentName" />
+        <result column="return_money_start" property="returnMoneyStart" />
+        <result column="return_money_stop" property="returnMoneyStop" />
+        <result column="return_cardinal_money" property="returnCardinalMoney" />
+        <result column="return_rate" property="returnRate" />
+        <result column="current_return_money" property="currentReturnMoney" />
+        <result column="return_money_status" property="returnMoneyStatus" />
+        <result column="return_money_desc" property="returnMoneyDesc" />
+        <result column="operate_id" property="operateId" />
+        <result column="operate_name" property="operateName" />
+        <result column="operate_date" property="operateDate" />
+        <result column="invalid_id" property="invalidId" />
+        <result column="invalid_person" property="invalidPerson" />
+        <result column="invalid_date" property="invalidDate" />
+        <result column="invalid_reason" property="invalidReason" />
+        <result column="update_person_id" property="updatePersonId" />
+        <result column="update_person_name" property="updatePersonName" />
+        <result column="update_date" property="updateDate" />
+        <result column="update_reason" property="updateReason" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, contract_id, rent_id, rent_name, return_money_start, return_money_stop, return_cardinal_money, return_rate, current_return_money, return_money_status, return_money_desc, operate_id, operate_name, operate_date, invalid_id, invalid_person, invalid_date, invalid_reason, update_person_id, update_person_name, update_date, update_reason
+    </sql>
+
+</mapper>
