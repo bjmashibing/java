@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyVisitManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyVisitManage">
+        <id column="id" property="id" />
+        <result column="visit_date" property="visitDate" />
+        <result column="leave_date" property="leaveDate" />
+        <result column="visit_person" property="visitPerson" />
+        <result column="id_card" property="idCard" />
+        <result column="visit_addr" property="visitAddr" />
+        <result column="visit_reason" property="visitReason" />
+        <result column="visited_person" property="visitedPerson" />
+        <result column="visited_reason" property="visitedReason" />
+        <result column="agent" property="agent" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, visit_date, leave_date, visit_person, id_card, visit_addr, visit_reason, visited_person, visited_reason, agent, remark, company
+    </sql>
+
+</mapper>

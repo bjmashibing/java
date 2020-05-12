@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhCustomerCheckMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhCustomerCheck">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="check_date" property="checkDate" />
+        <result column="confirm_date" property="confirmDate" />
+        <result column="check_item_id" property="checkItemId" />
+        <result column="check_item_name" property="checkItemName" />
+        <result column="is_pass" property="isPass" />
+        <result column="consumer_advice" property="consumerAdvice" />
+        <result column="house_keeper_advice" property="houseKeeperAdvice" />
+        <result column="check_person" property="checkPerson" />
+        <result column="remark" property="remark" />
+        <result column="input_person" property="inputPerson" />
+        <result column="input_date" property="inputDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="check_house_type" property="checkHouseType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, check_date, confirm_date, check_item_id, check_item_name, is_pass, consumer_advice, house_keeper_advice, check_person, remark, input_person, input_date, update_person, update_date, check_house_type
+    </sql>
+
+</mapper>

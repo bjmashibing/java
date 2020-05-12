@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhConsumerComplainMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhConsumerComplain">
+        <id column="id" property="id" />
+        <result column="cell_id" property="cellId" />
+        <result column="complain_person" property="complainPerson" />
+        <result column="complain_phone" property="complainPhone" />
+        <result column="complain_date" property="complainDate" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="reception_person" property="receptionPerson" />
+        <result column="complain_type" property="complainType" />
+        <result column="status" property="status" />
+        <result column="start_accept_person" property="startAcceptPerson" />
+        <result column="start_accept_date" property="startAcceptDate" />
+        <result column="accept_result" property="acceptResult" />
+        <result column="accept_finish_person" property="acceptFinishPerson" />
+        <result column="accept_finish_date" property="acceptFinishDate" />
+        <result column="datasource" property="datasource" />
+        <result column="refer_attach" property="referAttach" />
+        <result column="return_visit_person" property="returnVisitPerson" />
+        <result column="return_visit_date" property="returnVisitDate" />
+        <result column="is_satisfy" property="isSatisfy" />
+        <result column="customer_evaluate" property="customerEvaluate" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cell_id, complain_person, complain_phone, complain_date, phone_number, reception_person, complain_type, status, start_accept_person, start_accept_date, accept_result, accept_finish_person, accept_finish_date, datasource, refer_attach, return_visit_person, return_visit_date, is_satisfy, customer_evaluate, create_person, create_date
+    </sql>
+
+</mapper>

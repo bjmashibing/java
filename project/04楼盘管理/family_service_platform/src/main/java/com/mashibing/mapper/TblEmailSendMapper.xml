@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblEmailSendMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblEmailSend">
+        <id column="id" property="id" />
+        <result column="receive_person_code" property="receivePersonCode" />
+        <result column="receive_person_name" property="receivePersonName" />
+        <result column="email_title" property="emailTitle" />
+        <result column="email_content" property="emailContent" />
+        <result column="important_grade" property="importantGrade" />
+        <result column="is_draft" property="isDraft" />
+        <result column="is_delete" property="isDelete" />
+        <result column="is_secret_send" property="isSecretSend" />
+        <result column="email_attach" property="emailAttach" />
+        <result column="send_type" property="sendType" />
+        <result column="send_person" property="sendPerson" />
+        <result column="send_name" property="sendName" />
+        <result column="send_date" property="sendDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, receive_person_code, receive_person_name, email_title, email_content, important_grade, is_draft, is_delete, is_secret_send, email_attach, send_type, send_person, send_name, send_date
+    </sql>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyStandingBookMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyStandingBook">
+        <id column="id" property="id" />
+        <result column="standing_book_name" property="standingBookName" />
+        <result column="associate_cost_code" property="associateCostCode" />
+        <result column="remark" property="remark" />
+        <result column="creation_date" property="creationDate" />
+        <result column="creation_person" property="creationPerson" />
+        <result column="associate_standing_book_id" property="associateStandingBookId" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, standing_book_name, associate_cost_code, remark, creation_date, creation_person, associate_standing_book_id, company
+    </sql>
+
+</mapper>

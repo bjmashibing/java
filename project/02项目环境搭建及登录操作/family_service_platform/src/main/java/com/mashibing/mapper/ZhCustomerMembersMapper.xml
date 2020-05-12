@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.ZhCustomerMembersMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.ZhCustomerMembers">
+        <id column="id" property="id" />
+        <result column="belong_customer_id" property="belongCustomerId" />
+        <result column="name" property="name" />
+        <result column="birdate" property="birdate" />
+        <result column="gender" property="gender" />
+        <result column="ration" property="ration" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="certificate_number" property="certificateNumber" />
+        <result column="education" property="education" />
+        <result column="remark" property="remark" />
+        <result column="work_place" property="workPlace" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="picture" property="picture" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, belong_customer_id, name, birdate, gender, ration, certificate_type, certificate_number, education, remark, work_place, phone_number, picture
+    </sql>
+
+</mapper>

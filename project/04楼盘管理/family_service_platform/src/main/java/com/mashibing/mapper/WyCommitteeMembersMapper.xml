@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyCommitteeMembersMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyCommitteeMembers">
+        <id column="id" property="id" />
+        <result column="member_code" property="memberCode" />
+        <result column="member_name" property="memberName" />
+        <result column="member_duty" property="memberDuty" />
+        <result column="birthday" property="birthday" />
+        <result column="gender" property="gender" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="work_place" property="workPlace" />
+        <result column="self_introduce" property="selfIntroduce" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, member_code, member_name, member_duty, birthday, gender, phone_number, work_place, self_introduce, remark, company
+    </sql>
+
+</mapper>

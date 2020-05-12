@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyServiceCashierGroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyServiceCashierGroup">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="include_building_code" property="includeBuildingCode" />
+        <result column="include_building_name" property="includeBuildingName" />
+        <result column="include_service_code" property="includeServiceCode" />
+        <result column="include_service_name" property="includeServiceName" />
+        <result column="desc" property="desc" />
+        <result column="company" property="company" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, include_building_code, include_building_name, include_service_code, include_service_name, desc, company, create_person, create_date, update_person, update_date
+    </sql>
+
+</mapper>

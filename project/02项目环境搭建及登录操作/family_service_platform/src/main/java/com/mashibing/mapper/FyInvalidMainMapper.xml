@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyInvalidMainMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyInvalidMain">
+        <id column="invalid_id" property="invalidId" />
+        <result column="receive_id" property="receiveId" />
+        <result column="cell_id" property="cellId" />
+        <result column="receive_date" property="receiveDate" />
+        <result column="customer_name" property="customerName" />
+        <result column="money" property="money" />
+        <result column="real_receive_money" property="realReceiveMoney" />
+        <result column="discount_money" property="discountMoney" />
+        <result column="receive_method" property="receiveMethod" />
+        <result column="is_customer" property="isCustomer" />
+        <result column="receive_money" property="receiveMoney" />
+        <result column="money_id" property="moneyId" />
+        <result column="estate_id" property="estateId" />
+        <result column="current_delay_money" property="currentDelayMoney" />
+        <result column="last_delay_money" property="lastDelayMoney" />
+        <result column="invalid_type" property="invalidType" />
+        <result column="receipt_number" property="receiptNumber" />
+        <result column="invoice_number" property="invoiceNumber" />
+        <result column="receive_person" property="receivePerson" />
+        <result column="remark" property="remark" />
+        <result column="company" property="company" />
+        <result column="invalid_reason" property="invalidReason" />
+        <result column="invalid_date" property="invalidDate" />
+        <result column="invalid_person" property="invalidPerson" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        invalid_id, receive_id, cell_id, receive_date, customer_name, money, real_receive_money, discount_money, receive_method, is_customer, receive_money, money_id, estate_id, current_delay_money, last_delay_money, invalid_type, receipt_number, invoice_number, receive_person, remark, company, invalid_reason, invalid_date, invalid_person
+    </sql>
+
+</mapper>

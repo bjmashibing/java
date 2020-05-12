@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblMyplanMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblMyplan">
+        <id column="id" property="id" />
+        <result column="plan_theme" property="planTheme" />
+        <result column="plan_addr" property="planAddr" />
+        <result column="start_date" property="startDate" />
+        <result column="stop_date" property="stopDate" />
+        <result column="plan_type" property="planType" />
+        <result column="plan_status" property="planStatus" />
+        <result column="plan_prior" property="planPrior" />
+        <result column="field_bak" property="fieldBak" />
+        <result column="plan_desc" property="planDesc" />
+        <result column="attach_name" property="attachName" />
+        <result column="attach_url" property="attachUrl" />
+        <result column="owner" property="owner" />
+        <result column="create_date" property="createDate" />
+        <result column="plan_attach" property="planAttach" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, plan_theme, plan_addr, start_date, stop_date, plan_type, plan_status, plan_prior, field_bak, plan_desc, attach_name, attach_url, owner, create_date, plan_attach
+    </sql>
+
+</mapper>
