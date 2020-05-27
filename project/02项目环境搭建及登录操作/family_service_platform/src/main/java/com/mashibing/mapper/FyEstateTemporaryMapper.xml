@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.FyEstateTemporaryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.FyEstateTemporary">
+        <result column="company" property="company" />
+        <result column="estate_code" property="estateCode" />
+        <result column="estate_name" property="estateName" />
+        <result column="building_code" property="buildingCode" />
+        <result column="building_name" property="buildingName" />
+        <result column="unit_code" property="unitCode" />
+        <result column="unit_name" property="unitName" />
+        <result column="cell_code" property="cellCode" />
+        <result column="cell_name" property="cellName" />
+        <result column="build_area" property="buildArea" />
+        <result column="floor_number" property="floorNumber" />
+        <result column="function" property="function" />
+        <result column="remark" property="remark" />
+        <result column="operate_person" property="operatePerson" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        company, estate_code, estate_name, building_code, building_name, unit_code, unit_name, cell_code, cell_name, build_area, floor_number, function, remark, operate_person
+    </sql>
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblVodMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblVod">
+        <id column="id" property="id" />
+        <result column="video_name" property="videoName" />
+        <result column="video_source" property="videoSource" />
+        <result column="videl_type" property="videlType" />
+        <result column="program_name" property="programName" />
+        <result column="program_url" property="programUrl" />
+        <result column="simple_intro" property="simpleIntro" />
+        <result column="is_first" property="isFirst" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, video_name, video_source, videl_type, program_name, program_url, simple_intro, is_first, create_person, create_date
+    </sql>
+
+</mapper>

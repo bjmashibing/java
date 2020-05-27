@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.WyCarSpaceManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.WyCarSpaceManage">
+        <id column="id" property="id" />
+        <result column="car_space_type" property="carSpaceType" />
+        <result column="car_licence_id" property="carLicenceId" />
+        <result column="pre_sale_price" property="preSalePrice" />
+        <result column="pre_rent_price" property="preRentPrice" />
+        <result column="stop_car_licence" property="stopCarLicence" />
+        <result column="estate_id" property="estateId" />
+        <result column="manage_type" property="manageType" />
+        <result column="car_sapce_position" property="carSapcePosition" />
+        <result column="car_sapce_area" property="carSapceArea" />
+        <result column="owner_id" property="ownerId" />
+        <result column="owner_name" property="ownerName" />
+        <result column="real_sale_price" property="realSalePrice" />
+        <result column="car_space_category" property="carSpaceCategory" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="create_person" property="createPerson" />
+        <result column="create_date" property="createDate" />
+        <result column="update_person" property="updatePerson" />
+        <result column="update_date" property="updateDate" />
+        <result column="sale_person" property="salePerson" />
+        <result column="sale_date" property="saleDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, car_space_type, car_licence_id, pre_sale_price, pre_rent_price, stop_car_licence, estate_id, manage_type, car_sapce_position, car_sapce_area, owner_id, owner_name, real_sale_price, car_space_category, status, remark, create_person, create_date, update_person, update_date, sale_person, sale_date
+    </sql>
+
+</mapper>

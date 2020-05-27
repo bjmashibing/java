@@ -1,0 +1,21 @@
+#项目启动端口
+server:
+  port: 8080
+#数据源配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/family_service_platform?serverTimezone=UTC&useSSL=false
+    password: 123456
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#配置mybatis
+mybatis:
+  mapper-locations: classpath:com/mashibing/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+#sql语句日志打印
+logging:
+  level:
+    com:
+      mashibing:
+        mapper: debug

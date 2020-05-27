@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mashibing.mapper.TblCompanyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mashibing.bean.TblCompany">
+        <id column="id" property="id" />
+        <result column="company_full_name" property="companyFullName" />
+        <result column="company_simple_name" property="companySimpleName" />
+        <result column="company_english_name" property="companyEnglishName" />
+        <result column="company_brand" property="companyBrand" />
+        <result column="company_type" property="companyType" />
+        <result column="company_trade" property="companyTrade" />
+        <result column="company_addr" property="companyAddr" />
+        <result column="post_code" property="postCode" />
+        <result column="company_phone" property="companyPhone" />
+        <result column="company_fax" property="companyFax" />
+        <result column="company_website" property="companyWebsite" />
+        <result column="company_email" property="companyEmail" />
+        <result column="company_national" property="companyNational" />
+        <result column="company_land" property="companyLand" />
+        <result column="open_bank" property="openBank" />
+        <result column="bank_account" property="bankAccount" />
+        <result column="company_leader" property="companyLeader" />
+        <result column="register_date" property="registerDate" />
+        <result column="register_money" property="registerMoney" />
+        <result column="employee_number" property="employeeNumber" />
+        <result column="company_intro" property="companyIntro" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, company_full_name, company_simple_name, company_english_name, company_brand, company_type, company_trade, company_addr, post_code, company_phone, company_fax, company_website, company_email, company_national, company_land, open_bank, bank_account, company_leader, register_date, register_money, employee_number, company_intro, remark
+    </sql>
+
+</mapper>
